@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión – WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+<div id="google_translate_element" class="traductor-widget"></div>
+
+<div class="login-container">
+    <div class="left-panel">
+        <div class="logo-login">Way<span class="orange">Path</span></div>
+        <div class="overlay-content">
+            <h2>Bienvenido</h2>
+            <h1>de nuevo</h1>
+            <p>Inicia sesión y continúa planificando tu próxima aventura</p>
+        </div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="top-actions">
+            <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+            <div class="register-link">
+                ¿No tienes una cuenta? <a href="registro.html">Regístrate</a>
+            </div>
+        </div>
+        
+        <h1>Iniciar Sesión</h1>
+        
+        <form id="loginForm">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" required>
+            
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" required>
+            
+            <div class="forgot">
+                <a href="#">¿Olvidaste tu contraseña?</a>
+            </div>
+            
+            <button type="submit">Iniciar sesión</button>
+        </form>
+        
+        <div class="divider"></div>
+        
+        <div class="terms">
+            <i class="fa-solid fa-shield-check shield"></i>
+            <p>Al iniciar sesión aceptas nuestros <a href="#">Términos y Condiciones</a> y nuestra <a href="#">Política de Privacidad</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="js/accesibilidad.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const name = email.split('@')[0];
+    localStorage.setItem('waypath_usuario', name);
+    window.location.href = 'index.html';
+});
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

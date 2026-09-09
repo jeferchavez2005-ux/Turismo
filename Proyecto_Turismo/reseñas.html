@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestras Reseñas – WayPath</title>
+    <meta name="description" content="Lee las opiniones de los viajeros que ya vivieron experiencias únicas con WayPath. Más de 1,200 reseñas verificadas.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/reseñas.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menú principal">
+            <a href="servicios.html" class="nav-link">Nuestros servicios</a>
+            <a href="Destinos.html"  class="nav-link">Destinos</a>
+            <a href="compras.html"   class="nav-link">Mis compras</a>
+            <a href="reseñas.html"   class="nav-link active">Nuestras reseñas</a>
+            <a href="contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="reseñas.html" class="active"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<section class="wp-page-hero" id="main-content">
+    <span class="section-tag"><i class="fa-solid fa-star"></i> Opiniones reales</span>
+    <h1>Nuestras reseñas</h1>
+    <p>Más de 1,200 viajeros ya confiaron en WayPath. Aquí comparten sus experiencias.</p>
+</section>
+
+<main>
+<section class="reseñas-section">
+    <div class="wp-container">
+
+        <!-- Rating overview + filters -->
+        <div class="reseñas-top">
+            <!-- Score -->
+            <div class="score-panel">
+                <div class="score-big">
+                    <div class="score-num">4.9</div>
+                    <div class="score-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="score-total">1,248 reseñas</div>
+                </div>
+                <div class="score-bars">
+                    <div class="bar-row"><span>5 <i class="fa-solid fa-star" style="font-size:.7rem;color:var(--orange-500)"></i></span><div class="bar"><div class="fill" style="width:82%"></div></div><span class="bar-pct">82%</span></div>
+                    <div class="bar-row"><span>4 <i class="fa-solid fa-star" style="font-size:.7rem;color:var(--orange-500)"></i></span><div class="bar"><div class="fill" style="width:12%"></div></div><span class="bar-pct">12%</span></div>
+                    <div class="bar-row"><span>3 <i class="fa-solid fa-star" style="font-size:.7rem;color:var(--orange-500)"></i></span><div class="bar"><div class="fill" style="width:4%"></div></div><span class="bar-pct">4%</span></div>
+                    <div class="bar-row"><span>2 <i class="fa-solid fa-star" style="font-size:.7rem;color:var(--orange-500)"></i></span><div class="bar"><div class="fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div>
+                    <div class="bar-row"><span>1 <i class="fa-solid fa-star" style="font-size:.7rem;color:var(--orange-500)"></i></span><div class="bar"><div class="fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-panel">
+                <h3>Filtrar reseñas</h3>
+                <div class="filter-grid">
+                    <select id="filtroDestino" class="wp-select">
+                        <option value="">Todos los destinos</option>
+                        <option>Machu Picchu</option>
+                        <option>Lago Titicaca</option>
+                        <option>Máncora</option>
+                        <option>Huacachina</option>
+                        <option>Colca</option>
+                    </select>
+                    <select id="filtroEstrellas" class="wp-select">
+                        <option value="">Todas las calificaciones</option>
+                        <option value="5">★★★★★ (5 estrellas)</option>
+                        <option value="4">★★★★☆ (4 estrellas)</option>
+                        <option value="3">★★★☆☆ (3 estrellas)</option>
+                    </select>
+                </div>
+                <button id="btnEscribirReseña" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fa-solid fa-pen-to-square"></i> Escribir una reseña
+                </button>
+            </div>
+        </div>
+
+        <!-- Reviews layout -->
+        <div class="reseñas-layout">
+            <!-- Cards -->
+            <div class="reviews-list" id="reviewsList">
+
+                <article class="review-card" data-destino="Machu Picchu" data-stars="5">
+                    <img src="Img/machupichu.jpg" alt="Machu Picchu" class="review-img" loading="lazy">
+                    <div class="review-body">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <img src="Img/Maria garcia.jpg" alt="María García" class="avatar" style="object-fit: cover;">
+                                <div>
+                                    <h4>María García</h4>
+                                    <span class="reviewer-loc"><i class="fa-solid fa-location-dot"></i> Lima, Perú</span>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <h5 class="review-title">Una experiencia transformadora</h5>
+                        <p class="review-text">El viaje a Machu Picchu superó todas mis expectativas. La organización fue impecable, el guía tenía un conocimiento increíble y el paisaje es simplemente indescriptible. ¡Totalmente recomendado!</p>
+                        <div class="review-meta">
+                            <span class="review-dest"><i class="fa-solid fa-map-location-dot"></i> Machu Picchu</span>
+                            <span class="review-date"><i class="fa-regular fa-calendar"></i> Jun 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="review-card" data-destino="Lago Titicaca" data-stars="5">
+                    <img src="Img/LAGOTITICACA.webp" alt="Lago Titicaca" class="review-img" loading="lazy">
+                    <div class="review-body">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <img src="Img/Carlos Mendoza.jpg" alt="Carlos Mendoza" class="avatar" style="object-fit: cover;">
+                                <div>
+                                    <h4>Carlos Mendoza</h4>
+                                    <span class="reviewer-loc"><i class="fa-solid fa-location-dot"></i> Arequipa, Perú</span>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <h5 class="review-title">Cultura viva en el Titicaca</h5>
+                        <p class="review-text">Visitar las islas flotantes fue una vivencia única. La comunidad nos recibió con los brazos abiertos y aprendimos muchísimo. WayPath organizó todo de manera perfecta.</p>
+                        <div class="review-meta">
+                            <span class="review-dest"><i class="fa-solid fa-map-location-dot"></i> Lago Titicaca</span>
+                            <span class="review-date"><i class="fa-regular fa-calendar"></i> May 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="review-card" data-destino="Máncora" data-stars="4">
+                    <img src="Img/MANCORA.jpg" alt="Máncora" class="review-img" loading="lazy">
+                    <div class="review-body">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <img src="Img/Ana Torres.jpg" alt="Ana Torres" class="avatar" style="object-fit: cover;">
+                                <div>
+                                    <h4>Ana Torres</h4>
+                                    <span class="reviewer-loc"><i class="fa-solid fa-location-dot"></i> Trujillo, Perú</span>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                        <h5 class="review-title">Playas increíbles</h5>
+                        <p class="review-text">Máncora es un paraíso. El paquete incluía todo y el hotel fue mejor de lo esperado. Volveré el próximo verano sin dudarlo. Servicio muy bueno.</p>
+                        <div class="review-meta">
+                            <span class="review-dest"><i class="fa-solid fa-map-location-dot"></i> Máncora</span>
+                            <span class="review-date"><i class="fa-regular fa-calendar"></i> Ene 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="review-card" data-destino="Huacachina" data-stars="5">
+                    <img src="Img/OASISDEHUACACHINA.jpg" alt="Huacachina" class="review-img" loading="lazy">
+                    <div class="review-body">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                                <div>
+                                    <h4>Luis Paredes</h4>
+                                    <span class="reviewer-loc"><i class="fa-solid fa-location-dot"></i> Cusco, Perú</span>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <h5 class="review-title">El oasis es real</h5>
+                        <p class="review-text">Nunca imaginé que un lugar así existiera en el Perú. El sandboarding en las dunas fue lo más emocionante de mi vida. Todo perfectamente coordinado por WayPath.</p>
+                        <div class="review-meta">
+                            <span class="review-dest"><i class="fa-solid fa-map-location-dot"></i> Huacachina</span>
+                            <span class="review-date"><i class="fa-regular fa-calendar"></i> Mar 2026</span>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="reseñas-sidebar">
+                <div class="sidebar-card">
+                    <i class="fa-solid fa-compass sidebar-icon"></i>
+                    <h3>¿Listo para vivir tu propia aventura?</h3>
+                    <p>Explora nuestros destinos y reserva hoy mismo.</p>
+                    <a href="Destinos.html" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;margin-top:12px;">Ver destinos</a>
+                </div>
+                <div class="sidebar-card">
+                    <i class="fa-solid fa-shield-halved sidebar-icon" style="color:var(--blue-500)"></i>
+                    <h3>Reseñas verificadas</h3>
+                    <p>Todas las reseñas provienen de clientes reales que completaron su reserva.</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="wp-footer">
+    <div class="wp-footer-inner">
+        <div><span class="wp-footer-logo">Way<span class="accent">Path</span></span><p class="wp-footer-tagline">Tu agencia de viajes digital.</p></div>
+        <div class="wp-footer-col"><h4>Páginas</h4><a href="servicios.html">Servicios</a><a href="Destinos.html">Destinos</a><a href="compras.html">Mis compras</a><a href="reseñas.html">Reseñas</a><a href="contacto.html">Contacto</a></div>
+        <div class="wp-footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Soporte</a></div>
+    </div>
+    <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
+</footer>
+
+<script src="js/reseñas.js"></script>
+<script src="js/accesibilidad.js"></script>
+<script src="js/navbar.js"></script>
+<script>
+// Filtros
+function filtrarReseñas() {
+    const destino  = document.getElementById('filtroDestino').value.toLowerCase();
+    const estrellas = document.getElementById('filtroEstrellas').value;
+    document.querySelectorAll('.review-card').forEach(card => {
+        const matchDest  = !destino  || card.dataset.destino.toLowerCase().includes(destino);
+        const matchStar  = !estrellas || card.dataset.stars === estrellas;
+        card.style.display = (matchDest && matchStar) ? '' : 'none';
+    });
+}
+document.getElementById('filtroDestino').addEventListener('change', filtrarReseñas);
+document.getElementById('filtroEstrellas').addEventListener('change', filtrarReseñas);
+
+// Escribir reseña
+document.getElementById('btnEscribirReseña').addEventListener('click', () => {
+    Swal.fire({
+        title: '¡Comparte tu experiencia!',
+        html: `
+            <input id="swal-nombre"  class="swal2-input"   placeholder="Tu nombre">
+            <input id="swal-destino" class="swal2-input"   placeholder="Destino visitado">
+            <div style="display:flex;gap:6px;justify-content:center;margin:12px 0;font-size:1.6rem;color:#f97316;cursor:pointer;" id="starPicker">
+                <i class="fa-regular fa-star" data-v="1"></i>
+                <i class="fa-regular fa-star" data-v="2"></i>
+                <i class="fa-regular fa-star" data-v="3"></i>
+                <i class="fa-regular fa-star" data-v="4"></i>
+                <i class="fa-regular fa-star" data-v="5"></i>
+            </div>
+            <textarea id="swal-texto" class="swal2-textarea" placeholder="Escribe tu reseña..." rows="4"></textarea>
+        `,
+        confirmButtonText: 'Publicar reseña',
+        confirmButtonColor: '#f97316',
+        cancelButtonText: 'Cancelar',
+        showCancelButton: true,
+        didOpen: () => {
+            let sel = 0;
+            document.querySelectorAll('#starPicker i').forEach(star => {
+                star.addEventListener('click', () => {
+                    sel = +star.dataset.v;
+                    document.querySelectorAll('#starPicker i').forEach((s,i) => {
+                        s.className = i < sel ? 'fa-solid fa-star' : 'fa-regular fa-star';
+                    });
+                });
+            });
+        },
+        preConfirm: () => {
+            const nombre  = document.getElementById('swal-nombre').value.trim();
+            const destino = document.getElementById('swal-destino').value.trim();
+            const texto   = document.getElementById('swal-texto').value.trim();
+            if (!nombre || !destino || !texto) {
+                Swal.showValidationMessage('Por favor completa todos los campos');
+                return false;
+            }
+            return { nombre, destino, texto };
+        }
+    }).then(res => {
+        if (res.isConfirmed) {
+            Swal.fire({ icon: 'success', title: '¡Gracias!', text: 'Tu reseña ha sido enviada para revisión.', confirmButtonColor: '#f97316' });
+        }
+    });
+});
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

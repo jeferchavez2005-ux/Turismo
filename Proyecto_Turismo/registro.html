@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro – WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body class="auth-body">
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+<div id="google_translate_element" class="traductor-widget"></div>
+
+<div class="auth-container">
+    <div class="auth-panel">
+        <div class="auth-header">
+            <a href="index.html" class="wp-logo" style="margin:0 auto 16px;">Way<span class="accent">Path</span></a>
+            <h2>Crea tu cuenta</h2>
+            <p>Únete a WayPath y empieza a explorar el Perú.</p>
+        </div>
+        <form class="auth-form" id="registerForm">
+            <div class="form-field">
+                <label for="name">Nombre completo</label>
+                <input type="text" id="name" class="wp-input" placeholder="Tu nombre" required>
+            </div>
+            <div class="form-field">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" class="wp-input" placeholder="tu@correo.com" required>
+            </div>
+            <div class="form-field">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" class="wp-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;">Registrarse</button>
+        </form>
+        <div class="auth-footer">
+            <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="js/accesibilidad.js"></script>
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    localStorage.setItem('waypath_usuario', name.split(' ')[0]);
+    window.location.href = 'index.html';
+});
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

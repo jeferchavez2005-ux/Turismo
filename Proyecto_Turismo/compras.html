@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Compras – WayPath</title>
+    <meta name="description" content="Gestiona tus reservas y compras de viajes con WayPath. Revisa el estado de tus viajes próximos, completados y cancelados.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/compras.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menú principal">
+            <a href="servicios.html" class="nav-link">Nuestros servicios</a>
+            <a href="Destinos.html"  class="nav-link">Destinos</a>
+            <a href="compras.html"   class="nav-link active">Mis compras</a>
+            <a href="reseñas.html"   class="nav-link">Nuestras reseñas</a>
+            <a href="contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="compras.html" class="active"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<section class="wp-page-hero" id="main-content">
+    <span class="section-tag"><i class="fa-solid fa-bag-shopping"></i> Tu historial</span>
+    <h1>Mis compras</h1>
+    <p>Visualiza y gestiona todos tus viajes reservados con WayPath.</p>
+</section>
+
+<main>
+<section class="compras-section">
+    <div class="wp-container">
+        <!-- Stats strip -->
+        <div class="compras-stats">
+            <div class="cstat"><span class="cstat-num" id="totalViajes">3</span><span class="cstat-label">Viajes reservados</span></div>
+            <div class="cstat-div"></div>
+            <div class="cstat"><span class="cstat-num">S/ 2,329</span><span class="cstat-label">Total invertido</span></div>
+            <div class="cstat-div"></div>
+            <div class="cstat"><span class="cstat-num">1</span><span class="cstat-label">Próximo viaje</span></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-bar" role="tablist">
+            <button class="tab-btn active" data-filter="all"        role="tab" aria-selected="true">Todas</button>
+            <button class="tab-btn"        data-filter="proxima"    role="tab">Próximas</button>
+            <button class="tab-btn"        data-filter="completado" role="tab">Completadas</button>
+            <button class="tab-btn"        data-filter="cancelado"  role="tab">Canceladas</button>
+        </div>
+
+        <!-- List -->
+        <div class="purchases-list" id="contenedor-compras">
+
+            <article class="purchase-card" data-status="proxima">
+                <div class="pc-img">
+                    <img src="Img/machupichu.jpg" alt="Machu Picchu" loading="lazy">
+                </div>
+                <div class="pc-info">
+                    <div class="pc-top">
+                        <h3>Aventura en Machu Picchu</h3>
+                        <span class="wp-badge wp-badge-blue"><i class="fa-solid fa-clock"></i> Próximo</span>
+                    </div>
+                    <div class="pc-meta">
+                        <span><i class="fa-solid fa-location-dot"></i> Cusco, Perú</span>
+                        <span><i class="fa-regular fa-calendar"></i> 12–16 Ago, 2026</span>
+                        <span><i class="fa-regular fa-user"></i> 2 personas</span>
+                    </div>
+                    <div class="pc-code">Código: <strong>WP-2026-0891</strong></div>
+                </div>
+                <div class="pc-aside">
+                    <div class="pc-price-wrap">
+                        <span class="pc-price-label">Total pagado</span>
+                        <span class="pc-price">S/ 1,250</span>
+                    </div>
+                    <button class="wp-btn wp-btn-outline pc-detail-btn"
+                            data-titulo="Aventura en Machu Picchu"
+                            data-imagen="Img/machupichu.jpg"
+                            data-detalles="Viaje de 5 días y 4 noches en Cusco. Incluye transporte, guía y entrada al Santuario Histórico."
+                            data-precio="S/ 1,250">
+                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </article>
+
+            <article class="purchase-card" data-status="completado">
+                <div class="pc-img">
+                    <img src="Img/huaraz.jpg" alt="Huaraz" loading="lazy">
+                </div>
+                <div class="pc-info">
+                    <div class="pc-top">
+                        <h3>Expedición Laguna 69</h3>
+                        <span class="wp-badge wp-badge-green"><i class="fa-solid fa-check"></i> Completado</span>
+                    </div>
+                    <div class="pc-meta">
+                        <span><i class="fa-solid fa-location-dot"></i> Huaraz, Perú</span>
+                        <span><i class="fa-regular fa-calendar"></i> 05–08 Jun, 2026</span>
+                        <span><i class="fa-regular fa-user"></i> 1 persona</span>
+                    </div>
+                    <div class="pc-code">Código: <strong>WP-2026-0542</strong></div>
+                </div>
+                <div class="pc-aside">
+                    <div class="pc-price-wrap">
+                        <span class="pc-price-label">Total pagado</span>
+                        <span class="pc-price">S/ 450</span>
+                    </div>
+                    <button class="wp-btn wp-btn-outline pc-detail-btn"
+                            data-titulo="Expedición Laguna 69"
+                            data-imagen="Img/huaraz.jpg"
+                            data-detalles="Trekking y aventura en la Cordillera Blanca. 3 noches con guía especializado."
+                            data-precio="S/ 450">
+                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </article>
+
+            <article class="purchase-card" data-status="cancelado">
+                <div class="pc-img">
+                    <img src="Img/iquitos.jpg" alt="Iquitos" loading="lazy">
+                </div>
+                <div class="pc-info">
+                    <div class="pc-top">
+                        <h3>Selva Mágica en Iquitos</h3>
+                        <span class="wp-badge wp-badge-red"><i class="fa-solid fa-xmark"></i> Cancelado</span>
+                    </div>
+                    <div class="pc-meta">
+                        <span><i class="fa-solid fa-location-dot"></i> Iquitos, Perú</span>
+                        <span><i class="fa-regular fa-calendar"></i> 20–24 Abr, 2026</span>
+                        <span><i class="fa-regular fa-user"></i> 2 personas</span>
+                    </div>
+                    <div class="pc-code">Código: <strong>WP-2026-0765</strong></div>
+                </div>
+                <div class="pc-aside">
+                    <div class="pc-price-wrap">
+                        <span class="pc-price-label">Reembolsado</span>
+                        <span class="pc-price">S/ 629</span>
+                    </div>
+                    <button class="wp-btn wp-btn-outline pc-detail-btn"
+                            data-titulo="Selva Mágica en Iquitos"
+                            data-imagen="Img/iquitos.jpg"
+                            data-detalles="Experiencia amazónica con recorridos fluviales. Cancelado por el usuario."
+                            data-precio="S/ 629 (reembolsado)">
+                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="wp-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display:none;">
+    <div class="wp-modal-backdrop"></div>
+    <div class="wp-modal-box">
+        <button class="wp-modal-close" id="modalClose" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <img id="modalImg" src="" alt="" class="wp-modal-img">
+        <div class="wp-modal-body">
+            <h3 id="modalTitle"></h3>
+            <p id="modalDetalles"></p>
+            <div class="wp-modal-price">
+                <span class="price-from">Total</span>
+                <span class="price-amount" id="modalPrecio"></span>
+            </div>
+            <a href="Destinos.html" class="wp-btn wp-btn-primary" style="margin-top:16px;">
+                <i class="fa-solid fa-compass"></i> Reservar de nuevo
+            </a>
+        </div>
+    </div>
+</div>
+</main>
+
+<footer class="wp-footer">
+    <div class="wp-footer-inner">
+        <div><span class="wp-footer-logo">Way<span class="accent">Path</span></span><p class="wp-footer-tagline">Tu agencia de viajes digital.</p></div>
+        <div class="wp-footer-col"><h4>Páginas</h4><a href="servicios.html">Servicios</a><a href="Destinos.html">Destinos</a><a href="compras.html">Mis compras</a><a href="reseñas.html">Reseñas</a><a href="contacto.html">Contacto</a></div>
+        <div class="wp-footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Soporte</a></div>
+    </div>
+    <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
+</footer>
+
+<script src="js/compras.js"></script>
+<script src="js/accesibilidad.js"></script>
+<script src="js/navbar.js"></script>
+<script>
+// Tabs filter
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected','true');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.purchase-card').forEach(card => {
+            card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
+        });
+    });
+});
+// Modal
+const modal = document.getElementById('detailModal');
+document.querySelectorAll('.pc-detail-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent    = btn.dataset.titulo;
+        document.getElementById('modalImg').src              = btn.dataset.imagen;
+        document.getElementById('modalImg').alt              = btn.dataset.titulo;
+        document.getElementById('modalDetalles').textContent = btn.dataset.detalles;
+        document.getElementById('modalPrecio').textContent   = btn.dataset.precio;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+});
+function closeModal() { modal.style.display = 'none'; document.body.style.overflow = ''; }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.querySelector('.wp-modal-backdrop').addEventListener('click', closeModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

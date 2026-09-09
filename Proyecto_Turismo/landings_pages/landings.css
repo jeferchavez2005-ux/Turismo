@@ -1,0 +1,108 @@
+
+.landing-hero {
+    position: relative;
+    height: 80vh;
+    min-height: 500px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+}
+.landing-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    color: #fff;
+}
+.landing-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(249,115,22,.2);
+    border: 1px solid rgba(249,115,22,.5);
+    color: var(--orange-400);
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(4px);
+}
+.landing-hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.landing-hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+.landing-cta {
+    font-size: 1.1rem;
+    padding: 14px 32px;
+}
+
+
+.lead-form {
+    display: flex;
+    gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.lead-form .wp-input {
+    flex: 1;
+}
+
+
+.landing-benefits {
+    padding: 80px 0;
+    background: var(--bg-50);
+}
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+}
+.benefit-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 28px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+.benefit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.benefit-icon {
+    width: 64px; height: 64px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 1.6rem;
+    background: rgba(0,57,184,.1);
+    color: var(--blue-500);
+}
+.benefit-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--blue-900);
+    margin-bottom: 12px;
+}
+.benefit-card p {
+    font-size: 0.9rem;
+    color: var(--text-500);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .benefits-grid { grid-template-columns: 1fr; }
+    .lead-form { flex-direction: column; }
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu viaje – WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/reserva.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <a href="Destinos.html" class="wp-btn wp-btn-outline" style="padding:6px 14px;font-size:.8rem;">
+            <i class="fa-solid fa-arrow-left"></i> Volver a Destinos
+        </a>
+    </div>
+</header>
+
+<main class="reserva-section">
+    <div class="wp-container">
+        <div class="reserva-layout">
+
+            <!-- Form Col -->
+            <div class="reserva-form-col">
+                <div class="checkout-panel">
+                    <h2><i class="fa-solid fa-calendar-check"></i> Detalles de la reserva</h2>
+                    <p class="checkout-sub">Completa la información para asegurar tu lugar en esta aventura.</p>
+
+                    <form id="formReserva" class="checkout-form">
+                        <div class="form-section">
+                            <h3>1. Tus datos</h3>
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label>Nombres</label>
+                                    <input type="text" class="wp-input" id="resNombres" required>
+                                </div>
+                                <div class="form-field">
+                                    <label>Apellidos</label>
+                                    <input type="text" class="wp-input" id="resApellidos" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label>Correo electrónico</label>
+                                    <input type="email" class="wp-input" id="resEmail" required>
+                                </div>
+                                <div class="form-field">
+                                    <label>Teléfono</label>
+                                    <input type="tel" class="wp-input" id="resTel" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>2. Detalles del viaje</h3>
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label>Fecha de inicio</label>
+                                    <input type="date" class="wp-input" id="resFecha" required>
+                                </div>
+                                <div class="form-field">
+                                    <label>Número de viajeros</label>
+                                    <select class="wp-select" id="resPasajeros" onchange="calcularTotal()">
+                                        <option value="1">1 Persona</option>
+                                        <option value="2">2 Personas</option>
+                                        <option value="3">3 Personas</option>
+                                        <option value="4">4 Personas</option>
+                                        <option value="5">5 Personas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label>Requerimientos especiales (Opcional)</label>
+                                <textarea class="wp-textarea" placeholder="Alergias, necesidades de movilidad..."></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
+                            Continuar al pago <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Col -->
+            <div class="reserva-summary-col">
+                <div class="summary-card" id="summaryCard">
+                    <h3>Resumen de reserva</h3>
+                    <img id="sumImg" src="Img/machupichu.jpg" alt="" class="sum-img">
+                    <h4 id="sumDestino">Machu Picchu</h4>
+                    <p class="sum-loc"><i class="fa-solid fa-location-dot"></i> Perú</p>
+                    <div class="sum-divider"></div>
+                    <div class="sum-row">
+                        <span>Precio por persona</span>
+                        <span id="sumPrecioUnitario">S/ 0</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>Viajeros</span>
+                        <span id="sumPasajerosNum">1</span>
+                    </div>
+                    <div class="sum-divider"></div>
+                    <div class="sum-total-row">
+                        <span>Total a pagar</span>
+                        <span id="sumTotal">S/ 0</span>
+                    </div>
+                    <div class="sum-guarantee">
+                        <i class="fa-solid fa-lock"></i> Pago 100% seguro y encriptado
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script>
+let precioUnitario = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const destino = localStorage.getItem('destinoSeleccionado') || 'Destino Desconocido';
+    precioUnitario = parseFloat(localStorage.getItem('precioSeleccionado') || '0');
+    const img = localStorage.getItem('imgSeleccionada') || 'Img/machupichu.jpg';
+
+    document.getElementById('sumDestino').textContent = destino;
+    document.getElementById('sumImg').src = img;
+    document.getElementById('sumPrecioUnitario').textContent = 'S/ ' + precioUnitario;
+
+    calcularTotal();
+});
+
+function calcularTotal() {
+    const pax = parseInt(document.getElementById('resPasajeros').value);
+    document.getElementById('sumPasajerosNum').textContent = pax;
+    document.getElementById('sumTotal').textContent = 'S/ ' + (precioUnitario * pax).toFixed(2);
+}
+
+document.getElementById('formReserva').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const total = precioUnitario * parseInt(document.getElementById('resPasajeros').value);
+    localStorage.setItem('totalReserva', total);
+    localStorage.setItem('fechaReserva', document.getElementById('resFecha').value);
+    window.location.href = 'pago.html';
+});
+</script>
+<script src="js/accesibilidad.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destinos – WayPath</title>
+    <meta name="description" content="Explora los mejores destinos del Perú con WayPath. Machu Picchu, Montaña de Colores, Lago Titicaca y más.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/destinos.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menú principal">
+            <a href="servicios.html" class="nav-link">Nuestros servicios</a>
+            <a href="Destinos.html"  class="nav-link active">Destinos</a>
+            <a href="compras.html"   class="nav-link">Mis compras</a>
+            <a href="reseñas.html"   class="nav-link">Nuestras reseñas</a>
+            <a href="contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="Destinos.html" class="active"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+    <div class="mobile-divider"></div>
+    <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<section class="wp-page-hero" id="main-content">
+    <span class="section-tag"><i class="fa-solid fa-map-location-dot"></i> Perú te espera</span>
+    <h1>Explora nuestros destinos</h1>
+    <p>Descubre lugares increíbles y vive experiencias únicas en los mejores rincones del Perú.</p>
+</section>
+
+<main>
+<section class="destinos-section">
+    <div class="wp-container">
+        <!-- Filters -->
+        <div class="destinos-filters">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscador-destinos" placeholder="Buscar destino...">
+            </div>
+            <select id="filtro-precio" class="wp-select" style="width:auto;min-width:180px;">
+                <option value="">Todos los precios</option>
+                <option value="0-200">S/ 0 – 200</option>
+                <option value="200-500">S/ 200 – 500</option>
+                <option value="500-9999">S/ 500+</option>
+            </select>
+        </div>
+
+        <!-- Grid -->
+        <div class="destinos-grid" id="destinosGrid">
+
+            <article class="dest-card" data-nombre="Montaña de los 7 Colores" data-precio="180">
+                <div class="dest-img-wrap">
+                    <img src="Img/MONTAÑADELOS7COLORES.webp" alt="Montaña de los 7 colores" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Cusco</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Montaña de los 7 Colores</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Cusco, Perú</p>
+                    <p class="desc">Desafía la altura y conéctate con la naturaleza en este asombroso paisaje andino.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 180</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Montaña de los 7 colores" data-precio="180" data-img="Img/MONTAÑADELOS7COLORES.webp">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Machu Picchu" data-precio="950">
+                <div class="dest-img-wrap">
+                    <img src="Img/machupichu.jpg" alt="Machu Picchu" loading="lazy">
+                    <span class="dest-badge-img dest-badge-popular"><i class="fa-solid fa-fire"></i> Popular</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Machu Picchu</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Cusco, Perú</p>
+                    <p class="desc">Explora la legendaria e imponente ciudadela inca, maravilla del mundo.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 950</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Machu Picchu" data-precio="950" data-img="Img/machupichu.jpg">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Oasis de Huacachina" data-precio="160">
+                <div class="dest-img-wrap">
+                    <img src="Img/OASISDEHUACACHINA.jpg" alt="Oasis de Huacachina" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Ica</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Oasis de Huacachina</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Ica, Perú</p>
+                    <p class="desc">Un mágico oasis natural rodeado de gigantescas dunas de arena.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 160</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Oasis de Huacachina" data-precio="160" data-img="Img/OASISDEHUACACHINA.jpg">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Islas Ballestas" data-precio="220">
+                <div class="dest-img-wrap">
+                    <img src="Img/ISLASBALLESTAS.webp" alt="Islas Ballestas" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Paracas</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Islas Ballestas</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Ica, Perú</p>
+                    <p class="desc">Navega por el Pacífico y descubre un santuario de vida marina única.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 220</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Islas Ballestas" data-precio="220" data-img="Img/ISLASBALLESTAS.webp">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Cañón del Colca" data-precio="130">
+                <div class="dest-img-wrap">
+                    <img src="Img/CAÑONDELCOLCA.webp" alt="Cañón del Colca" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Arequipa</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Cañón del Colca</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Arequipa, Perú</p>
+                    <p class="desc">Uno de los cañones más profundos del planeta con vistas espectaculares.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 130</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Cañón del Colca" data-precio="130" data-img="Img/CAÑONDELCOLCA.webp">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Lago Titicaca" data-precio="110">
+                <div class="dest-img-wrap">
+                    <img src="Img/LAGOTITICACA.webp" alt="Lago Titicaca" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Puno</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Lago Titicaca</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Puno, Perú</p>
+                    <p class="desc">El lago navegable más alto del mundo con comunidades y cultura viva.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 110</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Lago Titicaca" data-precio="110" data-img="Img/LAGOTITICACA.webp">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Líneas de Nazca" data-precio="450">
+                <div class="dest-img-wrap">
+                    <img src="Img/nasca.jpg" alt="Líneas de Nazca" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Ica</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Líneas de Nazca</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Ica, Perú</p>
+                    <p class="desc">Sobrevuela el desierto y descifra los misterios de estos gigantescos geoglifos.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 450</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Líneas de Nazca" data-precio="450" data-img="Img/nasca.jpg">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Máncora" data-precio="350">
+                <div class="dest-img-wrap">
+                    <img src="Img/MANCORA.jpg" alt="Máncora" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Piura</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Máncora</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Piura, Perú</p>
+                    <p class="desc">Relájate en las playas más famosas del Perú y disfruta del sol junto al mar.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 350</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Máncora" data-precio="350" data-img="Img/MANCORA.jpg">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Reserva Nacional Pacaya" data-precio="1200">
+                <div class="dest-img-wrap">
+                    <img src="Img/RESERVANACIONALPACAYA.jpg" alt="Reserva Pacaya Samiria" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Loreto</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Reserva Nacional Pacaya</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Loreto, Perú</p>
+                    <p class="desc">Adéntrate en la selva de los espejos y navega por ríos caudalosos.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 1,200</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Reserva Nacional Pacaya" data-precio="1200" data-img="Img/RESERVANACIONALPACAYA.jpg">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dest-card" data-nombre="Parque Nacional Huascarán" data-precio="90">
+                <div class="dest-img-wrap">
+                    <img src="Img/PARQUENACIONALHUASCARAN.webp" alt="Parque Nacional Huascarán" loading="lazy">
+                    <span class="dest-badge-img"><i class="fa-solid fa-location-dot"></i> Áncash</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Parque Nacional Huascarán</h3>
+                    <p class="location"><i class="fa-solid fa-location-dot"></i> Áncash, Perú</p>
+                    <p class="desc">Joyas de la Cordillera Blanca con caminatas rodeadas de picos nevados.</p>
+                    <div class="dest-footer">
+                        <div class="price-info">
+                            <span class="price-from">Desde</span>
+                            <span class="price-amount">S/ 90</span>
+                        </div>
+                        <a href="reserva.html" class="wp-btn wp-btn-primary btn-reserva"
+                           data-nombre="Parque Nacional Huascarán" data-precio="90" data-img="Img/PARQUENACIONALHUASCARAN.webp">
+                            <i class="fa-solid fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty-state" style="display:none;">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <h3>No encontramos destinos</h3>
+            <p>Intenta con otro nombre o ajusta los filtros de precio.</p>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="wp-footer">
+    <div class="wp-footer-inner">
+        <div><span class="wp-footer-logo">Way<span class="accent">Path</span></span><p class="wp-footer-tagline">Tu agencia de viajes digital para explorar el Perú.</p></div>
+        <div class="wp-footer-col"><h4>Páginas</h4><a href="servicios.html">Servicios</a><a href="Destinos.html">Destinos</a><a href="compras.html">Mis compras</a><a href="reseñas.html">Reseñas</a><a href="contacto.html">Contacto</a></div>
+        <div class="wp-footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Soporte</a></div>
+    </div>
+    <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
+</footer>
+
+<script>
+// Reservar → guardar en localStorage
+document.querySelectorAll('.btn-reserva').forEach(a => {
+    a.addEventListener('click', function() {
+        localStorage.setItem('destinoSeleccionado', this.dataset.nombre);
+        localStorage.setItem('precioSeleccionado',  this.dataset.precio);
+        localStorage.setItem('imgSeleccionada',     this.dataset.img);
+    });
+});
+// Buscador
+const buscador = document.getElementById('buscador-destinos');
+const filtroPrecio = document.getElementById('filtro-precio');
+function filtrar() {
+    const txt = buscador.value.toLowerCase();
+    const [min, max] = (filtroPrecio.value || '0-999999').split('-').map(Number);
+    let visible = 0;
+    document.querySelectorAll('#destinosGrid .dest-card').forEach(c => {
+        const nombre = c.dataset.nombre.toLowerCase();
+        const precio = +c.dataset.precio;
+        const ok = nombre.includes(txt) && precio >= min && precio <= max;
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+    });
+    document.getElementById('emptyState').style.display = visible ? 'none' : 'block';
+}
+buscador.addEventListener('input', filtrar);
+filtroPrecio.addEventListener('change', filtrar);
+</script>
+<script src="js/accesibilidad.js"></script>
+<script src="js/navbar.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

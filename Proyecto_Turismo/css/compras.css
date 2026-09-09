@@ -1,0 +1,170 @@
+
+.compras-section { padding: 56px 0 96px; }
+
+
+.compras-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px 40px;
+    margin-bottom: 36px;
+    box-shadow: var(--shadow-sm);
+}
+.cstat { text-align: center; padding: 0 40px; }
+.cstat-num   { display: block; font-size: 1.8rem; font-weight: 800; color: var(--blue-900); }
+.cstat-label { font-size: 0.8rem; color: var(--text-500); font-weight: 500; }
+.cstat-div   { width: 1px; height: 40px; background: var(--border); }
+
+
+.tabs-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-100);
+    padding: 6px;
+    border-radius: var(--radius-full);
+    width: fit-content;
+    margin-bottom: 32px;
+}
+.tab-btn {
+    padding: 9px 22px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-500);
+    background: none;
+    border: none;
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+    cursor: pointer;
+}
+.tab-btn:hover { color: var(--orange-500); }
+.tab-btn.active {
+    background: var(--white);
+    color: var(--blue-900);
+    box-shadow: var(--shadow-sm);
+}
+
+
+.purchases-list { display: flex; flex-direction: column; gap: 16px; }
+
+.purchase-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 0;
+    transition: box-shadow var(--transition), transform var(--transition);
+}
+.purchase-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.pc-img {
+    width: 200px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.pc-img img { width:100%; height:100%; object-fit:cover; transition: transform .5s ease; }
+.purchase-card:hover .pc-img img { transform: scale(1.05); }
+
+.pc-info {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pc-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.pc-top h3 { font-size: 1.1rem; font-weight: 700; color: var(--blue-900); }
+.pc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--text-500);
+}
+.pc-meta span { display: flex; align-items: center; gap: 5px; }
+.pc-meta i { color: var(--orange-500); }
+.pc-code { font-size: 0.8rem; color: var(--text-300); background: var(--bg-100); padding: 6px 12px; border-radius: var(--radius-sm); width: fit-content; }
+
+.pc-aside {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    border-left: 1px solid var(--border);
+    min-width: 180px;
+}
+.pc-price-wrap { text-align: right; }
+.pc-price-label { display: block; font-size: 0.75rem; color: var(--text-300); }
+.pc-price { font-size: 1.4rem; font-weight: 800; color: var(--blue-900); }
+
+
+.wp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.wp-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15,23,42,.65);
+    backdrop-filter: blur(6px);
+}
+.wp-modal-box {
+    position: relative;
+    z-index: 1;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.25);
+    animation: fadeUp .3s ease;
+}
+.wp-modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    transition: background var(--transition);
+}
+.wp-modal-close:hover { background: #fee2e2; color: #dc2626; }
+.wp-modal-img { width:100%; height:240px; object-fit:cover; }
+.wp-modal-body {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.wp-modal-body h3 { font-size: 1.3rem; font-weight: 800; color: var(--blue-900); }
+.wp-modal-body p  { font-size: .875rem; color: var(--text-500); line-height: 1.7; }
+.wp-modal-price { display: flex; flex-direction: column; }
+
+@media (max-width: 760px) {
+    .purchase-card { flex-direction: column; }
+    .pc-img { width: 100%; height: 180px; }
+    .pc-aside { border-left: none; border-top: 1px solid var(--border); flex-direction: row; align-items: center; justify-content: space-between; }
+    .compras-stats { flex-wrap: wrap; gap: 16px; padding: 20px; }
+    .cstat-div { display: none; }
+}

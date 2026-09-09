@@ -1,0 +1,220 @@
+:root{
+    --blue: #0b2a4a;
+    --orange: #ff7a00;
+    --muted: #8a97a6;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+    background: #f4f6f8;
+    min-height: 100vh;
+}
+
+.login-container{
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+}
+
+.left-panel{
+    width: 48%;
+    position: relative;
+    background-image: url("../img/machupichu-login.jpg"); 
+    background-size: cover;
+    background-position: center;
+}
+
+.left-panel::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(11,42,74,.20);
+}
+
+.logo-login{
+    position: absolute;
+    top: 35px;
+    left: 35px;
+    z-index: 2;
+    font-size: 48px;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.blue{ color: white; }
+.orange{ color: var(--orange); }
+
+.overlay-content{
+    position: absolute;
+    z-index: 2;
+    left: 70px;
+    top: 140px;
+    color: white;
+}
+
+.overlay-content h2{ font-size: 60px; line-height: 1; }
+.overlay-content h1{ font-size: 70px; line-height: 1; color: var(--orange); }
+.overlay-content p{ margin-top: 20px; max-width: 320px; font-size: 22px; }
+
+.right-panel{
+    width: 52%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 70px;
+}
+
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.back-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.back-link i {
+    margin-right: 5px;
+}
+
+.back-link:hover {
+    color: var(--orange); 
+}
+
+.register-link {
+    text-align: right;
+}
+
+.register-link a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.right-panel h1{
+    margin-top: 40px;
+    color: var(--blue);
+    font-size: 52px;
+}
+
+form{ margin-top: 40px; }
+
+label{
+    display: block;
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: var(--blue);
+}
+
+input{
+    width: 100%;
+    padding: 18px;
+    border: 1px solid #d7dee7;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    font-size: 16px;
+    outline: none;
+}
+input:focus { border-color: var(--orange); }
+
+.forgot{
+    text-align: right;
+    margin-bottom: 30px;
+}
+
+.forgot a{
+    text-decoration: none;
+    color: var(--blue);
+}
+
+button{
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--orange);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+button:hover { background: #e06612; }
+
+.divider{
+    margin: 50px 0;
+    border-top: 1px solid #e5e5e5;
+}
+
+.terms{
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.shield { 
+    font-size: 38px; 
+    color: #4ade80; 
+}
+.terms p{
+    color: var(--blue);
+    line-height: 1.6;
+}
+
+.terms a{
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: 600;
+}
+@media (max-width: 900px) {
+    .login-container { flex-direction: column; }
+    .left-panel { width: 100%; min-height: 300px; }
+    .right-panel { width: 100%; padding: 40px 30px; }
+    .overlay-content h2 { font-size: 40px; }
+    .overlay-content h1 { font-size: 50px; }
+}
+
+/* Soporte para Modo Oscuro (Alto Contraste) */
+body.high-contrast .right-panel {
+    background: #1e293b;
+}
+
+body.high-contrast .right-panel h1,
+body.high-contrast .right-panel label,
+body.high-contrast .right-panel p,
+body.high-contrast .terms p {
+    color: #f8fafc;
+}
+
+body.high-contrast .back-link,
+body.high-contrast .forgot a,
+body.high-contrast .register-link,
+body.high-contrast .register-link a {
+    color: #94a3b8;
+}
+
+body.high-contrast .back-link:hover,
+body.high-contrast .forgot a:hover,
+body.high-contrast .register-link a:hover {
+    color: #fb923c;
+}
+
+body.high-contrast .terms a {
+    color: #fb923c;
+}
+
+body.high-contrast .terms a:hover {
+    color: #fdba74;
+}

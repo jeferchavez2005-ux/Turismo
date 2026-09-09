@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Seguro – WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/reserva.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <div style="font-weight:600;color:var(--text-500);"><i class="fa-solid fa-lock"></i> Checkout Seguro</div>
+    </div>
+</header>
+
+<main class="reserva-section">
+    <div class="wp-container">
+        <div class="reserva-layout">
+
+            <!-- Form Col -->
+            <div class="reserva-form-col">
+                <div class="checkout-panel">
+                    <h2><i class="fa-solid fa-credit-card"></i> Método de pago</h2>
+                    <p class="checkout-sub">Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.</p>
+
+                    <form id="formPago" class="checkout-form">
+
+                        <div class="metodos-pago">
+                            <!-- Tarjeta -->
+                            <div class="metodo-item">
+                                <input type="radio" name="metodo" id="metodo-tarjeta" value="tarjeta" class="sr-only" checked>
+                                <label for="metodo-tarjeta" class="metodo-label">
+                                    <div class="metodo-info">
+                                        <i class="fa-regular fa-credit-card"></i> Tarjeta de Crédito / Débito
+                                    </div>
+                                    <div class="metodo-icons">
+                                        <i class="fa-brands fa-cc-visa"></i>
+                                        <i class="fa-brands fa-cc-mastercard"></i>
+                                        <i class="fa-brands fa-cc-amex"></i>
+                                    </div>
+                                </label>
+                                <div class="pago-details tarjeta-info">
+                                    <div class="form-field" style="margin-bottom:12px;">
+                                        <label>Número de Tarjeta</label>
+                                        <input type="text" class="wp-input" placeholder="0000 0000 0000 0000" maxlength="19">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-field">
+                                            <label>Vencimiento</label>
+                                            <input type="text" class="wp-input" placeholder="MM/AA" maxlength="5">
+                                        </div>
+                                        <div class="form-field">
+                                            <label>CVV</label>
+                                            <input type="text" class="wp-input" placeholder="123" maxlength="4">
+                                        </div>
+                                    </div>
+                                    <div class="form-field" style="margin-top:12px;">
+                                        <label>Nombre del Titular</label>
+                                        <input type="text" class="wp-input" placeholder="Como aparece en la tarjeta">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Yape -->
+                            <div class="metodo-item" style="margin-top:16px;">
+                                <input type="radio" name="metodo" id="metodo-yape" value="yape" class="sr-only">
+                                <label for="metodo-yape" class="metodo-label">
+                                    <div class="metodo-info">
+                                        <i class="fa-solid fa-mobile-screen"></i> Yape / Plin
+                                    </div>
+                                    <div class="metodo-icons">
+                                        <span style="font-size:.8rem;font-weight:700;color:#7c3aed;">YAPE</span>
+                                    </div>
+                                </label>
+                                <div class="pago-details yape-info">
+                                    <p style="font-size:.85rem;color:var(--text-500);margin-bottom:12px;">Escanea el código QR desde tu aplicación para realizar el pago.</p>
+                                    <img src="Img/qr-code.png" alt="Código QR Yape" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg'">
+                                    <p style="font-size:.9rem;font-weight:700;color:var(--blue-900);">Número: 987 654 321</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
+                            Confirmar y pagar <i class="fa-solid fa-lock"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Col -->
+            <div class="reserva-summary-col">
+                <div class="summary-card">
+                    <h3>Resumen de reserva</h3>
+                    <img id="sumImg" src="Img/machupichu.jpg" alt="" class="sum-img">
+                    <h4 id="sumDestino">Machu Picchu</h4>
+                    <p class="sum-loc" style="margin-bottom:12px;"><i class="fa-regular fa-calendar"></i> <span id="sumFecha">--</span></p>
+                    <div class="sum-divider"></div>
+                    <div class="sum-total-row">
+                        <span>Total a pagar</span>
+                        <span id="sumTotal" style="color:var(--orange-500);">S/ 0</span>
+                    </div>
+                    <div class="sum-guarantee">
+                        <i class="fa-solid fa-shield-check"></i> Tu compra está 100% protegida. WayPath garantiza los más altos estándares de seguridad en cada transacción.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script src="js/accesibilidad.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const destino = localStorage.getItem('destinoSeleccionado') || 'Destino Desconocido';
+    const total = localStorage.getItem('totalReserva') || '0';
+    const fecha = localStorage.getItem('fechaReserva') || 'Fecha no especificada';
+    const img = localStorage.getItem('imgSeleccionada') || 'Img/machupichu.jpg';
+
+    document.getElementById('sumDestino').textContent = destino;
+    document.getElementById('sumImg').src = img;
+    document.getElementById('sumTotal').textContent = 'S/ ' + parseFloat(total).toFixed(2);
+    document.getElementById('sumFecha').textContent = fecha;
+});
+
+document.getElementById('formPago').addEventListener('submit', (e) => {
+    e.preventDefault();
+    Swal.fire({
+        title: '¡Pago Exitoso!',
+        text: 'Tu reserva ha sido confirmada. Hemos enviado los detalles a tu correo electrónico.',
+        icon: 'success',
+        confirmButtonColor: '#f97316',
+        confirmButtonText: 'Ver mis compras'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'compras.html';
+        }
+    });
+});
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Marketing | WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="dashboards.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="../index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menú principal">
+            <a href="../servicios.html" class="nav-link">Nuestros servicios</a>
+            <a href="../Destinos.html"  class="nav-link">Destinos</a>
+            <a href="../compras.html"   class="nav-link">Mis compras</a>
+            <a href="../reseñas.html"   class="nav-link">Nuestras reseñas</a>
+            <a href="../contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle active"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboard-marketing.html" class="active"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="../landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="../landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="../login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="../servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="../Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="../compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="../reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="../contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+    <a href="dashboard-marketing.html" class="active"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+    <a href="../landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+    <a href="../landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+    <div class="mobile-divider"></div>
+    <a href="../login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<main class="dashboard-main">
+    <div class="wp-container">
+        <div class="dashboard-header">
+            <div>
+                <h1>Marketing y Tráfico Web</h1>
+                <p>Análisis de canales, dispositivos y edad de los usuarios.</p>
+            </div>
+            <a href="dashboard-ventas.html" class="wp-btn wp-btn-outline"><i class="fa-solid fa-chart-bar"></i> Ver Ventas</a>
+        </div>
+
+        <div class="graficos-grid">
+            <div class="grafico-card">
+                <div class="grafico-head">
+                    <i class="fa-solid fa-bullhorn" style="color:var(--orange-500)"></i>
+                    <h3>1. Retorno de Inversión por Campañas</h3>
+                </div>
+                <div class="canvas-wrap"><canvas id="graficoCampanas"></canvas></div>
+                <div class="grafico-insight">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <p><strong>Decisión:</strong> Reasignar presupuesto de San Valentín a Fiestas Patrias debido a su alto rendimiento.</p>
+                </div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-head">
+                    <i class="fa-brands fa-instagram" style="color:var(--blue-500)"></i>
+                    <h3>2. Interacciones en Redes Sociales</h3>
+                </div>
+                <div class="canvas-wrap"><canvas id="graficoSocial"></canvas></div>
+                <div class="grafico-insight">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <p><strong>Decisión:</strong> Incrementar la creación de contenido en formato vertical corto para TikTok e Reels.</p>
+                </div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-head">
+                    <i class="fa-solid fa-users" style="color:#15803d"></i>
+                    <h3>3. Distribución por Edades</h3>
+                </div>
+                <div class="canvas-wrap"><canvas id="graficoEdades"></canvas></div>
+                <div class="grafico-insight">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <p><strong>Decisión:</strong> Crear paquetes de turismo de aventura específicos para el grupo más activo de 25-34 años.</p>
+                </div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-head">
+                    <i class="fa-solid fa-laptop" style="color:#7c3aed"></i>
+                    <h3>4. Dispositivos de Acceso</h3>
+                </div>
+                <div class="canvas-wrap"><canvas id="graficoDispositivos"></canvas></div>
+                <div class="grafico-insight">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <p><strong>Decisión:</strong> Seguir optimizando la plataforma para escritorio, que representa la mayoría de reservas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="wp-footer">
+    <div class="wp-footer-inner">
+        <div><span class="wp-footer-logo">Way<span class="accent">Path</span></span></div>
+        <div class="wp-footer-col"><a href="../index.html">Volver al inicio</a></div>
+    </div>
+</footer>
+
+<script src="../js/accesibilidad.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="dashboard-marketing.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

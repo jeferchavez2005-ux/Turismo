@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros Servicios – WayPath</title>
+    <meta name="description" content="Descubre los servicios de WayPath: paquetes turísticos, reservas digitales, atención personalizada y más.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/servicios.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" aria-label="Aumentar tamaño de texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  aria-label="Reducir tamaño de texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" aria-label="Modo oscuro"               title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" role="navigation" aria-label="Menú principal">
+            <a href="servicios.html" class="nav-link active">Nuestros servicios</a>
+            <a href="Destinos.html"  class="nav-link">Destinos</a>
+            <a href="compras.html"   class="nav-link">Mis compras</a>
+            <a href="reseñas.html"   class="nav-link">Nuestras reseñas</a>
+            <a href="contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="servicios.html" class="active"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+    <div class="mobile-divider"></div>
+    <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<!-- HERO -->
+<section class="wp-page-hero" id="main-content">
+    <span class="section-tag"><i class="fa-solid fa-concierge-bell"></i> Lo que ofrecemos</span>
+    <h1>Nuestros servicios</h1>
+    <p>Te acompañamos en cada etapa de tu viaje con tecnología y atención personalizada.</p>
+</section>
+
+<main>
+<section class="servicios-section">
+    <div class="wp-container">
+        <div class="servicios-grid">
+            <div class="servicio-card animate-fadeup delay-1">
+                <div class="servicio-icon" style="background:rgba(249,115,22,.1);color:var(--orange-500)">
+                    <i class="fa-solid fa-suitcase-rolling"></i>
+                </div>
+                <h3>Paquetes turísticos</h3>
+                <p>Seleccionamos los mejores paquetes para que vivas experiencias inolvidables en cada destino del Perú.</p>
+                <a href="Destinos.html" class="servicio-link">Explorar destinos <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="servicio-card animate-fadeup delay-2">
+                <div class="servicio-icon" style="background:rgba(0,57,184,.1);color:var(--blue-500)">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                </div>
+                <h3>Reservas digitales</h3>
+                <p>Reserva, paga y gestiona todo tu viaje desde un solo lugar de manera rápida y completamente segura.</p>
+                <a href="Destinos.html" class="servicio-link">Hacer una reserva <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="servicio-card animate-fadeup delay-3">
+                <div class="servicio-icon" style="background:rgba(21,128,61,.1);color:#15803d">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <h3>Seguimiento de compras</h3>
+                <p>Monitorea el estado de tus compras y recibe actualizaciones en tiempo real en todo momento.</p>
+                <a href="compras.html" class="servicio-link">Mis compras <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="servicio-card animate-fadeup delay-1">
+                <div class="servicio-icon" style="background:rgba(139,92,246,.1);color:#7c3aed">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h3>Atención al cliente</h3>
+                <p>Nuestro equipo está listo para ayudarte antes, durante y después de tu viaje. Soporte 24/7.</p>
+                <a href="contacto.html" class="servicio-link">Contáctanos <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="servicio-card animate-fadeup delay-2">
+                <div class="servicio-icon" style="background:rgba(6,182,212,.1);color:#0891b2">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <h3>Gestión de itinerarios</h3>
+                <p>Organiza tu itinerario y accede a toda la información de tu viaje de forma fácil y centralizada.</p>
+                <a href="compras.html" class="servicio-link">Ver mis viajes <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="servicio-card animate-fadeup delay-3">
+                <div class="servicio-icon" style="background:rgba(234,179,8,.1);color:#ca8a04">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>Soporte al viajero</h3>
+                <p>Asistencia 24/7 para que viajes con la mayor tranquilidad y seguridad en todo momento.</p>
+                <a href="contacto.html" class="servicio-link">Saber más <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <!-- CTA Banner -->
+        <div class="cta-banner">
+            <div class="cta-content">
+                <h2>¿Listo para tu próxima aventura?</h2>
+                <p>Explora nuestros destinos y reserva hoy mismo con los mejores precios del mercado.</p>
+            </div>
+            <a href="Destinos.html" class="wp-btn wp-btn-primary"><i class="fa-solid fa-compass"></i> Ver destinos</a>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="wp-footer" role="contentinfo">
+    <div class="wp-footer-inner">
+        <div>
+            <span class="wp-footer-logo">Way<span class="accent">Path</span></span>
+            <p class="wp-footer-tagline">Tu agencia de viajes digital para explorar el Perú y el mundo con confianza.</p>
+        </div>
+        <div class="wp-footer-col">
+            <h4>Páginas</h4>
+            <a href="servicios.html">Nuestros servicios</a>
+            <a href="Destinos.html">Destinos</a>
+            <a href="compras.html">Mis compras</a>
+            <a href="reseñas.html">Nuestras reseñas</a>
+            <a href="contacto.html">Contacto</a>
+        </div>
+        <div class="wp-footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacidad</a>
+            <a href="#">Términos y condiciones</a>
+            <a href="#">Soporte</a>
+        </div>
+    </div>
+    <div class="wp-footer-bottom">
+        <span>© 2026 WayPath. Todos los derechos reservados.</span>
+        <div style="display:flex;gap:16px;"><a href="#">Privacidad</a><a href="#">Términos</a></div>
+    </div>
+</footer>
+
+<script src="js/accesibilidad.js"></script>
+<script src="js/navbar.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

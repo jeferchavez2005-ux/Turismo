@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Viajero | WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="landings.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+</head>
+<body>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="../index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menú principal">
+            <a href="../servicios.html" class="nav-link">Nuestros servicios</a>
+            <a href="../Destinos.html"  class="nav-link">Destinos</a>
+            <a href="../compras.html"   class="nav-link">Mis compras</a>
+            <a href="../reseñas.html"   class="nav-link">Nuestras reseñas</a>
+            <a href="../contacto.html"  class="nav-link">Contacto</a>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle"><i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="../dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="../dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle active"><i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages <i class="fa-solid fa-chevron-down chevron"></i></button>
+                <div class="wp-dropdown-menu">
+                    <a href="landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landing-guia.html" class="active"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+        <a href="../login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu">
+    <a href="../servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="../Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="../compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="../reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="../contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="../dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+    <a href="../dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+    <a href="landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+    <a href="landing-guia.html" class="active"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+    <div class="mobile-divider"></div>
+    <a href="../login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<main>
+    <section class="landing-hero" style="background-image: linear-gradient(rgba(0,26,61,.75), rgba(0,26,61,.75)), url('../Img/machupichu.jpg');">
+        <div class="landing-hero-content animate-fadeup">
+            <span class="landing-badge" style="background:rgba(21,128,61,.2);color:#86efac;border-color:rgba(21,128,61,.5)">Guía Gratuita</span>
+            <h1>Descubre los secretos del Perú</h1>
+            <p>Descarga nuestra guía exclusiva de viaje con tips, rutas ocultas y consejos para empacar como un experto.</p>
+            
+            <form class="lead-form">
+                <input type="email" class="wp-input" placeholder="Tu correo electrónico" required style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2);backdrop-filter:blur(4px);">
+                <button type="submit" class="wp-btn wp-btn-primary"><i class="fa-solid fa-download"></i> Descargar Guía</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="landing-benefits">
+        <div class="wp-container">
+            <div class="section-head" style="text-align:center;">
+                <h2 class="section-title" style="margin:0 auto;">¿Qué aprenderás en esta guía?</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card animate-fadeup delay-1">
+                    <div class="benefit-icon" style="color:#7c3aed;background:rgba(124,58,237,.1)"><i class="fa-solid fa-map"></i></div>
+                    <h3>Rutas Ocultas</h3>
+                    <p>Descubre destinos fuera de lo tradicional que te dejarán sin aliento.</p>
+                </div>
+                <div class="benefit-card animate-fadeup delay-2">
+                    <div class="benefit-icon" style="color:#0891b2;background:rgba(8,145,178,.1)"><i class="fa-solid fa-suitcase"></i></div>
+                    <h3>Tips de Empaque</h3>
+                    <p>Aprende a empacar ligero y llevar exactamente lo que necesitas para cada región.</p>
+                </div>
+                <div class="benefit-card animate-fadeup delay-3">
+                    <div class="benefit-icon" style="color:#ca8a04;background:rgba(202,138,4,.1)"><i class="fa-solid fa-wallet"></i></div>
+                    <h3>Ahorro Seguro</h3>
+                    <p>Conoce los mejores meses para viajar y cómo optimizar tu presupuesto diario.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="wp-footer">
+    <div class="wp-footer-inner">
+        <div><span class="wp-footer-logo">Way<span class="accent">Path</span></span><p class="wp-footer-tagline">Tu agencia de viajes digital.</p></div>
+        <div class="wp-footer-col"><h4>Páginas</h4><a href="../servicios.html">Servicios</a><a href="../Destinos.html">Destinos</a><a href="../contacto.html">Contacto</a></div>
+        <div class="wp-footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a></div>
+    </div>
+    <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
+</footer>
+
+<script src="../js/accesibilidad.js"></script>
+<script src="../js/navbar.js"></script>
+<script>
+document.querySelector('.lead-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('¡Gracias! La guía ha sido enviada a tu correo.');
+    this.reset();
+});
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

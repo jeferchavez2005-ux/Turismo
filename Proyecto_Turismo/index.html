@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WayPath – Descubre el Perú</title>
+    <meta name="description" content="WayPath es tu agencia de viajes digital para explorar los mejores destinos del Perú. Reserva paquetes, gestiona tus viajes y vive experiencias únicas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+<!-- Traductor -->
+<div id="google_translate_element" class="traductor-widget"></div>
+
+<!-- Widgets de accesibilidad -->
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" aria-label="Aumentar tamaño de texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto"  aria-label="Reducir tamaño de texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" aria-label="Modo oscuro"               title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<!-- ─── NAVBAR ─── -->
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo" aria-label="WayPath inicio">Way<span class="accent">Path</span></a>
+
+        <nav class="wp-nav-links" role="navigation" aria-label="Menú principal">
+            <a href="servicios.html"  class="nav-link">Nuestros servicios</a>
+            <a href="Destinos.html"   class="nav-link">Destinos</a>
+            <a href="compras.html"    class="nav-link">Mis compras</a>
+            <a href="reseñas.html"    class="nav-link">Nuestras reseñas</a>
+            <a href="contacto.html"   class="nav-link">Contacto</a>
+
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa-solid fa-chart-line" style="font-size:.8rem;"></i> Dashboards
+                    <i class="fa-solid fa-chevron-down chevron"></i>
+                </button>
+                <div class="wp-dropdown-menu" role="menu">
+                    <a href="dashboards/dashboard-ventas.html"    role="menuitem"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+                    <a href="dashboards/dashboard-marketing.html" role="menuitem"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+                </div>
+            </div>
+
+            <div class="wp-dropdown">
+                <button class="wp-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa-solid fa-rocket" style="font-size:.8rem;"></i> Landing Pages
+                    <i class="fa-solid fa-chevron-down chevron"></i>
+                </button>
+                <div class="wp-dropdown-menu" role="menu">
+                    <a href="landings_pages/landing-mancora.html" role="menuitem"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+                    <a href="landings_pages/landing-guia.html"    role="menuitem"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+                </div>
+            </div>
+        </nav>
+
+        <a href="login.html" class="wp-btn-login desktop login-btn">
+            <i class="fa-regular fa-user"></i> Iniciar sesión
+        </a>
+
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<!-- Mobile menu -->
+<nav class="wp-mobile-menu" id="mobileMenu" role="navigation" aria-label="Menú móvil">
+    <a href="servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
+    <a href="Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
+    <a href="compras.html"><i class="fa-solid fa-bag-shopping"></i> Mis compras</a>
+    <a href="reseñas.html"><i class="fa-solid fa-star"></i> Nuestras reseñas</a>
+    <a href="contacto.html"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <div class="mobile-divider"></div>
+    <a href="dashboards/dashboard-ventas.html"><i class="fa-solid fa-chart-bar"></i> Rendimiento Comercial</a>
+    <a href="dashboards/dashboard-marketing.html"><i class="fa-solid fa-bullhorn"></i> Marketing y Tráfico</a>
+    <a href="landings_pages/landing-mancora.html"><i class="fa-solid fa-umbrella-beach"></i> Escapada a Máncora</a>
+    <a href="landings_pages/landing-guia.html"><i class="fa-solid fa-book-open"></i> Guía del Viajero</a>
+    <div class="mobile-divider"></div>
+    <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="main-content" role="main">
+    <div class="hero-slider" id="heroSlider">
+        <div class="hero-slide active" style="background-image:url('Img/machupichu.jpg')"></div>
+        <div class="hero-slide"        style="background-image:url('Img/LAGOTITICACA.webp')"></div>
+        <div class="hero-slide"        style="background-image:url('Img/MANCORA.jpg')"></div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content animate-fadeup">
+        <span class="hero-tag"><i class="fa-solid fa-compass"></i> &nbsp;Agencia de viajes digital</span>
+        <h1>Descubre la magia<br><span class="highlight-text">del Perú</span></h1>
+        <p>Explora milenios de historia, culturas vivas y paisajes que te quitarán el aliento. Tu próxima gran historia comienza con nosotros.</p>
+        <div class="hero-ctas">
+            <a href="Destinos.html"  class="wp-btn wp-btn-primary"><i class="fa-solid fa-map"></i> Explorar destinos</a>
+            <a href="contacto.html"  class="wp-btn wp-btn-secondary"><i class="fa-regular fa-envelope"></i> Contáctanos</a>
+        </div>
+    </div>
+    <div class="hero-dots">
+        <button class="dot active" data-idx="0" aria-label="Slide 1"></button>
+        <button class="dot"        data-idx="1" aria-label="Slide 2"></button>
+        <button class="dot"        data-idx="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="hero-stats">
+        <div class="stat"><span class="stat-num">+500</span><span class="stat-label">Destinos</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">+10k</span><span class="stat-label">Viajeros</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">4.9★</span><span class="stat-label">Calificación</span></div>
+    </div>
+</section>
+
+<!-- ─── DESTINATIONS ─── -->
+<main>
+<section class="section-destinations">
+    <div class="wp-container">
+        <div class="section-head animate-fadeup">
+            <span class="section-tag"><i class="fa-solid fa-location-dot"></i> Destinos destacados</span>
+            <h2 class="section-title">Joyas arqueológicas del Perú</h2>
+            <p class="section-sub">Paquetes turísticos diseñados para conectarte con el pasado milenario.</p>
+        </div>
+        <div class="dest-grid">
+            <article class="dest-card animate-fadeup delay-1">
+                <div class="dest-img-wrap">
+                    <img src="Img/machupichu.jpg" alt="Machu Picchu" loading="lazy">
+                    <span class="dest-badge"><i class="fa-solid fa-location-dot"></i> Cusco</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Santuario Histórico de Machu Picchu</h3>
+                    <p>Recorre la imponente maravilla del mundo, obra maestra de la arquitectura inca enclavada en los Andes.</p>
+                    <a href="Destinos.html" class="dest-link">Ver destino <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </article>
+            <article class="dest-card animate-fadeup delay-2">
+                <div class="dest-img-wrap">
+                    <img src="Img/nasca.jpg" alt="Líneas de Nasca" loading="lazy">
+                    <span class="dest-badge"><i class="fa-solid fa-location-dot"></i> Ica</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Enigma de las Líneas de Nasca</h3>
+                    <p>Sobrevuela el desierto y maravíllate con los gigantescos geoglifos trazados por antiguas culturas.</p>
+                    <a href="Destinos.html" class="dest-link">Ver destino <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </article>
+            <article class="dest-card animate-fadeup delay-3">
+                <div class="dest-img-wrap">
+                    <img src="Img/caral.jpg" alt="Ciudad Sagrada de Caral" loading="lazy">
+                    <span class="dest-badge"><i class="fa-solid fa-location-dot"></i> Lima Provincias</span>
+                </div>
+                <div class="dest-body">
+                    <h3>Orígenes en la Ciudad Sagrada de Caral</h3>
+                    <p>Explora la civilización más antigua de América y sus impresionantes construcciones milenarias.</p>
+                    <a href="Destinos.html" class="dest-link">Ver destino <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </article>
+        </div>
+        <div style="text-align:center;margin-top:2.5rem;">
+            <a href="Destinos.html" class="wp-btn wp-btn-primary"><i class="fa-solid fa-compass"></i> Ver todos los destinos</a>
+        </div>
+    </div>
+</section>
+
+<!-- ─── WHY US ─── -->
+<section class="section-why">
+    <div class="wp-container">
+        <div class="section-head" style="text-align:center;">
+            <span class="section-tag"><i class="fa-solid fa-star"></i> ¿Por qué WayPath?</span>
+            <h2 class="section-title" style="margin:0 auto;">Lo que nos hace diferentes</h2>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon" style="background:rgba(249,115,22,.1);color:var(--orange-500)"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Reserva 100% segura</h3>
+                <p>Tus datos y pagos están protegidos con los más altos estándares de seguridad.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:rgba(0,57,184,.1);color:var(--blue-500)"><i class="fa-solid fa-headset"></i></div>
+                <h3>Soporte 24/7</h3>
+                <p>Asistencia personalizada antes, durante y después de tu viaje.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:rgba(21,128,61,.1);color:#15803d"><i class="fa-solid fa-tags"></i></div>
+                <h3>Mejores precios</h3>
+                <p>Garantizamos los precios más competitivos del mercado sin costos ocultos.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="fa-solid fa-mobile-screen"></i></div>
+                <h3>Todo digital</h3>
+                <p>Reserva, paga y gestiona todo tu viaje desde cualquier dispositivo.</p>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<!-- ─── FOOTER ─── -->
+<footer class="wp-footer" role="contentinfo">
+    <div class="wp-footer-inner">
+        <div>
+            <span class="wp-footer-logo">Way<span class="accent">Path</span></span>
+            <p class="wp-footer-tagline">Tu agencia de viajes digital para explorar el Perú y el mundo con confianza.</p>
+        </div>
+        <div class="wp-footer-col">
+            <h4>Páginas</h4>
+            <a href="servicios.html">Nuestros servicios</a>
+            <a href="Destinos.html">Destinos</a>
+            <a href="compras.html">Mis compras</a>
+            <a href="reseñas.html">Nuestras reseñas</a>
+            <a href="contacto.html">Contacto</a>
+        </div>
+        <div class="wp-footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacidad</a>
+            <a href="#">Términos y condiciones</a>
+            <a href="#">Soporte</a>
+        </div>
+    </div>
+    <div class="wp-footer-bottom">
+        <span>© 2026 WayPath. Todos los derechos reservados.</span>
+        <div style="display:flex;gap:16px;">
+            <a href="#">Privacidad</a>
+            <a href="#">Términos</a>
+        </div>
+    </div>
+</footer>
+
+<script src="js/accesibilidad.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+// Hamburger
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('open'));
+});
+
+// Hero slider
+let currentSlide = 0;
+const slides = document.querySelectorAll('.hero-slide');
+const dots   = document.querySelectorAll('.dot');
+function goTo(n) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+    currentSlide = (n + slides.length) % slides.length;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+}
+dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.idx)));
+setInterval(() => goTo(currentSlide + 1), 5000);
+
+// Login state
+document.addEventListener('DOMContentLoaded', () => {
+    const user = localStorage.getItem('waypath_usuario');
+    if (user) {
+        const name = user.split(' ')[0];
+        document.querySelectorAll('.login-btn').forEach(btn => {
+            btn.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Salir (${name})`;
+            btn.href = '#';
+            btn.style.cssText = 'background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;';
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                localStorage.removeItem('waypath_usuario');
+                window.location.reload();
+            });
+        });
+    }
+});
+</script>
+</body>
+</html>
