@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="form-field">
                                     <label>Número de viajeros</label>
-                                    <select class="wp-select" id="resPasajeros" onchange="calcularTotal()">
+                                    <select class="wp-select" id="resPasajeros">
                                         <option value="1">1 Persona</option>
                                         <option value="2">2 Personas</option>
                                         <option value="3">3 Personas</option>
@@ -81,7 +81,7 @@
                             </div>
                             <div class="form-field">
                                 <label>Requerimientos especiales (Opcional)</label>
-                                <textarea class="wp-textarea" placeholder="Alergias, necesidades de movilidad..."></textarea>
+                                <textarea class="wp-textarea" id="resObservaciones" placeholder="Alergias, necesidades de movilidad..."></textarea>
                             </div>
                         </div>
 
@@ -123,35 +123,7 @@
     </div>
 </main>
 
-<script>
-let precioUnitario = 0;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const destino = localStorage.getItem('destinoSeleccionado') || 'Destino Desconocido';
-    precioUnitario = parseFloat(localStorage.getItem('precioSeleccionado') || '0');
-    const img = localStorage.getItem('imgSeleccionada') || 'Img/machupichu.jpg';
-
-    document.getElementById('sumDestino').textContent = destino;
-    document.getElementById('sumImg').src = img;
-    document.getElementById('sumPrecioUnitario').textContent = 'S/ ' + precioUnitario;
-
-    calcularTotal();
-});
-
-function calcularTotal() {
-    const pax = parseInt(document.getElementById('resPasajeros').value);
-    document.getElementById('sumPasajerosNum').textContent = pax;
-    document.getElementById('sumTotal').textContent = 'S/ ' + (precioUnitario * pax).toFixed(2);
-}
-
-document.getElementById('formReserva').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const total = precioUnitario * parseInt(document.getElementById('resPasajeros').value);
-    localStorage.setItem('totalReserva', total);
-    localStorage.setItem('fechaReserva', document.getElementById('resFecha').value);
-    window.location.href = 'pago.html';
-});
-</script>
+<script type="module" src="js/reserva.js"></script>
 <script src="js/accesibilidad.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>

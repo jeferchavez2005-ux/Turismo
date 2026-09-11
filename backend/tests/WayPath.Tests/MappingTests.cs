@@ -4,6 +4,7 @@ using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
 using WayPath.Domain.Operacion;
 using WayPath.Domain.Seguridad;
+using WayPath.Domain.Ventas;
 using WayPath.Infrastructure;
 
 namespace WayPath.Tests;
@@ -15,7 +16,7 @@ public sealed class MappingTests
     {
         using var db = new WayPathDbContext(new DbContextOptionsBuilder<WayPathDbContext>()
             .UseSqlServer("Server=unused;Database=unused;Integrated Security=True").Options);
-        Assert.Equal(44, db.Model.GetEntityTypes().Count());
+        Assert.Equal(48, db.Model.GetEntityTypes().Count());
         Assert.Equal("Usuarios", db.Model.FindEntityType(typeof(Usuario))!.GetTableName());
         Assert.Equal("Seguridad", db.Model.FindEntityType(typeof(Usuario))!.GetSchema());
         Assert.Equal("Clientes", db.Model.FindEntityType(typeof(ClientePerfil))!.GetTableName());
@@ -32,10 +33,16 @@ public sealed class MappingTests
         Assert.Equal("Salidas", db.Model.FindEntityType(typeof(Salida))!.GetTableName());
         Assert.Equal("CuposSalida", db.Model.FindEntityType(typeof(CupoSalida))!.GetTableName());
         Assert.Equal("AsignacionesOperacion", db.Model.FindEntityType(typeof(AsignacionOperacion))!.GetTableName());
+        Assert.Equal("Reservas", db.Model.FindEntityType(typeof(Reserva))!.GetTableName());
+        Assert.Equal("Ventas", db.Model.FindEntityType(typeof(Reserva))!.GetSchema());
+        Assert.Equal("ReservaDetalle", db.Model.FindEntityType(typeof(ReservaDetalle))!.GetTableName());
+        Assert.Equal("ReservaPasajeros", db.Model.FindEntityType(typeof(ReservaPasajero))!.GetTableName());
+        Assert.Equal("ReservaHistorialEstados", db.Model.FindEntityType(typeof(ReservaHistorialEstado))!.GetTableName());
         Assert.True(db.Model.FindEntityType(typeof(Usuario))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(ClientePerfil))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Destino))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Paquete))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
+        Assert.True(db.Model.FindEntityType(typeof(Reserva))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.Equal(["UsuarioId", "RolId"], db.Model.FindEntityType(typeof(UsuarioRol))!
             .FindPrimaryKey()!.Properties.Select(p => p.Name).ToArray());
         Assert.Equal(["RolId", "PermisoId"], db.Model.FindEntityType(typeof(RolPermiso))!

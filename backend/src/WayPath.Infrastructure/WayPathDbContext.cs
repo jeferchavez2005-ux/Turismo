@@ -4,6 +4,7 @@ using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
 using WayPath.Domain.Operacion;
 using WayPath.Domain.Seguridad;
+using WayPath.Domain.Ventas;
 
 namespace WayPath.Infrastructure;
 
@@ -53,6 +54,10 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<BloqueoDisponibilidad> BloqueosDisponibilidad => Set<BloqueoDisponibilidad>();
     public DbSet<AsignacionOperacion> AsignacionesOperacion => Set<AsignacionOperacion>();
     public DbSet<ItinerarioOperativo> ItinerarioOperativo => Set<ItinerarioOperativo>();
+    public DbSet<Reserva> Reservas => Set<Reserva>();
+    public DbSet<ReservaDetalle> ReservaDetalle => Set<ReservaDetalle>();
+    public DbSet<ReservaPasajero> ReservaPasajeros => Set<ReservaPasajero>();
+    public DbSet<ReservaHistorialEstado> ReservaHistorialEstados => Set<ReservaHistorialEstado>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -511,6 +516,57 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         operativo.Property(x => x.Descripcion).HasMaxLength(500);
         operativo.HasIndex(x => new { x.SalidaId, x.DiaNumero, x.Actividad }).IsUnique();
         operativo.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+
+        var reserva = model.Entity<Reserva>();
+        reserva.ToTable("Reservas", "Ventas", t => t.ExcludeFromMigrations());
+        reserva.HasKey(x => x.ReservaId);
+        reserva.Property(x => x.ReservaId).UseIdentityColumn();
+        reserva.Property(x => x.CodigoReserva).HasMaxLength(40).IsRequired();
+        reserva.HasIndex(x => x.CodigoReserva).IsUnique();
+        reserva.Property(x => x.FechaReserva).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        reserva.Property(x => x.FechaExpiracion).HasColumnType("datetime2(0)");
+        reserva.Property(x => x.Subtotal).HasColumnType("decimal(18,2)");
+        reserva.Property(x => x.Impuestos).HasColumnType("decimal(18,2)");
+        reserva.Property(x => x.Descuento).HasColumnType("decimal(18,2)");
+        reserva.Property(x => x.Total).HasColumnType("decimal(18,2)");
+        reserva.Property(x => x.Observaciones).HasMaxLength(500);
+        reserva.Property(x => x.FilaVersion).IsRowVersion();
+        reserva.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
+        reserva.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+        reserva.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+        reserva.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+
+        var reservaDetalle = model.Entity<ReservaDetalle>();
+        reservaDetalle.ToTable("ReservaDetalle", "Ventas", t => t.ExcludeFromMigrations());
+        reservaDetalle.HasKey(x => x.ReservaDetalleId);
+        reservaDetalle.Property(x => x.ReservaDetalleId).UseIdentityColumn();
+        reservaDetalle.Property(x => x.TipoDetalle).HasMaxLength(40).IsRequired();
+        reservaDetalle.Property(x => x.Descripcion).HasMaxLength(250).IsRequired();
+        reservaDetalle.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
+        reservaDetalle.Property(x => x.Importe).HasColumnType("decimal(18,2)");
+        reservaDetalle.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        reservaDetalle.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+        reservaDetalle.HasOne<Tarifa>().WithMany().HasForeignKey(x => x.TarifaId).OnDelete(DeleteBehavior.NoAction);
+
+        var reservaPasajero = model.Entity<ReservaPasajero>();
+        reservaPasajero.ToTable("ReservaPasajeros", "Ventas", t => t.ExcludeFromMigrations());
+        reservaPasajero.HasKey(x => x.ReservaPasajeroId);
+        reservaPasajero.Property(x => x.ReservaPasajeroId).UseIdentityColumn();
+        reservaPasajero.Property(x => x.TipoPasajero).HasMaxLength(30).IsRequired();
+        reservaPasajero.HasIndex(x => new { x.ReservaId, x.PasajeroId }).IsUnique();
+        reservaPasajero.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        reservaPasajero.HasOne<Pasajero>().WithMany().HasForeignKey(x => x.PasajeroId).OnDelete(DeleteBehavior.NoAction);
+
+        var historial = model.Entity<ReservaHistorialEstado>();
+        historial.ToTable("ReservaHistorialEstados", "Ventas", t => t.ExcludeFromMigrations());
+        historial.HasKey(x => x.ReservaHistorialEstadoId);
+        historial.Property(x => x.ReservaHistorialEstadoId).UseIdentityColumn();
+        historial.Property(x => x.Comentario).HasMaxLength(500);
+        historial.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        historial.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        historial.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoAnteriorId).OnDelete(DeleteBehavior.NoAction);
+        historial.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoNuevoId).OnDelete(DeleteBehavior.NoAction);
+        historial.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
