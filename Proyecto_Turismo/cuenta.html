@@ -21,13 +21,97 @@
     <p id="accountMessage" class="auth-message" role="status" aria-live="polite">Cargando cuenta...</p>
     <div id="accountContent" hidden>
         <section class="account-section">
-            <h2>Perfil</h2>
+            <h2>Usuario</h2>
             <p id="accountEmail" class="account-email"></p>
             <form id="profileForm">
                 <label for="name">Nombre</label>
                 <input id="name" class="wp-input" required maxlength="100" autocomplete="name">
                 <button type="submit" class="wp-btn wp-btn-primary">
                     <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Guardar
+                </button>
+            </form>
+        </section>
+        <section class="account-section">
+            <h2>Perfil de cliente</h2>
+            <form id="clientProfileForm" class="account-grid">
+                <label for="clientNames">Nombres</label>
+                <input id="clientNames" class="wp-input" required maxlength="120" autocomplete="given-name">
+                <label for="clientLastNames">Apellidos</label>
+                <input id="clientLastNames" class="wp-input" required maxlength="120" autocomplete="family-name">
+                <label for="clientPhone">Telefono</label>
+                <input id="clientPhone" class="wp-input" maxlength="30" autocomplete="tel">
+                <label for="clientBirthDate">Fecha de nacimiento</label>
+                <input id="clientBirthDate" class="wp-input" type="date" autocomplete="bday">
+                <label for="clientGender">Genero</label>
+                <select id="clientGender" class="wp-input">
+                    <option value="">Prefiero no indicar</option>
+                    <option value="MASCULINO">Masculino</option>
+                    <option value="FEMENINO">Femenino</option>
+                    <option value="OTRO">Otro</option>
+                    <option value="NO_DECLARA">No declara</option>
+                </select>
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-id-card" aria-hidden="true"></i> Guardar cliente
+                </button>
+            </form>
+        </section>
+        <section class="account-section">
+            <h2>Documentos</h2>
+            <div id="documentsList" class="account-list"></div>
+            <form id="documentForm" class="account-grid">
+                <input id="documentId" type="hidden">
+                <label for="documentType">Tipo</label>
+                <select id="documentType" class="wp-input" required></select>
+                <label for="documentNumber">Numero</label>
+                <input id="documentNumber" class="wp-input" required maxlength="40">
+                <label for="documentCountry">Pais de emision</label>
+                <select id="documentCountry" class="wp-input"></select>
+                <label for="documentExpiration">Fecha de vencimiento</label>
+                <input id="documentExpiration" class="wp-input" type="date">
+                <label class="account-check">
+                    <input id="documentMain" type="checkbox"> Principal
+                </label>
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-file-shield" aria-hidden="true"></i> Guardar documento
+                </button>
+            </form>
+        </section>
+        <section class="account-section">
+            <h2>Direcciones</h2>
+            <div id="addressesList" class="account-list"></div>
+            <form id="addressForm" class="account-grid">
+                <input id="addressId" type="hidden">
+                <label for="addressCity">Ciudad</label>
+                <select id="addressCity" class="wp-input" required></select>
+                <label for="addressLine">Direccion</label>
+                <input id="addressLine" class="wp-input" required maxlength="250" autocomplete="street-address">
+                <label for="addressPostalCode">Codigo postal</label>
+                <input id="addressPostalCode" class="wp-input" maxlength="20" autocomplete="postal-code">
+                <label class="account-check">
+                    <input id="addressMain" type="checkbox"> Principal
+                </label>
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i> Guardar direccion
+                </button>
+            </form>
+        </section>
+        <section class="account-section">
+            <h2>Preferencias</h2>
+            <form id="preferencesForm" class="account-grid">
+                <label for="preferredLanguage">Idioma</label>
+                <input id="preferredLanguage" class="wp-input" required maxlength="10" value="es">
+                <label for="preferredCurrency">Moneda</label>
+                <select id="preferredCurrency" class="wp-input"></select>
+                <label class="account-check">
+                    <input id="receivePromotions" type="checkbox" checked> Recibir promociones
+                </label>
+                <label class="account-check">
+                    <input id="requiresAccessibility" type="checkbox"> Requiere accesibilidad
+                </label>
+                <label for="preferenceNotes">Observaciones</label>
+                <textarea id="preferenceNotes" class="wp-input" maxlength="500" rows="4"></textarea>
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-sliders" aria-hidden="true"></i> Guardar preferencias
                 </button>
             </form>
         </section>
@@ -49,4 +133,3 @@
 <script type="module" src="js/cuenta.js"></script>
 </body>
 </html>
-

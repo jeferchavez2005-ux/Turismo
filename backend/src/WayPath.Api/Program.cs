@@ -31,7 +31,9 @@ builder.Services.AddSingleton(jwt);
 builder.Services.AddSingleton<JwtSession>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ISecurityStore, SecurityStore>();
+builder.Services.AddScoped<IClienteStore, ClienteStore>();
 builder.Services.AddDbContext<WayPathDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddControllers(options => options.Filters.Add<CsrfFilter>())
     .AddJsonOptions(options => options.JsonSerializerOptions.UnmappedMemberHandling =
