@@ -1,0 +1,117 @@
+import { api } from "./api.js";
+
+const grid = document.getElementById("destinosGrid");
+const emptyState = document.getElementById("emptyState");
+const buscador = document.getElementById("buscador-destinos");
+const filtroPrecio = document.getElementById("filtro-precio");
+let destinos = [];
+
+function money(value, currency) {
+    if (value === null || value === undefined) return "Consultar";
+    const prefix = currency === "USD" ? "$" : "S/";
+    return `${prefix} ${Number(value).toLocaleString("es-PE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+function fallbackImage(url) {
+    return url && url.length ? url : "Img/machupichu.jpg";
+}
+function card(destino) {
+    const article = document.createElement("article");
+    article.className = "dest-card";
+    article.dataset.nombre = destino.nombre;
+    article.dataset.precio = destino.precioDesde ?? "";
+
+    const imgWrap = document.createElement("div");
+    imgWrap.className = "dest-img-wrap";
+    const img = document.createElement("img");
+    img.src = fallbackImage(destino.imagenUrl);
+    img.alt = destino.imagenAlt || destino.nombre;
+    img.loading = "lazy";
+    const badge = document.createElement("span");
+    badge.className = destino.esDestacado ? "dest-badge-img dest-badge-popular" : "dest-badge-img";
+    const badgeIcon = document.createElement("i");
+    badgeIcon.className = destino.esDestacado ? "fa-solid fa-fire" : "fa-solid fa-location-dot";
+    badge.append(badgeIcon, document.createTextNode(` ${destino.esDestacado ? "Destacado" : destino.region}`));
+    imgWrap.append(img, badge);
+
+    const body = document.createElement("div");
+    body.className = "dest-body";
+    const title = document.createElement("h3");
+    title.textContent = destino.nombre;
+    const location = document.createElement("p");
+    location.className = "location";
+    const locationIcon = document.createElement("i");
+    locationIcon.className = "fa-solid fa-location-dot";
+    location.append(locationIcon, document.createTextNode(` ${destino.ciudad}, ${destino.pais}`));
+    const desc = document.createElement("p");
+    desc.className = "desc";
+    desc.textContent = destino.descripcionCorta;
+
+    const footer = document.createElement("div");
+    footer.className = "dest-footer";
+    const priceInfo = document.createElement("div");
+    priceInfo.className = "price-info";
+    const from = document.createElement("span");
+    from.className = "price-from";
+    from.textContent = "Desde";
+    const amount = document.createElement("span");
+    amount.className = "price-amount";
+    amount.textContent = money(destino.precioDesde, destino.moneda);
+    priceInfo.append(from, amount);
+
+    const reserve = document.createElement("a");
+    reserve.href = "reserva.html";
+    reserve.className = "wp-btn wp-btn-primary btn-reserva";
+    reserve.dataset.destinoId = destino.destinoId;
+    reserve.dataset.nombre = destino.nombre;
+    reserve.dataset.precio = destino.precioDesde ?? "0";
+    reserve.dataset.img = fallbackImage(destino.imagenUrl);
+    const calendar = document.createElement("i");
+    calendar.className = "fa-solid fa-calendar-plus";
+    reserve.append(calendar, document.createTextNode(" Reservar"));
+    reserve.addEventListener("click", () => {
+        localStorage.setItem("destinoIdSeleccionado", destino.destinoId);
+        localStorage.setItem("destinoSeleccionado", destino.nombre);
+        localStorage.setItem("precioSeleccionado", destino.precioDesde ?? "0");
+        localStorage.setItem("imgSeleccionada", fallbackImage(destino.imagenUrl));
+    });
+
+    footer.append(priceInfo, reserve);
+    body.append(title, location, desc, footer);
+    article.append(imgWrap, body);
+    return article;
+}
+function render(rows) {
+    grid.replaceChildren();
+    rows.forEach(destino => grid.append(card(destino)));
+    emptyState.style.display = rows.length ? "none" : "block";
+}
+function filterLocal() {
+    const text = buscador.value.trim().toLowerCase();
+    const [min, max] = (filtroPrecio.value || "0-999999").split("-").map(Number);
+    const rows = destinos.filter(destino => {
+        const price = Number(destino.precioDesde ?? 0);
+        const searchable = `${destino.nombre} ${destino.descripcionCorta} ${destino.ciudad} ${destino.region}`.toLowerCase();
+        return searchable.includes(text) && price >= min && price <= max;
+    });
+    render(rows);
+}
+async function loadDestinations() {
+    try {
+        destinos = await api("/api/catalogo/destinos");
+        render(destinos);
+    } catch {
+        destinos = Array.from(document.querySelectorAll("#destinosGrid .dest-card")).map(card => ({
+            nombre: card.dataset.nombre,
+            precioDesde: Number(card.dataset.precio || 0),
+            descripcionCorta: card.querySelector(".desc")?.textContent || "",
+            ciudad: card.querySelector(".location")?.textContent?.replace(/\s+/g, " ").trim() || "",
+            region: "",
+            pais: "Peru"
+        }));
+        filterLocal();
+    }
+}
+
+buscador.addEventListener("input", filterLocal);
+filtroPrecio.addEventListener("change", filterLocal);
+await loadDestinations();

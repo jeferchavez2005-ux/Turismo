@@ -20,6 +20,18 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<Pais> Paises => Set<Pais>();
     public DbSet<Region> Regiones => Set<Region>();
     public DbSet<Ciudad> Ciudades => Set<Ciudad>();
+    public DbSet<UbicacionTuristica> UbicacionesTuristicas => Set<UbicacionTuristica>();
+    public DbSet<Destino> Destinos => Set<Destino>();
+    public DbSet<CategoriaDestino> CategoriasDestino => Set<CategoriaDestino>();
+    public DbSet<DestinoCategoria> DestinoCategorias => Set<DestinoCategoria>();
+    public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
+    public DbSet<DestinoImagen> DestinoImagenes => Set<DestinoImagen>();
+    public DbSet<AtraccionDestino> AtraccionesDestino => Set<AtraccionDestino>();
+    public DbSet<Paquete> Paquetes => Set<Paquete>();
+    public DbSet<Tarifa> Tarifas => Set<Tarifa>();
+    public DbSet<PaqueteItinerario> PaqueteItinerario => Set<PaqueteItinerario>();
+    public DbSet<PaqueteIncluye> PaqueteIncluye => Set<PaqueteIncluye>();
+    public DbSet<PaqueteNoIncluye> PaqueteNoIncluye => Set<PaqueteNoIncluye>();
     public DbSet<ClientePerfil> Clientes => Set<ClientePerfil>();
     public DbSet<DocumentoCliente> DocumentosCliente => Set<DocumentoCliente>();
     public DbSet<DireccionCliente> DireccionesCliente => Set<DireccionCliente>();
@@ -130,6 +142,124 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         ciudad.Property(x => x.CiudadId).UseIdentityColumn();
         ciudad.Property(x => x.Nombre).HasMaxLength(120).IsRequired();
         ciudad.HasOne<Region>().WithMany().HasForeignKey(x => x.RegionId).OnDelete(DeleteBehavior.NoAction);
+
+        var ubicacion = model.Entity<UbicacionTuristica>();
+        ubicacion.ToTable("UbicacionesTuristicas", "Catalogo", t => t.ExcludeFromMigrations());
+        ubicacion.HasKey(x => x.UbicacionTuristicaId);
+        ubicacion.Property(x => x.UbicacionTuristicaId).UseIdentityColumn();
+        ubicacion.Property(x => x.Nombre).HasMaxLength(150).IsRequired();
+        ubicacion.Property(x => x.Direccion).HasMaxLength(250);
+        ubicacion.Property(x => x.Latitud).HasColumnType("decimal(9,6)");
+        ubicacion.Property(x => x.Longitud).HasColumnType("decimal(9,6)");
+        ubicacion.HasOne<Ciudad>().WithMany().HasForeignKey(x => x.CiudadId).OnDelete(DeleteBehavior.NoAction);
+
+        var destino = model.Entity<Destino>();
+        destino.ToTable("Destinos", "Catalogo", t => t.ExcludeFromMigrations());
+        destino.HasKey(x => x.DestinoId);
+        destino.Property(x => x.DestinoId).UseIdentityColumn();
+        destino.Property(x => x.Nombre).HasMaxLength(160).IsRequired();
+        destino.Property(x => x.Slug).HasMaxLength(180).IsRequired();
+        destino.HasIndex(x => x.Slug).IsUnique();
+        destino.Property(x => x.DescripcionCorta).HasMaxLength(300).IsRequired();
+        destino.Property(x => x.DescripcionLarga).HasColumnType("nvarchar(max)");
+        destino.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        destino.Property(x => x.ActualizadoEn).HasColumnType("datetime2(0)");
+        destino.Property(x => x.FilaVersion).IsRowVersion();
+        destino.HasOne<Ciudad>().WithMany().HasForeignKey(x => x.CiudadId).OnDelete(DeleteBehavior.NoAction);
+        destino.HasOne<UbicacionTuristica>().WithMany().HasForeignKey(x => x.UbicacionTuristicaId).OnDelete(DeleteBehavior.NoAction);
+        destino.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var categoria = model.Entity<CategoriaDestino>();
+        categoria.ToTable("CategoriasDestino", "Catalogo", t => t.ExcludeFromMigrations());
+        categoria.HasKey(x => x.CategoriaDestinoId);
+        categoria.Property(x => x.CategoriaDestinoId).UseIdentityColumn();
+        categoria.Property(x => x.Codigo).HasMaxLength(50).IsRequired();
+        categoria.HasIndex(x => x.Codigo).IsUnique();
+        categoria.Property(x => x.Nombre).HasMaxLength(120).IsRequired();
+        categoria.Property(x => x.Descripcion).HasMaxLength(250);
+
+        var destinoCategoria = model.Entity<DestinoCategoria>();
+        destinoCategoria.ToTable("DestinoCategorias", "Catalogo", t => t.ExcludeFromMigrations());
+        destinoCategoria.HasKey(x => new { x.DestinoId, x.CategoriaDestinoId });
+        destinoCategoria.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
+        destinoCategoria.HasOne<CategoriaDestino>().WithMany().HasForeignKey(x => x.CategoriaDestinoId).OnDelete(DeleteBehavior.NoAction);
+
+        var media = model.Entity<MediaAsset>();
+        media.ToTable("MediaAssets", "Catalogo", t => t.ExcludeFromMigrations());
+        media.HasKey(x => x.MediaAssetId);
+        media.Property(x => x.MediaAssetId).UseIdentityColumn();
+        media.Property(x => x.Tipo).HasMaxLength(30).IsRequired();
+        media.Property(x => x.Url).HasMaxLength(1000).IsRequired();
+        media.Property(x => x.NombreArchivo).HasMaxLength(255);
+        media.Property(x => x.MimeType).HasMaxLength(100);
+        media.Property(x => x.TextoAlternativo).HasMaxLength(250);
+        media.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+
+        var destinoImagen = model.Entity<DestinoImagen>();
+        destinoImagen.ToTable("DestinoImagenes", "Catalogo", t => t.ExcludeFromMigrations());
+        destinoImagen.HasKey(x => x.DestinoImagenId);
+        destinoImagen.Property(x => x.DestinoImagenId).UseIdentityColumn();
+        destinoImagen.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
+        destinoImagen.HasOne<MediaAsset>().WithMany().HasForeignKey(x => x.MediaAssetId).OnDelete(DeleteBehavior.NoAction);
+
+        var atraccion = model.Entity<AtraccionDestino>();
+        atraccion.ToTable("AtraccionesDestino", "Catalogo", t => t.ExcludeFromMigrations());
+        atraccion.HasKey(x => x.AtraccionDestinoId);
+        atraccion.Property(x => x.AtraccionDestinoId).UseIdentityColumn();
+        atraccion.Property(x => x.Nombre).HasMaxLength(160).IsRequired();
+        atraccion.Property(x => x.Descripcion).HasMaxLength(500);
+        atraccion.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
+
+        var paquete = model.Entity<Paquete>();
+        paquete.ToTable("Paquetes", "Catalogo", t => t.ExcludeFromMigrations());
+        paquete.HasKey(x => x.PaqueteId);
+        paquete.Property(x => x.PaqueteId).UseIdentityColumn();
+        paquete.Property(x => x.Nombre).HasMaxLength(180).IsRequired();
+        paquete.Property(x => x.Slug).HasMaxLength(200).IsRequired();
+        paquete.HasIndex(x => x.Slug).IsUnique();
+        paquete.Property(x => x.Descripcion).HasColumnType("nvarchar(max)");
+        paquete.Property(x => x.NivelDificultad).HasMaxLength(30);
+        paquete.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        paquete.Property(x => x.ActualizadoEn).HasColumnType("datetime2(0)");
+        paquete.Property(x => x.FilaVersion).IsRowVersion();
+        paquete.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
+        paquete.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var tarifa = model.Entity<Tarifa>();
+        tarifa.ToTable("Tarifas", "Catalogo", t => t.ExcludeFromMigrations());
+        tarifa.HasKey(x => x.TarifaId);
+        tarifa.Property(x => x.TarifaId).UseIdentityColumn();
+        tarifa.Property(x => x.TipoTarifa).HasMaxLength(40).IsRequired();
+        tarifa.Property(x => x.PrecioBase).HasColumnType("decimal(18,2)");
+        tarifa.Property(x => x.PrecioNino).HasColumnType("decimal(18,2)");
+        tarifa.Property(x => x.VigenciaInicio).HasColumnType("date");
+        tarifa.Property(x => x.VigenciaFin).HasColumnType("date");
+        tarifa.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        tarifa.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+        tarifa.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        tarifa.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var itin = model.Entity<PaqueteItinerario>();
+        itin.ToTable("PaqueteItinerario", "Catalogo", t => t.ExcludeFromMigrations());
+        itin.HasKey(x => x.PaqueteItinerarioId);
+        itin.Property(x => x.PaqueteItinerarioId).UseIdentityColumn();
+        itin.Property(x => x.Titulo).HasMaxLength(160).IsRequired();
+        itin.Property(x => x.Descripcion).HasColumnType("nvarchar(max)");
+        itin.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+
+        var incluye = model.Entity<PaqueteIncluye>();
+        incluye.ToTable("PaqueteIncluye", "Catalogo", t => t.ExcludeFromMigrations());
+        incluye.HasKey(x => x.PaqueteIncluyeId);
+        incluye.Property(x => x.PaqueteIncluyeId).UseIdentityColumn();
+        incluye.Property(x => x.Descripcion).HasMaxLength(250).IsRequired();
+        incluye.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+
+        var noIncluye = model.Entity<PaqueteNoIncluye>();
+        noIncluye.ToTable("PaqueteNoIncluye", "Catalogo", t => t.ExcludeFromMigrations());
+        noIncluye.HasKey(x => x.PaqueteNoIncluyeId);
+        noIncluye.Property(x => x.PaqueteNoIncluyeId).UseIdentityColumn();
+        noIncluye.Property(x => x.Descripcion).HasMaxLength(250).IsRequired();
+        noIncluye.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
 
         var cliente = model.Entity<ClientePerfil>();
         cliente.ToTable("Clientes", "Cliente", t => t.ExcludeFromMigrations());

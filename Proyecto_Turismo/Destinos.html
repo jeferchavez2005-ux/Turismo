@@ -329,34 +329,7 @@
     <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
 </footer>
 
-<script>
-// Reservar → guardar en localStorage
-document.querySelectorAll('.btn-reserva').forEach(a => {
-    a.addEventListener('click', function() {
-        localStorage.setItem('destinoSeleccionado', this.dataset.nombre);
-        localStorage.setItem('precioSeleccionado',  this.dataset.precio);
-        localStorage.setItem('imgSeleccionada',     this.dataset.img);
-    });
-});
-// Buscador
-const buscador = document.getElementById('buscador-destinos');
-const filtroPrecio = document.getElementById('filtro-precio');
-function filtrar() {
-    const txt = buscador.value.toLowerCase();
-    const [min, max] = (filtroPrecio.value || '0-999999').split('-').map(Number);
-    let visible = 0;
-    document.querySelectorAll('#destinosGrid .dest-card').forEach(c => {
-        const nombre = c.dataset.nombre.toLowerCase();
-        const precio = +c.dataset.precio;
-        const ok = nombre.includes(txt) && precio >= min && precio <= max;
-        c.style.display = ok ? '' : 'none';
-        if (ok) visible++;
-    });
-    document.getElementById('emptyState').style.display = visible ? 'none' : 'block';
-}
-buscador.addEventListener('input', filtrar);
-filtroPrecio.addEventListener('change', filtrar);
-</script>
+<script type="module" src="js/catalogo-destinos.js"></script>
 <script src="js/accesibilidad.js"></script>
 <script src="js/navbar.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
