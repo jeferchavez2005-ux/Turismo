@@ -3,6 +3,7 @@ using WayPath.Domain.Catalogo;
 using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
 using WayPath.Domain.Operacion;
+using WayPath.Domain.Pagos;
 using WayPath.Domain.Seguridad;
 using WayPath.Domain.Ventas;
 
@@ -58,6 +59,11 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<ReservaDetalle> ReservaDetalle => Set<ReservaDetalle>();
     public DbSet<ReservaPasajero> ReservaPasajeros => Set<ReservaPasajero>();
     public DbSet<ReservaHistorialEstado> ReservaHistorialEstados => Set<ReservaHistorialEstado>();
+    public DbSet<MetodoPago> MetodosPago => Set<MetodoPago>();
+    public DbSet<OrdenPago> OrdenesPago => Set<OrdenPago>();
+    public DbSet<Pago> Pagos => Set<Pago>();
+    public DbSet<PagoIntento> PagoIntentos => Set<PagoIntento>();
+    public DbSet<Reembolso> Reembolsos => Set<Reembolso>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -567,6 +573,70 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         historial.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoAnteriorId).OnDelete(DeleteBehavior.NoAction);
         historial.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoNuevoId).OnDelete(DeleteBehavior.NoAction);
         historial.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var metodoPago = model.Entity<MetodoPago>();
+        metodoPago.ToTable("MetodosPago", "Pagos", t => t.ExcludeFromMigrations());
+        metodoPago.HasKey(x => x.MetodoPagoId);
+        metodoPago.Property(x => x.MetodoPagoId).UseIdentityColumn();
+        metodoPago.Property(x => x.Codigo).HasMaxLength(50).IsRequired();
+        metodoPago.HasIndex(x => x.Codigo).IsUnique();
+        metodoPago.Property(x => x.Nombre).HasMaxLength(100).IsRequired();
+
+        var ordenPago = model.Entity<OrdenPago>();
+        ordenPago.ToTable("OrdenesPago", "Pagos", t => t.ExcludeFromMigrations());
+        ordenPago.HasKey(x => x.OrdenPagoId);
+        ordenPago.Property(x => x.OrdenPagoId).UseIdentityColumn();
+        ordenPago.Property(x => x.CodigoOrden).HasMaxLength(60).IsRequired();
+        ordenPago.HasIndex(x => x.CodigoOrden).IsUnique();
+        ordenPago.Property(x => x.MontoTotal).HasColumnType("decimal(18,2)");
+        ordenPago.Property(x => x.FechaCreacion).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        ordenPago.Property(x => x.FechaExpiracion).HasColumnType("datetime2(0)");
+        ordenPago.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        ordenPago.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        ordenPago.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var pago = model.Entity<Pago>();
+        pago.ToTable("Pagos", "Pagos", t => t.ExcludeFromMigrations());
+        pago.HasKey(x => x.PagoId);
+        pago.Property(x => x.PagoId).UseIdentityColumn();
+        pago.Property(x => x.CodigoTransaccion).HasMaxLength(120);
+        pago.Property(x => x.Monto).HasColumnType("decimal(18,2)");
+        pago.Property(x => x.FechaPago).HasColumnType("datetime2(0)");
+        pago.Property(x => x.ReferenciaPasarela).HasMaxLength(200);
+        pago.Property(x => x.Observaciones).HasMaxLength(500);
+        pago.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        pago.Property(x => x.FilaVersion).IsRowVersion();
+        pago.HasOne<OrdenPago>().WithMany().HasForeignKey(x => x.OrdenPagoId).OnDelete(DeleteBehavior.NoAction);
+        pago.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        pago.HasOne<MetodoPago>().WithMany().HasForeignKey(x => x.MetodoPagoId).OnDelete(DeleteBehavior.NoAction);
+        pago.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        pago.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var intento = model.Entity<PagoIntento>();
+        intento.ToTable("PagoIntentos", "Pagos", t => t.ExcludeFromMigrations());
+        intento.HasKey(x => x.PagoIntentoId);
+        intento.Property(x => x.PagoIntentoId).UseIdentityColumn();
+        intento.Property(x => x.Resultado).HasMaxLength(40).IsRequired();
+        intento.Property(x => x.Mensaje).HasMaxLength(500);
+        intento.Property(x => x.PayloadRespuesta).HasColumnType("nvarchar(max)");
+        intento.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        intento.HasOne<OrdenPago>().WithMany().HasForeignKey(x => x.OrdenPagoId).OnDelete(DeleteBehavior.NoAction);
+        intento.HasOne<Pago>().WithMany().HasForeignKey(x => x.PagoId).OnDelete(DeleteBehavior.NoAction);
+        intento.HasOne<MetodoPago>().WithMany().HasForeignKey(x => x.MetodoPagoId).OnDelete(DeleteBehavior.NoAction);
+
+        var reembolso = model.Entity<Reembolso>();
+        reembolso.ToTable("Reembolsos", "Pagos", t => t.ExcludeFromMigrations());
+        reembolso.HasKey(x => x.ReembolsoId);
+        reembolso.Property(x => x.ReembolsoId).UseIdentityColumn();
+        reembolso.Property(x => x.CodigoReembolso).HasMaxLength(80).IsRequired();
+        reembolso.HasIndex(x => x.CodigoReembolso).IsUnique();
+        reembolso.Property(x => x.Monto).HasColumnType("decimal(18,2)");
+        reembolso.Property(x => x.Motivo).HasMaxLength(500).IsRequired();
+        reembolso.Property(x => x.FechaSolicitud).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        reembolso.Property(x => x.FechaProcesado).HasColumnType("datetime2(0)");
+        reembolso.HasOne<Pago>().WithMany().HasForeignKey(x => x.PagoId).OnDelete(DeleteBehavior.NoAction);
+        reembolso.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        reembolso.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

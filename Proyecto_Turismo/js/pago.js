@@ -1,62 +1,126 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const nombreDestino = localStorage.getItem('destinoSeleccionado') || "Destino Sorpresa";
-    const rutaImagen = localStorage.getItem('imgSeleccionada') || "Img/machupichu.jpg";
-    const totalPagar = localStorage.getItem('wp_total_pagar') || "S/. 0.00";
-    const detallePasajeros = localStorage.getItem('wp_detalle_pasajeros') || "1x Adultos (S/. 0 c/u)";
+import { ApiError, api } from "./api.js";
 
-    if(document.getElementById("pago-destino")) document.getElementById("pago-destino").textContent = nombreDestino;
-    if(document.getElementById("pago-img")) {
-        document.getElementById("pago-img").src = rutaImagen;
-        document.getElementById("pago-img").alt = nombreDestino;
+const state = {
+    reservaId: localStorage.getItem("wp_reserva_id"),
+    order: null,
+    methods: []
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    bindStaticSummary();
+    document.getElementById("formPago")?.addEventListener("submit", submitPayment);
+    try {
+        await loadPaymentContext();
+    } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+        showAlert("No se pudo cargar el pago", error instanceof ApiError ? error.message : "Intenta nuevamente.");
     }
-    if(document.getElementById("pago-pasajeros")) document.getElementById("pago-pasajeros").textContent = detallePasajeros;
-    if(document.getElementById("pago-subtotal")) document.getElementById("pago-subtotal").textContent = totalPagar;
-    if(document.getElementById("pago-gran-total")) document.getElementById("pago-gran-total").textContent = totalPagar;
+});
 
-    const tarjetasMetodos = document.querySelectorAll(".metodo-card");
-    const formTarjeta = document.getElementById("form-tarjeta");
-    const formYape = document.getElementById("form-yape");
+function bindStaticSummary() {
+    const destino = localStorage.getItem("destinoSeleccionado") || "Destino Desconocido";
+    const total = Number.parseFloat(localStorage.getItem("totalReserva") || "0");
+    const fecha = localStorage.getItem("fechaReserva") || "Fecha no especificada";
+    const img = localStorage.getItem("imgSeleccionada") || "Img/machupichu.jpg";
+    text("sumDestino", destino);
+    text("sumTotal", money(total));
+    text("sumFecha", fecha);
+    const image = document.getElementById("sumImg");
+    if (image) {
+        image.src = img;
+        image.alt = destino;
+    }
+}
 
-    tarjetasMetodos.forEach(tarjeta => {
-        tarjeta.addEventListener("click", function() {
-            tarjetasMetodos.forEach(t => t.classList.remove("activo"));
-            this.classList.add("activo");
+async function loadPaymentContext() {
+    if (!state.reservaId) throw new ApiError("No existe una reserva pendiente para pagar.", 400);
+    const detail = await api(`/api/reservas/me/${encodeURIComponent(state.reservaId)}`);
+    text("sumDestino", detail.destino);
+    text("sumFecha", detail.fechaInicio);
+    text("sumTotal", money(detail.total));
+    localStorage.setItem("totalReserva", String(detail.total));
+    localStorage.setItem("wp_codigo_reserva", detail.codigoReserva);
+    state.methods = await api("/api/pagos/metodos");
+    state.order = await api("/api/pagos/ordenes", {
+        method: "POST",
+        body: { reservaId: Number(state.reservaId) }
+    });
+    text("sumTotal", money(state.order.montoTotal));
+}
 
-            if (this.getAttribute("data-metodo") === "yape") {
-                if(formTarjeta) formTarjeta.style.display = "none";
-                if(formYape) formYape.style.display = "block";
-            } else {
-                if(formYape) formYape.style.display = "none";
-                if(formTarjeta) formTarjeta.style.display = "flex";
+async function submitPayment(event) {
+    event.preventDefault();
+    if (!state.order) {
+        showAlert("Orden no disponible", "No se pudo preparar la orden de pago.");
+        return;
+    }
+    const method = selectedMethod();
+    if (!method) {
+        showAlert("Metodo no disponible", "Seleccione un metodo de pago activo.");
+        return;
+    }
+    const button = event.submitter || document.querySelector("#formPago button[type='submit']");
+    button.disabled = true;
+    try {
+        Swal.fire({
+            title: "Procesando pago...",
+            html: 'Conectando con la pasarela simulada de WayPath<br><br><i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:#f97316;"></i>',
+            showConfirmButton: false,
+            allowOutsideClick: false
+        });
+        const result = localStorage.getItem("wp_pago_simulado") || "APROBADO";
+        const payment = await api("/api/pagos/intentos", {
+            method: "POST",
+            body: {
+                ordenPagoId: Number(state.order.ordenPagoId),
+                metodoPagoId: method.metodoPagoId,
+                resultadoSimulado: result,
+                mensaje: `Resultado simulado desde checkout web: ${result}`
             }
         });
-    });
-
-    function procesarPago(e) {
-        if (e) e.preventDefault();
-
-        Swal.fire({
-            title: 'Procesando pago...',
-            html: 'Conectando con la pasarela de WayPath de forma segura<br><br><i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color: var(--primary-orange);"></i>',
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            timer: 2000
-        }).then(() => {
-            Swal.fire({
-                title: '¡Pago Exitoso!',
-                text: 'Tu reserva ha sido procesada correctamente.',
-                icon: 'success',
-                confirmButtonColor: '#002244',
-                confirmButtonText: 'Ver mis compras'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.setItem('wp_pago_exitoso', 'true');
-                    window.location.href = 'compras.html';
-                }
-            });
+        await Swal.fire({
+            title: payment.estado === "APROBADO" ? "Pago exitoso" : "Pago registrado",
+            text: payment.estado === "APROBADO"
+                ? "Tu reserva fue confirmada correctamente."
+                : "El pago no fue aprobado. Puedes intentar con otro metodo.",
+            icon: payment.estado === "APROBADO" ? "success" : "warning",
+            confirmButtonColor: "#f97316",
+            confirmButtonText: payment.estado === "APROBADO" ? "Ver mis compras" : "Intentar de nuevo"
         });
+        if (payment.estado === "APROBADO") {
+            localStorage.setItem("wp_pago_exitoso", "true");
+            localStorage.setItem("wp_pago_id", payment.pagoId);
+            window.location.href = "compras.html";
+        }
+    } catch (error) {
+        showAlert("No se pudo procesar el pago", error instanceof ApiError ? error.message : "Intenta nuevamente.");
+    } finally {
+        button.disabled = false;
     }
+}
 
-    if(formTarjeta) formTarjeta.addEventListener("submit", procesarPago);
-    if(document.getElementById("btn-yape-pagado")) document.getElementById("btn-yape-pagado").addEventListener("click", procesarPago);
-});
+function selectedMethod() {
+    const selected = document.querySelector("input[name='metodo']:checked")?.value || "tarjeta";
+    const code = selected === "yape" ? "YAPE" : "TARJETA_CREDITO";
+    return state.methods.find(x => x.codigo === code) || state.methods[0];
+}
+
+function showAlert(title, text) {
+    if (window.Swal) {
+        Swal.fire({ title, text, icon: "error", confirmButtonColor: "#f97316" });
+    } else {
+        alert(`${title}: ${text}`);
+    }
+}
+
+function text(id, content) {
+    const node = document.getElementById(id);
+    if (node) node.textContent = content;
+}
+
+function money(value) {
+    return `S/ ${Number(value || 0).toFixed(2)}`;
+}

@@ -122,34 +122,7 @@
 </main>
 
 <script src="js/accesibilidad.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const destino = localStorage.getItem('destinoSeleccionado') || 'Destino Desconocido';
-    const total = localStorage.getItem('totalReserva') || '0';
-    const fecha = localStorage.getItem('fechaReserva') || 'Fecha no especificada';
-    const img = localStorage.getItem('imgSeleccionada') || 'Img/machupichu.jpg';
-
-    document.getElementById('sumDestino').textContent = destino;
-    document.getElementById('sumImg').src = img;
-    document.getElementById('sumTotal').textContent = 'S/ ' + parseFloat(total).toFixed(2);
-    document.getElementById('sumFecha').textContent = fecha;
-});
-
-document.getElementById('formPago').addEventListener('submit', (e) => {
-    e.preventDefault();
-    Swal.fire({
-        title: '¡Pago Exitoso!',
-        text: 'Tu reserva ha sido confirmada. Hemos enviado los detalles a tu correo electrónico.',
-        icon: 'success',
-        confirmButtonColor: '#f97316',
-        confirmButtonText: 'Ver mis compras'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = 'compras.html';
-        }
-    });
-});
-</script>
+<script type="module" src="js/pago.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
