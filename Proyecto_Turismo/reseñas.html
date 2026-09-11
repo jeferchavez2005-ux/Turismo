@@ -254,71 +254,9 @@
     <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
 </footer>
 
-<script src="js/reseñas.js"></script>
+<script type="module" src="js/reseñas.js"></script>
 <script src="js/accesibilidad.js"></script>
 <script src="js/navbar.js"></script>
-<script>
-// Filtros
-function filtrarReseñas() {
-    const destino  = document.getElementById('filtroDestino').value.toLowerCase();
-    const estrellas = document.getElementById('filtroEstrellas').value;
-    document.querySelectorAll('.review-card').forEach(card => {
-        const matchDest  = !destino  || card.dataset.destino.toLowerCase().includes(destino);
-        const matchStar  = !estrellas || card.dataset.stars === estrellas;
-        card.style.display = (matchDest && matchStar) ? '' : 'none';
-    });
-}
-document.getElementById('filtroDestino').addEventListener('change', filtrarReseñas);
-document.getElementById('filtroEstrellas').addEventListener('change', filtrarReseñas);
-
-// Escribir reseña
-document.getElementById('btnEscribirReseña').addEventListener('click', () => {
-    Swal.fire({
-        title: '¡Comparte tu experiencia!',
-        html: `
-            <input id="swal-nombre"  class="swal2-input"   placeholder="Tu nombre">
-            <input id="swal-destino" class="swal2-input"   placeholder="Destino visitado">
-            <div style="display:flex;gap:6px;justify-content:center;margin:12px 0;font-size:1.6rem;color:#f97316;cursor:pointer;" id="starPicker">
-                <i class="fa-regular fa-star" data-v="1"></i>
-                <i class="fa-regular fa-star" data-v="2"></i>
-                <i class="fa-regular fa-star" data-v="3"></i>
-                <i class="fa-regular fa-star" data-v="4"></i>
-                <i class="fa-regular fa-star" data-v="5"></i>
-            </div>
-            <textarea id="swal-texto" class="swal2-textarea" placeholder="Escribe tu reseña..." rows="4"></textarea>
-        `,
-        confirmButtonText: 'Publicar reseña',
-        confirmButtonColor: '#f97316',
-        cancelButtonText: 'Cancelar',
-        showCancelButton: true,
-        didOpen: () => {
-            let sel = 0;
-            document.querySelectorAll('#starPicker i').forEach(star => {
-                star.addEventListener('click', () => {
-                    sel = +star.dataset.v;
-                    document.querySelectorAll('#starPicker i').forEach((s,i) => {
-                        s.className = i < sel ? 'fa-solid fa-star' : 'fa-regular fa-star';
-                    });
-                });
-            });
-        },
-        preConfirm: () => {
-            const nombre  = document.getElementById('swal-nombre').value.trim();
-            const destino = document.getElementById('swal-destino').value.trim();
-            const texto   = document.getElementById('swal-texto').value.trim();
-            if (!nombre || !destino || !texto) {
-                Swal.showValidationMessage('Por favor completa todos los campos');
-                return false;
-            }
-            return { nombre, destino, texto };
-        }
-    }).then(res => {
-        if (res.isConfirmed) {
-            Swal.fire({ icon: 'success', title: '¡Gracias!', text: 'Tu reseña ha sido enviada para revisión.', confirmButtonColor: '#f97316' });
-        }
-    });
-});
-</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

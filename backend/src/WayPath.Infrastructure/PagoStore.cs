@@ -7,7 +7,7 @@ using WayPath.Domain.Ventas;
 
 namespace WayPath.Infrastructure;
 
-public sealed class PagoStore(WayPathDbContext db) : IPagoStore
+public sealed class PagoStore(WayPathDbContext db, IVentaStore ventas) : IPagoStore
 {
     private const int PaymentOrderMinutes = 30;
     private static string Id(long id) => id.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -128,6 +128,8 @@ public sealed class PagoStore(WayPathDbContext db) : IPagoStore
             });
         }
         await SaveGuard(ct);
+        if (request.ResultadoSimulado == "APROBADO")
+            await ventas.EmitFromApprovedPayment(pago.PagoId, ct);
         await tx.CommitAsync(ct);
         return await FindPayment(pago.PagoId, ct);
     }
@@ -175,6 +177,7 @@ public sealed class PagoStore(WayPathDbContext db) : IPagoStore
             ?? throw new SecurityFault(404, "Pago no encontrado.");
         payment.EstadoId = await PagoStateId(request.Codigo, ct);
         payment.Observaciones = request.Observaciones;
+        var emitSale = request.Codigo == "APROBADO";
         if (request.Codigo == "APROBADO" && payment.FechaPago is null)
         {
             payment.FechaPago = DateTime.UtcNow;
@@ -195,6 +198,8 @@ public sealed class PagoStore(WayPathDbContext db) : IPagoStore
             });
         }
         await SaveGuard(ct);
+        if (emitSale)
+            await ventas.EmitFromApprovedPayment(payment.PagoId, ct);
         await tx.CommitAsync(ct);
     }
 

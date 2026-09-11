@@ -1,194 +1,154 @@
+import { api, ApiError } from "./api.js";
+
+let reviews = [];
+
 document.addEventListener("DOMContentLoaded", () => {
-    const btnAñadir = document.getElementById("btn-añadir");
-    const btnCargar = document.getElementById("btn-cargar");
-    const selectDestinos = document.getElementById("filter-destinos");
-    const contenedorReseñas = document.getElementById("contenedor-reseñas");
-
-    if (btnAñadir) {
-        btnAñadir.addEventListener("click", () => {
-            Swal.fire({
-                title: 'Cuéntanos tu experiencia',
-                html: `
-                    <!-- Selector de Destino -->
-                    <select id="swal-destino" class="swal2-input" style="width: 85%; max-width: 100%; font-size: 15px;">
-                        <option value="" disabled selected>Selecciona el destino que visitaste</option>
-                        <option value="Machu Picchu">Machu Picchu</option>
-                        <option value="Montaña de los 7 colores">Montaña de los 7 colores</option>
-                        <option value="Cañón del Colca">Cañón del Colca</option>
-                        <option value="Lago Titicaca">Lago Titicaca</option>
-                        <option value="Huaraz">Huaraz</option>
-                        <option value="Iquitos">Iquitos</option>
-                        <option value="Islas Ballestas">Islas Ballestas</option>
-                        <option value="Máncora">Máncora</option>
-                    </select>
-                    
-                    <!-- Estrellas Interactivas WayPath -->
-                    <div id="swal-star-rating" style="color: #f97316; font-size: 32px; cursor: pointer; margin: 15px 0;">
-                        <i class="fa-solid fa-star" data-value="1"></i>
-                        <i class="fa-solid fa-star" data-value="2"></i>
-                        <i class="fa-solid fa-star" data-value="3"></i>
-                        <i class="fa-solid fa-star" data-value="4"></i>
-                        <i class="fa-solid fa-star" data-value="5"></i>
-                    </div>
-                    <!-- Guardará el número de estrellas en secreto -->
-                    <input type="hidden" id="swal-estrellas-hidden" value="5">
-
-                    <!-- Caja de texto para la reseña -->
-                    <textarea id="swal-comentario" class="swal2-textarea" placeholder="Escribe aquí los detalles de tu viaje..." style="width: 85%; max-width: 100%; font-size: 15px;"></textarea>
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Publicar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#f97316',
-                cancelButtonColor: '#64748b',
-                didOpen: () => {
-                    const stars = document.querySelectorAll('#swal-star-rating i');
-                    const hiddenInput = document.getElementById('swal-estrellas-hidden');
-                    
-                    stars.forEach(star => {
-                        star.addEventListener('click', function() {
-                            const rating = this.getAttribute('data-value');
-                            hiddenInput.value = rating; 
-                            
-                            stars.forEach(s => {
-                                if (s.getAttribute('data-value') <= rating) {
-                                    s.classList.remove('fa-regular');
-                                    s.classList.add('fa-solid');
-                                } else {
-                                    s.classList.remove('fa-solid');
-                                    s.classList.add('fa-regular');
-                                }
-                            });
-                        });
-                    });
-                },
-                preConfirm: () => {
-                    const destino = document.getElementById('swal-destino').value;
-                    const estrellas = parseInt(document.getElementById('swal-estrellas-hidden').value);
-                    const comentario = document.getElementById('swal-comentario').value;
-                    
-                    if (!destino || !comentario.trim()) {
-                        Swal.showValidationMessage('Por favor selecciona un destino y escribe tu reseña');
-                        return false;
-                    }
-                    return { destino, estrellas, comentario };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const datos = result.value;
-                    
-                    const imagenes = {
-                        "Machu Picchu": "Img/machupichu.jpg",
-                        "Montaña de los 7 colores": "Img/MONTAÑADELOS7COLORES.webp",
-                        "Cañón del Colca": "Img/CAÑONDELCOLCA.webp",
-                        "Lago Titicaca": "Img/LAGOTITICACA.webp",
-                        "Huaraz": "Img/huaraz.jpg",
-                        "Iquitos": "Img/iquitos.jpg",
-                        "Islas Ballestas": "Img/ISLASBALLESTAS.webp",
-                        "Máncora": "Img/MANCORA.jpg"
-                    };
-                    const rutaImagen = imagenes[datos.destino] || "Img/machupichu.jpg";
-
-                    let estrellasHTML = "";
-                    for(let i = 0; i < datos.estrellas; i++) {
-                        estrellasHTML += '<i class="fa-solid fa-star"></i>';
-                    }
-                    for(let i = datos.estrellas; i < 5; i++) {
-                        estrellasHTML += '<i class="fa-regular fa-star"></i>';
-                    }
-
-                    const nuevaTarjetaHTML = `
-                        <div class="review-card">
-                            <img src="${rutaImagen}" class="dest-img" alt="${datos.destino}">
-                            <div class="review-body">
-                                <div class="user-info">
-                                    <i class="fa-solid fa-circle-user avatar-placeholder" style="color: var(--primary-orange);"></i>
-                                    <div>
-                                        <h4>Nuevo Viajero</h4>
-                                        <span class="user-loc">📍 Viajero Frecuente</span>
-                                    </div>
-                                </div>
-                                <p class="review-text">${datos.comentario}</p>
-                            </div>
-                            <div class="card-stars">
-                                ${estrellasHTML}
-                            </div>
-                        </div>
-                    `;
-
-                    contenedorReseñas.insertAdjacentHTML('afterbegin', nuevaTarjetaHTML);
-
-                    Swal.fire({
-                        title: '¡Publicado!',
-                        text: 'Tu reseña se ha agregado exitosamente.',
-                        icon: 'success',
-                        confirmButtonColor: '#002244'
-                    });
-                }
-            });
-        });
-    }
-
-    if (btnCargar) {
-        btnCargar.addEventListener("click", () => {
-            
-            const reseñasExtra = `
-                <!-- Reseña Extra 1 -->
-                <div class="review-card">
-                    <img src="Img/ISLASBALLESTAS.webp" class="dest-img" alt="Islas Ballestas">
-                    <div class="review-body">
-                        <div class="user-info">
-                            <i class="fa-solid fa-circle-user avatar-placeholder"></i>
-                            <div>
-                                <h4>Jorge Mendoza</h4>
-                                <span class="user-loc">📍 Ica, Perú</span>
-                            </div>
-                        </div>
-                        <p class="review-text">Excelente paseo en bote por las Islas Ballestas. Vimos muchos lobos marinos y pingüinos. El guía explicó todo muy detalladamente.</p>
-                    </div>
-                    <div class="card-stars">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                </div>
-
-                <!-- Reseña Extra 2 -->
-                <div class="review-card">
-                    <img src="Img/MANCORA.jpg" class="dest-img" alt="Máncora">
-                    <div class="review-body">
-                        <div class="user-info">
-                            <i class="fa-solid fa-circle-user avatar-placeholder"></i>
-                            <div>
-                                <h4>Valeria Ríos</h4>
-                                <span class="user-loc">📍 Trujillo, Perú</span>
-                            </div>
-                        </div>
-                        <p class="review-text">Las mejores playas del norte. El hotel que nos recomendaron en WayPath tenía una vista espectacular frente al mar. Súper relajante.</p>
-                    </div>
-                    <div class="card-stars">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>
-                    </div>
-                </div>
-            `;
-
-            contenedorReseñas.insertAdjacentHTML('beforeend', reseñasExtra);
-            btnCargar.style.display = 'none';
-        });
-    }
-
-    if (selectDestinos) {
-        selectDestinos.addEventListener("change", (e) => {
-            const opcion = e.target.value.toLowerCase();
-            const tarjetas = document.querySelectorAll(".review-card"); 
-            
-            tarjetas.forEach(tarjeta => {
-                const destinoImgAlt = tarjeta.querySelector(".dest-img").alt.toLowerCase();
-                if (opcion === "todos los destinos" || opcion === "" || destinoImgAlt.includes(opcion)) {
-                    tarjeta.style.display = "flex";
-                } else {
-                    tarjeta.style.display = "none";
-                }
-            });
-        });
-    }
+    document.getElementById("filtroDestino")?.addEventListener("change", renderReviews);
+    document.getElementById("filtroEstrellas")?.addEventListener("change", renderReviews);
+    document.getElementById("btnEscribirReseña")?.addEventListener("click", writeReview);
+    loadReviews();
 });
+
+async function loadReviews() {
+    const list = document.getElementById("reviewsList");
+    if (!list) return;
+    list.innerHTML = empty("Cargando resenas verificadas...");
+    try {
+        reviews = await api("/api/ventas/resenas");
+        fillDestinationFilter(reviews);
+        renderReviews();
+    } catch (error) {
+        list.innerHTML = empty(error.message || "No se pudieron cargar las resenas.");
+    }
+}
+
+function renderReviews() {
+    const list = document.getElementById("reviewsList");
+    const destination = document.getElementById("filtroDestino")?.value || "";
+    const starsFilter = document.getElementById("filtroEstrellas")?.value || "";
+    const filtered = reviews.filter(item =>
+        (!destination || item.destino === destination) &&
+        (!starsFilter || String(item.calificacion) === starsFilter));
+    if (filtered.length === 0) {
+        list.innerHTML = empty("Aun no hay resenas publicadas con esos filtros.");
+        return;
+    }
+    list.innerHTML = filtered.map(reviewHtml).join("");
+}
+
+async function writeReview() {
+    try {
+        const reservas = await api("/api/reservas/me");
+        const available = reservas.filter(x => (x.estado || "").toUpperCase() === "COMPLETADA");
+        if (available.length === 0) {
+            await Swal.fire("Sin viajes completados", "Solo puedes resenar reservas completadas.", "info");
+            return;
+        }
+        const options = available.map(x =>
+            `<option value="${x.reservaId}">${escapeHtml(x.codigoReserva)} - ${escapeHtml(x.paquete)}</option>`).join("");
+        const result = await Swal.fire({
+            title: "Comparte tu experiencia",
+            html: `
+                <select id="swal-reserva" class="swal2-input">${options}</select>
+                <select id="swal-stars" class="swal2-input">
+                    <option value="5">5 estrellas</option>
+                    <option value="4">4 estrellas</option>
+                    <option value="3">3 estrellas</option>
+                    <option value="2">2 estrellas</option>
+                    <option value="1">1 estrella</option>
+                </select>
+                <input id="swal-title" class="swal2-input" maxlength="160" placeholder="Titulo">
+                <textarea id="swal-text" class="swal2-textarea" maxlength="2000" placeholder="Escribe tu resena"></textarea>
+            `,
+            showCancelButton: true,
+            confirmButtonText: "Enviar",
+            confirmButtonColor: "#f97316",
+            cancelButtonText: "Cancelar",
+            preConfirm: () => {
+                const reservaId = Number(document.getElementById("swal-reserva").value);
+                const calificacion = Number(document.getElementById("swal-stars").value);
+                const titulo = document.getElementById("swal-title").value.trim();
+                const comentario = document.getElementById("swal-text").value.trim();
+                if (!comentario) {
+                    Swal.showValidationMessage("Escribe tu resena.");
+                    return false;
+                }
+                return { reservaId, calificacion, titulo, comentario };
+            }
+        });
+        if (!result.isConfirmed) return;
+        await api("/api/ventas/resenas", { method: "POST", body: result.value });
+        await Swal.fire("Recibida", "Tu resena fue enviada para moderacion.", "success");
+        await loadReviews();
+    } catch (error) {
+        const message = error instanceof ApiError && error.status === 401
+            ? "Inicia sesion para escribir una resena."
+            : error.message || "No se pudo registrar la resena.";
+        await Swal.fire("WayPath", message, "warning");
+    }
+}
+
+function reviewHtml(item) {
+    return `
+        <article class="review-card" data-destino="${escapeHtml(item.destino)}" data-stars="${item.calificacion}">
+            <img src="${imageFor(item.destino)}" alt="${escapeHtml(item.destino)}" class="review-img" loading="lazy">
+            <div class="review-body">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <div class="avatar">${initials(item.cliente)}</div>
+                        <div>
+                            <h4>${escapeHtml(item.cliente)}</h4>
+                            <span class="reviewer-loc"><i class="fa-solid fa-circle-check"></i> Cliente verificado</span>
+                        </div>
+                    </div>
+                    <div class="review-stars">${stars(item.calificacion)}</div>
+                </div>
+                <h5 class="review-title">${escapeHtml(item.titulo || item.destino)}</h5>
+                <p class="review-text">${escapeHtml(item.comentario)}</p>
+                <div class="review-meta">
+                    <span class="review-dest"><i class="fa-solid fa-map-location-dot"></i> ${escapeHtml(item.destino)}</span>
+                    <span class="review-date"><i class="fa-regular fa-calendar"></i> ${formatDate(item.creadoEn)}</span>
+                </div>
+            </div>
+        </article>`;
+}
+
+function fillDestinationFilter(items) {
+    const select = document.getElementById("filtroDestino");
+    if (!select) return;
+    const current = select.value;
+    const names = [...new Set(items.map(x => x.destino).filter(Boolean))].sort();
+    select.innerHTML = `<option value="">Todos los destinos</option>${names.map(x => `<option>${escapeHtml(x)}</option>`).join("")}`;
+    select.value = current;
+}
+
+function stars(score) {
+    return Array.from({ length: 5 }, (_, index) =>
+        `<i class="${index < score ? "fa-solid" : "fa-regular"} fa-star"></i>`).join("");
+}
+
+function initials(name) {
+    return (name || "WP").split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase();
+}
+
+function imageFor(destination) {
+    const normalized = (destination || "").toLowerCase();
+    if (normalized.includes("titicaca")) return "Img/LAGOTITICACA.webp";
+    if (normalized.includes("mancora") || normalized.includes("máncora")) return "Img/MANCORA.jpg";
+    if (normalized.includes("huacachina")) return "Img/OASISDEHUACACHINA.jpg";
+    return "Img/machupichu.jpg";
+}
+
+function formatDate(value) {
+    return new Date(value).toLocaleDateString("es-PE", { month: "short", year: "numeric" });
+}
+
+function empty(text) {
+    return `<article class="review-card"><div class="review-body"><h5 class="review-title">${escapeHtml(text)}</h5><p class="review-text">Las resenas aprobadas apareceran aqui cuando existan en WayPathDB.</p></div></article>`;
+}
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    })[char]);
+}

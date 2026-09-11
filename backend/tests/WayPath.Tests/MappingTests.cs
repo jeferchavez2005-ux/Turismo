@@ -17,7 +17,7 @@ public sealed class MappingTests
     {
         using var db = new WayPathDbContext(new DbContextOptionsBuilder<WayPathDbContext>()
             .UseSqlServer("Server=unused;Database=unused;Integrated Security=True").Options);
-        Assert.Equal(53, db.Model.GetEntityTypes().Count());
+        Assert.Equal(59, db.Model.GetEntityTypes().Count());
         Assert.Equal("Usuarios", db.Model.FindEntityType(typeof(Usuario))!.GetTableName());
         Assert.Equal("Seguridad", db.Model.FindEntityType(typeof(Usuario))!.GetSchema());
         Assert.Equal("Clientes", db.Model.FindEntityType(typeof(ClientePerfil))!.GetTableName());
@@ -45,6 +45,13 @@ public sealed class MappingTests
         Assert.Equal("Pagos", db.Model.FindEntityType(typeof(Pago))!.GetTableName());
         Assert.Equal("PagoIntentos", db.Model.FindEntityType(typeof(PagoIntento))!.GetTableName());
         Assert.Equal("Reembolsos", db.Model.FindEntityType(typeof(Reembolso))!.GetTableName());
+        Assert.Equal("Compras", db.Model.FindEntityType(typeof(Compra))!.GetTableName());
+        Assert.Equal("Ventas", db.Model.FindEntityType(typeof(Compra))!.GetSchema());
+        Assert.Equal("Comprobantes", db.Model.FindEntityType(typeof(Comprobante))!.GetTableName());
+        Assert.Equal("ComprobanteDetalle", db.Model.FindEntityType(typeof(ComprobanteDetalle))!.GetTableName());
+        Assert.Equal("TicketsViaje", db.Model.FindEntityType(typeof(TicketViaje))!.GetTableName());
+        Assert.Equal("Vouchers", db.Model.FindEntityType(typeof(Voucher))!.GetTableName());
+        Assert.Equal("Resenas", db.Model.FindEntityType(typeof(Resena))!.GetTableName());
         Assert.True(db.Model.FindEntityType(typeof(Usuario))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(ClientePerfil))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Destino))!.FindProperty("FilaVersion")!.IsConcurrencyToken);

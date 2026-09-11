@@ -1,107 +1,150 @@
+import { api, ApiError } from "./api.js";
+
+const fallbackImage = "Img/machupichu.jpg";
+let purchases = [];
+let currentFilter = "all";
+
 document.addEventListener("DOMContentLoaded", () => {
-    
-    const pagoExitoso = localStorage.getItem('wp_pago_exitoso');
-    
-    if (pagoExitoso === 'true') {
-        const nombreDestino = localStorage.getItem('destinoSeleccionado') || "Destino Turístico";
-        const rutaImagen = localStorage.getItem('imgSeleccionada') || "Img/machupichu.jpg";
-        const totalPagar = localStorage.getItem('wp_total_pagar') || "S/. 0.00";
-        const detallePasajeros = localStorage.getItem('wp_detalle_pasajeros') || "1x Adultos";
+    bindTabs();
+    bindModal();
+    loadPurchases();
+});
 
-        const contenedorCompras = document.getElementById("contenedor-compras");
-        const codigoAleatorio = Math.floor(Math.random() * 9000) + 1000;
-        
-        if (contenedorCompras) {
-            const nuevaCompraHTML = `
-                <article class="purchase-wrapper" data-status="proxima">
-                    <div class="purchase-card" style="border-left: 4px solid #f97316;">
-                        <img src="${rutaImagen}" alt="${nombreDestino}">
-                        <div class="purchase-info">
-                            <h3>Aventura en ${nombreDestino}</h3>
-                            <div class="details">
-                                <i class="fa-solid fa-location-dot"></i> Perú &nbsp;|&nbsp; 
-                                <i class="fa-regular fa-calendar"></i> Próximamente &nbsp;|&nbsp; 
-                                <i class="fa-regular fa-user"></i> ${detallePasajeros.split('x')[0]} viajero(s)
-                            </div>
-                            <div class="code">Código de reserva: WP-2026-${codigoAleatorio}</div>
-                        </div>
-                        <div class="purchase-side">
-                            <div class="badge badge-blue" style="background-color: #f97316; color: white;">¡Nuevo!</div>
-                            <div class="price-label">Total pagado</div>
-                            <div class="price">${totalPagar}</div>
-                            <button class="details-btn">Ver detalles <i class="fa-solid fa-arrow-down"></i></button>
-                        </div>
-                    </div>
-                    <div class="trip-details">
-                        <h4>Itinerario y detalles de la reserva:</h4>
-                        <ul>
-                            <li><strong>Hotel:</strong> Asignado según paquete estándar (4 noches)</li>
-                            <li><strong>Guía:</strong> Servicio local en español incluido</li>
-                            <li><strong>Estado del Ticket:</strong> Confirmado y listo para descargar</li>
-                        </ul>
-                        <div class="details-actions">
-                            <button class="btn-outline">Descargar Tickets</button>
-                            <button class="btn-outline">Modificar Reserva</button>
-                        </div>
-                    </div>
-                </article>
-            `;
-            contenedorCompras.insertAdjacentHTML('afterbegin', nuevaCompraHTML);
-        }
-        
-        localStorage.removeItem('wp_pago_exitoso');
+async function loadPurchases() {
+    const container = document.getElementById("contenedor-compras");
+    if (!container) return;
+    container.innerHTML = state("Cargando tus compras...");
+    try {
+        purchases = await api("/api/ventas/compras/me");
+        renderPurchases();
+    } catch (error) {
+        const message = error instanceof ApiError && error.status === 401
+            ? "Inicia sesion para ver tus compras reales."
+            : error.message || "No se pudieron cargar tus compras.";
+        container.innerHTML = state(message);
+        updateStats([]);
     }
+}
 
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.details-btn');
-        if (!btn) return; 
-        
-        e.preventDefault();
-        
-        const wrapper = btn.closest('.purchase-wrapper');
-        const panelDetalles = wrapper.querySelector('.trip-details');
-        
-        if (panelDetalles) {
-            panelDetalles.style.display = 'block';
-            
-            const estaAbierto = panelDetalles.style.maxHeight && panelDetalles.style.maxHeight !== '0px';
-            
-            if (estaAbierto) {
-                panelDetalles.style.maxHeight = '0px';
-                panelDetalles.style.padding = '0px 20px';
-                panelDetalles.style.borderTopColor = 'transparent';
-                
-                btn.innerHTML = 'Ver detalles <i class="fa-solid fa-arrow-down"></i>';
-            } else {
-                panelDetalles.style.maxHeight = panelDetalles.scrollHeight + 60 + 'px'; 
-                panelDetalles.style.padding = '20px';
-                panelDetalles.style.borderTopColor = 'var(--border-color)';
-                
-                btn.innerHTML = 'Ocultar detalles <i class="fa-solid fa-arrow-up"></i>';
-            }
-        }
+function renderPurchases() {
+    const container = document.getElementById("contenedor-compras");
+    const visible = purchases.filter(x => currentFilter === "all" || statusClass(x.estado) === currentFilter);
+    updateStats(purchases);
+    if (visible.length === 0) {
+        container.innerHTML = state(currentFilter === "all"
+            ? "Aun no tienes compras emitidas."
+            : "No hay compras en este estado.");
+        return;
+    }
+    container.innerHTML = visible.map(cardHtml).join("");
+    container.querySelectorAll(".pc-detail-btn").forEach(btn => {
+        btn.addEventListener("click", () => openDetails(btn.dataset.id));
     });
+}
 
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
+function cardHtml(item) {
+    const status = statusClass(item.estado);
+    return `
+        <article class="purchase-card" data-status="${status}">
+            <img src="${fallbackImage}" alt="${escapeHtml(item.destino)}">
+            <div class="purchase-info">
+                <h3>${escapeHtml(item.paquete)}</h3>
+                <div class="purchase-meta">
+                    <span><i class="fa-solid fa-map-location-dot"></i> ${escapeHtml(item.destino)}</span>
+                    <span><i class="fa-regular fa-calendar"></i> ${formatDate(item.fechaInicio)} - ${formatDate(item.fechaFin)}</span>
+                </div>
+                <p>Reserva ${escapeHtml(item.codigoReserva)}</p>
+                <span class="purchase-code">${escapeHtml(item.codigoCompra)}</span>
+            </div>
+            <div class="purchase-side">
+                <span class="status-pill ${status}">${escapeHtml(item.estado)}</span>
+                <strong>${money(item.totalPagado)}</strong>
+                <button class="pc-detail-btn" type="button" data-id="${item.compraId}">
+                    Ver detalles
+                </button>
+            </div>
+        </article>`;
+}
 
-            const filterValue = this.getAttribute('data-filter');
-            const articles = document.querySelectorAll('.purchase-wrapper');
+async function openDetails(id) {
+    try {
+        const detail = await api(`/api/ventas/compras/me/${id}`);
+        document.getElementById("modalTitle").textContent = detail.paquete;
+        document.getElementById("modalImg").src = fallbackImage;
+        document.getElementById("modalImg").alt = detail.destino;
+        document.getElementById("modalPrecio").textContent = money(detail.totalPagado);
+        document.getElementById("modalDetalles").innerHTML = [
+            `Destino: ${escapeHtml(detail.destino)}`,
+            `Reserva: ${escapeHtml(detail.codigoReserva)}`,
+            `Comprobante: ${detail.comprobante ? `${escapeHtml(detail.comprobante.serie)}-${escapeHtml(detail.comprobante.numero)}` : "pendiente"}`,
+            `Tickets emitidos: ${detail.tickets?.length ?? 0}`,
+            `Voucher: ${detail.voucher ? escapeHtml(detail.voucher.codigoVoucher) : "pendiente"}`
+        ].join("<br>");
+        showModal(true);
+    } catch (error) {
+        alert(error.message || "No se pudo cargar el detalle.");
+    }
+}
 
-            articles.forEach(article => {
-                if (filterValue === 'all') {
-                    article.style.display = 'block';
-                } else {
-                    if (article.getAttribute('data-status') === filterValue) {
-                        article.style.display = 'block';
-                    } else {
-                        article.style.display = 'none';
-                    }
-                }
+function bindTabs() {
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(item => {
+                item.classList.remove("active");
+                item.setAttribute("aria-selected", "false");
             });
+            btn.classList.add("active");
+            btn.setAttribute("aria-selected", "true");
+            currentFilter = btn.dataset.filter || "all";
+            renderPurchases();
         });
     });
-});
+}
+
+function bindModal() {
+    document.getElementById("modalClose")?.addEventListener("click", () => showModal(false));
+    document.querySelector(".wp-modal-backdrop")?.addEventListener("click", () => showModal(false));
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") showModal(false);
+    });
+}
+
+function showModal(open) {
+    const modal = document.getElementById("detailModal");
+    if (!modal) return;
+    modal.style.display = open ? "flex" : "none";
+    document.body.style.overflow = open ? "hidden" : "";
+}
+
+function updateStats(items) {
+    const stats = document.querySelectorAll(".cstat-num");
+    if (stats[0]) stats[0].textContent = items.length.toString();
+    if (stats[1]) stats[1].textContent = items.filter(x => statusClass(x.estado) === "proxima").length.toString();
+    if (stats[2]) stats[2].textContent = items.filter(x => statusClass(x.estado) === "completado").length.toString();
+}
+
+function statusClass(value) {
+    const state = (value || "").toUpperCase();
+    if (state === "ANULADA") return "cancelado";
+    if (state === "COMPLETADA") return "completado";
+    return "proxima";
+}
+
+function money(value) {
+    return Number(value || 0).toLocaleString("es-PE", { style: "currency", currency: "PEN" });
+}
+
+function formatDate(value) {
+    if (!value) return "Fecha por definir";
+    return new Date(`${value}T00:00:00`).toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function state(text) {
+    return `<article class="purchase-card"><div class="purchase-info"><h3>${escapeHtml(text)}</h3><p>WayPath mostrara aqui las compras generadas desde pagos aprobados.</p></div></article>`;
+}
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    })[char]);
+}

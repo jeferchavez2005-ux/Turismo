@@ -213,40 +213,9 @@
     <div class="wp-footer-bottom"><span>© 2026 WayPath. Todos los derechos reservados.</span></div>
 </footer>
 
-<script src="js/compras.js"></script>
+<script type="module" src="js/compras.js"></script>
 <script src="js/accesibilidad.js"></script>
 <script src="js/navbar.js"></script>
-<script>
-// Tabs filter
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected','true');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.purchase-card').forEach(card => {
-            card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
-        });
-    });
-});
-// Modal
-const modal = document.getElementById('detailModal');
-document.querySelectorAll('.pc-detail-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('modalTitle').textContent    = btn.dataset.titulo;
-        document.getElementById('modalImg').src              = btn.dataset.imagen;
-        document.getElementById('modalImg').alt              = btn.dataset.titulo;
-        document.getElementById('modalDetalles').textContent = btn.dataset.detalles;
-        document.getElementById('modalPrecio').textContent   = btn.dataset.precio;
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    });
-});
-function closeModal() { modal.style.display = 'none'; document.body.style.overflow = ''; }
-document.getElementById('modalClose').addEventListener('click', closeModal);
-document.querySelector('.wp-modal-backdrop').addEventListener('click', closeModal);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

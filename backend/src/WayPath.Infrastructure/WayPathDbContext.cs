@@ -64,6 +64,12 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<Pago> Pagos => Set<Pago>();
     public DbSet<PagoIntento> PagoIntentos => Set<PagoIntento>();
     public DbSet<Reembolso> Reembolsos => Set<Reembolso>();
+    public DbSet<Compra> Compras => Set<Compra>();
+    public DbSet<Comprobante> Comprobantes => Set<Comprobante>();
+    public DbSet<ComprobanteDetalle> ComprobanteDetalle => Set<ComprobanteDetalle>();
+    public DbSet<TicketViaje> TicketsViaje => Set<TicketViaje>();
+    public DbSet<Voucher> Vouchers => Set<Voucher>();
+    public DbSet<Resena> Resenas => Set<Resena>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -637,6 +643,87 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         reembolso.HasOne<Pago>().WithMany().HasForeignKey(x => x.PagoId).OnDelete(DeleteBehavior.NoAction);
         reembolso.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
         reembolso.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var compra = model.Entity<Compra>();
+        compra.ToTable("Compras", "Ventas", t => t.ExcludeFromMigrations());
+        compra.HasKey(x => x.CompraId);
+        compra.Property(x => x.CompraId).UseIdentityColumn();
+        compra.Property(x => x.CodigoCompra).HasMaxLength(50).IsRequired();
+        compra.HasIndex(x => x.CodigoCompra).IsUnique();
+        compra.HasIndex(x => x.ReservaId).IsUnique();
+        compra.Property(x => x.FechaCompra).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        compra.Property(x => x.TotalPagado).HasColumnType("decimal(18,2)");
+        compra.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        compra.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
+        compra.HasOne<Pago>().WithMany().HasForeignKey(x => x.PagoId).OnDelete(DeleteBehavior.NoAction);
+        compra.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var comprobante = model.Entity<Comprobante>();
+        comprobante.ToTable("Comprobantes", "Ventas", t => t.ExcludeFromMigrations());
+        comprobante.HasKey(x => x.ComprobanteId);
+        comprobante.Property(x => x.ComprobanteId).UseIdentityColumn();
+        comprobante.Property(x => x.TipoComprobante).HasMaxLength(30).IsRequired();
+        comprobante.Property(x => x.Serie).HasMaxLength(10).IsRequired();
+        comprobante.Property(x => x.Numero).HasMaxLength(20).IsRequired();
+        comprobante.HasIndex(x => new { x.Serie, x.Numero }).IsUnique();
+        comprobante.Property(x => x.FechaEmision).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        comprobante.Property(x => x.Subtotal).HasColumnType("decimal(18,2)");
+        comprobante.Property(x => x.Impuestos).HasColumnType("decimal(18,2)");
+        comprobante.Property(x => x.Total).HasColumnType("decimal(18,2)");
+        comprobante.HasOne<Compra>().WithMany().HasForeignKey(x => x.CompraId).OnDelete(DeleteBehavior.NoAction);
+        comprobante.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
+        comprobante.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        comprobante.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var comprobanteDetalle = model.Entity<ComprobanteDetalle>();
+        comprobanteDetalle.ToTable("ComprobanteDetalle", "Ventas", t => t.ExcludeFromMigrations());
+        comprobanteDetalle.HasKey(x => x.ComprobanteDetalleId);
+        comprobanteDetalle.Property(x => x.ComprobanteDetalleId).UseIdentityColumn();
+        comprobanteDetalle.Property(x => x.Descripcion).HasMaxLength(250).IsRequired();
+        comprobanteDetalle.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
+        comprobanteDetalle.Property(x => x.Importe).HasColumnType("decimal(18,2)");
+        comprobanteDetalle.HasOne<Comprobante>().WithMany().HasForeignKey(x => x.ComprobanteId).OnDelete(DeleteBehavior.NoAction);
+
+        var ticket = model.Entity<TicketViaje>();
+        ticket.ToTable("TicketsViaje", "Ventas", t => t.ExcludeFromMigrations());
+        ticket.HasKey(x => x.TicketViajeId);
+        ticket.Property(x => x.TicketViajeId).UseIdentityColumn();
+        ticket.Property(x => x.CodigoTicket).HasMaxLength(80).IsRequired();
+        ticket.HasIndex(x => x.CodigoTicket).IsUnique();
+        ticket.Property(x => x.EmitidoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        ticket.Property(x => x.UrlDocumento).HasMaxLength(1000);
+        ticket.HasOne<Compra>().WithMany().HasForeignKey(x => x.CompraId).OnDelete(DeleteBehavior.NoAction);
+        ticket.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        ticket.HasOne<Pasajero>().WithMany().HasForeignKey(x => x.PasajeroId).OnDelete(DeleteBehavior.NoAction);
+        ticket.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+        ticket.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var voucher = model.Entity<Voucher>();
+        voucher.ToTable("Vouchers", "Ventas", t => t.ExcludeFromMigrations());
+        voucher.HasKey(x => x.VoucherId);
+        voucher.Property(x => x.VoucherId).UseIdentityColumn();
+        voucher.Property(x => x.CodigoVoucher).HasMaxLength(80).IsRequired();
+        voucher.HasIndex(x => x.CodigoVoucher).IsUnique();
+        voucher.Property(x => x.UrlDocumento).HasMaxLength(1000);
+        voucher.Property(x => x.EmitidoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        voucher.HasOne<Compra>().WithMany().HasForeignKey(x => x.CompraId).OnDelete(DeleteBehavior.NoAction);
+        voucher.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        voucher.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var resena = model.Entity<Resena>();
+        resena.ToTable("Resenas", "Ventas", t => t.ExcludeFromMigrations());
+        resena.HasKey(x => x.ResenaId);
+        resena.Property(x => x.ResenaId).UseIdentityColumn();
+        resena.Property(x => x.Titulo).HasMaxLength(160);
+        resena.Property(x => x.Comentario).HasMaxLength(2000).IsRequired();
+        resena.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        resena.Property(x => x.ModeradoEn).HasColumnType("datetime2(0)");
+        resena.HasIndex(x => new { x.ClienteId, x.ReservaId }).IsUnique().HasFilter("[ReservaId] IS NOT NULL");
+        resena.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
+        resena.HasOne<Reserva>().WithMany().HasForeignKey(x => x.ReservaId).OnDelete(DeleteBehavior.NoAction);
+        resena.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
+        resena.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoModeracionId).OnDelete(DeleteBehavior.NoAction);
+        resena.HasOne<Usuario>().WithMany().HasForeignKey(x => x.ModeradoPorUsuarioId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
