@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WayPath.Domain.Catalogo;
 using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
+using WayPath.Domain.Operacion;
 using WayPath.Domain.Seguridad;
 using WayPath.Infrastructure;
 
@@ -14,7 +15,7 @@ public sealed class MappingTests
     {
         using var db = new WayPathDbContext(new DbContextOptionsBuilder<WayPathDbContext>()
             .UseSqlServer("Server=unused;Database=unused;Integrated Security=True").Options);
-        Assert.Equal(29, db.Model.GetEntityTypes().Count());
+        Assert.Equal(44, db.Model.GetEntityTypes().Count());
         Assert.Equal("Usuarios", db.Model.FindEntityType(typeof(Usuario))!.GetTableName());
         Assert.Equal("Seguridad", db.Model.FindEntityType(typeof(Usuario))!.GetSchema());
         Assert.Equal("Clientes", db.Model.FindEntityType(typeof(ClientePerfil))!.GetTableName());
@@ -26,6 +27,11 @@ public sealed class MappingTests
         Assert.Equal("Destinos", db.Model.FindEntityType(typeof(Destino))!.GetTableName());
         Assert.Equal("Paquetes", db.Model.FindEntityType(typeof(Paquete))!.GetTableName());
         Assert.Equal("Tarifas", db.Model.FindEntityType(typeof(Tarifa))!.GetTableName());
+        Assert.Equal("Proveedores", db.Model.FindEntityType(typeof(Proveedor))!.GetTableName());
+        Assert.Equal("Operacion", db.Model.FindEntityType(typeof(Proveedor))!.GetSchema());
+        Assert.Equal("Salidas", db.Model.FindEntityType(typeof(Salida))!.GetTableName());
+        Assert.Equal("CuposSalida", db.Model.FindEntityType(typeof(CupoSalida))!.GetTableName());
+        Assert.Equal("AsignacionesOperacion", db.Model.FindEntityType(typeof(AsignacionOperacion))!.GetTableName());
         Assert.True(db.Model.FindEntityType(typeof(Usuario))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(ClientePerfil))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Destino))!.FindProperty("FilaVersion")!.IsConcurrencyToken);

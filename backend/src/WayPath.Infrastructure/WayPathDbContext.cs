@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WayPath.Domain.Catalogo;
 using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
+using WayPath.Domain.Operacion;
 using WayPath.Domain.Seguridad;
 
 namespace WayPath.Infrastructure;
@@ -37,6 +38,21 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<DireccionCliente> DireccionesCliente => Set<DireccionCliente>();
     public DbSet<PreferenciaCliente> PreferenciasCliente => Set<PreferenciaCliente>();
     public DbSet<Pasajero> Pasajeros => Set<Pasajero>();
+    public DbSet<Area> Areas => Set<Area>();
+    public DbSet<Empleado> Empleados => Set<Empleado>();
+    public DbSet<Proveedor> Proveedores => Set<Proveedor>();
+    public DbSet<ProveedorContacto> ProveedorContactos => Set<ProveedorContacto>();
+    public DbSet<ProveedorServicio> ProveedorServicios => Set<ProveedorServicio>();
+    public DbSet<ContratoProveedor> ContratosProveedor => Set<ContratoProveedor>();
+    public DbSet<Guia> Guias => Set<Guia>();
+    public DbSet<Transporte> Transportes => Set<Transporte>();
+    public DbSet<Hotel> Hoteles => Set<Hotel>();
+    public DbSet<Habitacion> Habitaciones => Set<Habitacion>();
+    public DbSet<Salida> Salidas => Set<Salida>();
+    public DbSet<CupoSalida> CuposSalida => Set<CupoSalida>();
+    public DbSet<BloqueoDisponibilidad> BloqueosDisponibilidad => Set<BloqueoDisponibilidad>();
+    public DbSet<AsignacionOperacion> AsignacionesOperacion => Set<AsignacionOperacion>();
+    public DbSet<ItinerarioOperativo> ItinerarioOperativo => Set<ItinerarioOperativo>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -320,6 +336,181 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         pas.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
         pas.HasOne<TipoDocumento>().WithMany().HasForeignKey(x => x.TipoDocumentoId).OnDelete(DeleteBehavior.NoAction);
         pas.HasOne<Pais>().WithMany().HasForeignKey(x => x.NacionalidadPaisId).OnDelete(DeleteBehavior.NoAction);
+
+        var area = model.Entity<Area>();
+        area.ToTable("Areas", "Operacion", t => t.ExcludeFromMigrations());
+        area.HasKey(x => x.AreaId);
+        area.Property(x => x.AreaId).UseIdentityColumn();
+        area.Property(x => x.Codigo).HasMaxLength(50).IsRequired();
+        area.HasIndex(x => x.Codigo).IsUnique();
+        area.Property(x => x.Nombre).HasMaxLength(120).IsRequired();
+        area.Property(x => x.Descripcion).HasMaxLength(250);
+
+        var emp = model.Entity<Empleado>();
+        emp.ToTable("Empleados", "Operacion", t => t.ExcludeFromMigrations());
+        emp.HasKey(x => x.EmpleadoId);
+        emp.Property(x => x.EmpleadoId).UseIdentityColumn();
+        emp.HasIndex(x => x.UsuarioId).IsUnique();
+        emp.HasIndex(x => x.CodigoEmpleado).IsUnique();
+        emp.Property(x => x.CodigoEmpleado).HasMaxLength(50).IsRequired();
+        emp.Property(x => x.Cargo).HasMaxLength(120).IsRequired();
+        emp.Property(x => x.FechaIngreso).HasColumnType("date");
+        emp.Property(x => x.FechaSalida).HasColumnType("date");
+        emp.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
+        emp.HasOne<Area>().WithMany().HasForeignKey(x => x.AreaId).OnDelete(DeleteBehavior.NoAction);
+        emp.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var prov = model.Entity<Proveedor>();
+        prov.ToTable("Proveedores", "Operacion", t => t.ExcludeFromMigrations());
+        prov.HasKey(x => x.ProveedorId);
+        prov.Property(x => x.ProveedorId).UseIdentityColumn();
+        prov.Property(x => x.NumeroDocumento).HasMaxLength(40);
+        prov.Property(x => x.RazonSocial).HasMaxLength(180).IsRequired();
+        prov.Property(x => x.NombreComercial).HasMaxLength(180);
+        prov.Property(x => x.Email).HasMaxLength(255);
+        prov.Property(x => x.Telefono).HasMaxLength(30);
+        prov.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        prov.HasOne<TipoDocumento>().WithMany().HasForeignKey(x => x.TipoDocumentoId).OnDelete(DeleteBehavior.NoAction);
+        prov.HasOne<Ciudad>().WithMany().HasForeignKey(x => x.CiudadId).OnDelete(DeleteBehavior.NoAction);
+        prov.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var contacto = model.Entity<ProveedorContacto>();
+        contacto.ToTable("ProveedorContactos", "Operacion", t => t.ExcludeFromMigrations());
+        contacto.HasKey(x => x.ProveedorContactoId);
+        contacto.Property(x => x.ProveedorContactoId).UseIdentityColumn();
+        contacto.Property(x => x.Nombres).HasMaxLength(120).IsRequired();
+        contacto.Property(x => x.Apellidos).HasMaxLength(120);
+        contacto.Property(x => x.Cargo).HasMaxLength(120);
+        contacto.Property(x => x.Email).HasMaxLength(255);
+        contacto.Property(x => x.Telefono).HasMaxLength(30);
+        contacto.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+
+        var servicio = model.Entity<ProveedorServicio>();
+        servicio.ToTable("ProveedorServicios", "Operacion", t => t.ExcludeFromMigrations());
+        servicio.HasKey(x => x.ProveedorServicioId);
+        servicio.Property(x => x.ProveedorServicioId).UseIdentityColumn();
+        servicio.Property(x => x.TipoServicio).HasMaxLength(60).IsRequired();
+        servicio.Property(x => x.Nombre).HasMaxLength(160).IsRequired();
+        servicio.Property(x => x.Descripcion).HasMaxLength(500);
+        servicio.Property(x => x.CostoBase).HasColumnType("decimal(18,2)");
+        servicio.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+        servicio.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        servicio.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var contrato = model.Entity<ContratoProveedor>();
+        contrato.ToTable("ContratosProveedor", "Operacion", t => t.ExcludeFromMigrations());
+        contrato.HasKey(x => x.ContratoProveedorId);
+        contrato.Property(x => x.ContratoProveedorId).UseIdentityColumn();
+        contrato.Property(x => x.CodigoContrato).HasMaxLength(80).IsRequired();
+        contrato.HasIndex(x => x.CodigoContrato).IsUnique();
+        contrato.Property(x => x.FechaInicio).HasColumnType("date");
+        contrato.Property(x => x.FechaFin).HasColumnType("date");
+        contrato.Property(x => x.Condiciones).HasColumnType("nvarchar(max)");
+        contrato.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+        contrato.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var guia = model.Entity<Guia>();
+        guia.ToTable("Guias", "Operacion", t => t.ExcludeFromMigrations());
+        guia.HasKey(x => x.GuiaId);
+        guia.Property(x => x.GuiaId).UseIdentityColumn();
+        guia.Property(x => x.NumeroDocumento).HasMaxLength(40);
+        guia.Property(x => x.Nombres).HasMaxLength(120).IsRequired();
+        guia.Property(x => x.Apellidos).HasMaxLength(120).IsRequired();
+        guia.Property(x => x.Telefono).HasMaxLength(30);
+        guia.Property(x => x.Email).HasMaxLength(255);
+        guia.Property(x => x.Idiomas).HasMaxLength(250);
+        guia.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+        guia.HasOne<TipoDocumento>().WithMany().HasForeignKey(x => x.TipoDocumentoId).OnDelete(DeleteBehavior.NoAction);
+        guia.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var transporte = model.Entity<Transporte>();
+        transporte.ToTable("Transportes", "Operacion", t => t.ExcludeFromMigrations());
+        transporte.HasKey(x => x.TransporteId);
+        transporte.Property(x => x.TransporteId).UseIdentityColumn();
+        transporte.Property(x => x.TipoTransporte).HasMaxLength(50).IsRequired();
+        transporte.Property(x => x.Placa).HasMaxLength(30);
+        transporte.Property(x => x.Marca).HasMaxLength(80);
+        transporte.Property(x => x.Modelo).HasMaxLength(80);
+        transporte.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+        transporte.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var hotel = model.Entity<Hotel>();
+        hotel.ToTable("Hoteles", "Operacion", t => t.ExcludeFromMigrations());
+        hotel.HasKey(x => x.HotelId);
+        hotel.Property(x => x.HotelId).UseIdentityColumn();
+        hotel.Property(x => x.Nombre).HasMaxLength(180).IsRequired();
+        hotel.Property(x => x.CategoriaEstrellas).HasColumnType("decimal(2,1)");
+        hotel.Property(x => x.Direccion).HasMaxLength(250);
+        hotel.Property(x => x.Telefono).HasMaxLength(30);
+        hotel.Property(x => x.Email).HasMaxLength(255);
+        hotel.HasOne<Proveedor>().WithMany().HasForeignKey(x => x.ProveedorId).OnDelete(DeleteBehavior.NoAction);
+        hotel.HasOne<Ciudad>().WithMany().HasForeignKey(x => x.CiudadId).OnDelete(DeleteBehavior.NoAction);
+        hotel.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var hab = model.Entity<Habitacion>();
+        hab.ToTable("Habitaciones", "Operacion", t => t.ExcludeFromMigrations());
+        hab.HasKey(x => x.HabitacionId);
+        hab.Property(x => x.HabitacionId).UseIdentityColumn();
+        hab.Property(x => x.TipoHabitacion).HasMaxLength(80).IsRequired();
+        hab.Property(x => x.PrecioNoche).HasColumnType("decimal(18,2)");
+        hab.HasOne<Hotel>().WithMany().HasForeignKey(x => x.HotelId).OnDelete(DeleteBehavior.NoAction);
+        hab.HasOne<Moneda>().WithMany().HasForeignKey(x => x.MonedaId).OnDelete(DeleteBehavior.NoAction);
+        hab.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var salida = model.Entity<Salida>();
+        salida.ToTable("Salidas", "Operacion", t => t.ExcludeFromMigrations());
+        salida.HasKey(x => x.SalidaId);
+        salida.Property(x => x.SalidaId).UseIdentityColumn();
+        salida.Property(x => x.FechaInicio).HasColumnType("date");
+        salida.Property(x => x.FechaFin).HasColumnType("date");
+        salida.Property(x => x.PuntoEncuentro).HasMaxLength(250);
+        salida.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        salida.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+        salida.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoId).OnDelete(DeleteBehavior.NoAction);
+
+        var cupo = model.Entity<CupoSalida>();
+        cupo.ToTable("CuposSalida", "Operacion", t => t.ExcludeFromMigrations());
+        cupo.HasKey(x => x.CupoSalidaId);
+        cupo.Property(x => x.CupoSalidaId).UseIdentityColumn();
+        cupo.Property(x => x.TipoCupo).HasMaxLength(40).IsRequired();
+        cupo.HasIndex(x => new { x.SalidaId, x.TipoCupo }).IsUnique();
+        cupo.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+
+        var bloqueo = model.Entity<BloqueoDisponibilidad>();
+        bloqueo.ToTable("BloqueosDisponibilidad", "Operacion", t => t.ExcludeFromMigrations());
+        bloqueo.HasKey(x => x.BloqueoDisponibilidadId);
+        bloqueo.Property(x => x.BloqueoDisponibilidadId).UseIdentityColumn();
+        bloqueo.Property(x => x.FechaInicio).HasColumnType("date");
+        bloqueo.Property(x => x.FechaFin).HasColumnType("date");
+        bloqueo.Property(x => x.Motivo).HasMaxLength(250).IsRequired();
+        bloqueo.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        bloqueo.HasOne<Paquete>().WithMany().HasForeignKey(x => x.PaqueteId).OnDelete(DeleteBehavior.NoAction);
+        bloqueo.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+        bloqueo.HasOne<Usuario>().WithMany().HasForeignKey(x => x.CreadoPorUsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var asignacion = model.Entity<AsignacionOperacion>();
+        asignacion.ToTable("AsignacionesOperacion", "Operacion", t => t.ExcludeFromMigrations());
+        asignacion.HasKey(x => x.AsignacionOperacionId);
+        asignacion.Property(x => x.AsignacionOperacionId).UseIdentityColumn();
+        asignacion.Property(x => x.FechaAsignacion).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        asignacion.Property(x => x.Observaciones).HasMaxLength(500);
+        asignacion.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
+        asignacion.HasOne<ProveedorServicio>().WithMany().HasForeignKey(x => x.ProveedorServicioId).OnDelete(DeleteBehavior.NoAction);
+        asignacion.HasOne<Guia>().WithMany().HasForeignKey(x => x.GuiaId).OnDelete(DeleteBehavior.NoAction);
+        asignacion.HasOne<Transporte>().WithMany().HasForeignKey(x => x.TransporteId).OnDelete(DeleteBehavior.NoAction);
+        asignacion.HasOne<Hotel>().WithMany().HasForeignKey(x => x.HotelId).OnDelete(DeleteBehavior.NoAction);
+        asignacion.HasOne<Habitacion>().WithMany().HasForeignKey(x => x.HabitacionId).OnDelete(DeleteBehavior.NoAction);
+
+        var operativo = model.Entity<ItinerarioOperativo>();
+        operativo.ToTable("ItinerarioOperativo", "Operacion", t => t.ExcludeFromMigrations());
+        operativo.HasKey(x => x.ItinerarioOperativoId);
+        operativo.Property(x => x.ItinerarioOperativoId).UseIdentityColumn();
+        operativo.Property(x => x.HoraInicio).HasColumnType("time(0)");
+        operativo.Property(x => x.HoraFin).HasColumnType("time(0)");
+        operativo.Property(x => x.Actividad).HasMaxLength(180).IsRequired();
+        operativo.Property(x => x.Descripcion).HasMaxLength(500);
+        operativo.HasIndex(x => new { x.SalidaId, x.DiaNumero, x.Actividad }).IsUnique();
+        operativo.HasOne<Salida>().WithMany().HasForeignKey(x => x.SalidaId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
