@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi cuenta - WayPath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/account.css">
+    <link rel="stylesheet" href="css/accesibilidad.css">
+</head>
+<body>
+<main class="account-shell">
+    <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+    <div class="account-heading">
+        <h1>Mi cuenta</h1>
+        <button id="logout" type="button" class="wp-btn wp-btn-outline" disabled>
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Cerrar sesion
+        </button>
+    </div>
+    <p id="accountMessage" class="auth-message" role="status" aria-live="polite">Cargando cuenta...</p>
+    <div id="accountContent" hidden>
+        <section class="account-section">
+            <h2>Perfil</h2>
+            <p id="accountEmail" class="account-email"></p>
+            <form id="profileForm">
+                <label for="name">Nombre</label>
+                <input id="name" class="wp-input" required maxlength="100" autocomplete="name">
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Guardar
+                </button>
+            </form>
+        </section>
+        <section class="account-section">
+            <h2>Cambiar contrasena</h2>
+            <form id="passwordForm">
+                <label for="currentPassword">Contrasena actual</label>
+                <input id="currentPassword" class="wp-input" type="password" required maxlength="128" autocomplete="current-password">
+                <label for="newPassword">Nueva contrasena (minimo 12 caracteres)</label>
+                <input id="newPassword" class="wp-input" type="password" required minlength="12" maxlength="128" autocomplete="new-password">
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-key" aria-hidden="true"></i> Cambiar contrasena
+                </button>
+            </form>
+        </section>
+    </div>
+</main>
+<script src="js/accesibilidad.js"></script>
+<script type="module" src="js/cuenta.js"></script>
+</body>
+</html>
+

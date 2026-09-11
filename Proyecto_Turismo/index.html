@@ -256,23 +256,7 @@ function goTo(n) {
 dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.idx)));
 setInterval(() => goTo(currentSlide + 1), 5000);
 
-// Login state
-document.addEventListener('DOMContentLoaded', () => {
-    const user = localStorage.getItem('waypath_usuario');
-    if (user) {
-        const name = user.split(' ')[0];
-        document.querySelectorAll('.login-btn').forEach(btn => {
-            btn.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Salir (${name})`;
-            btn.href = '#';
-            btn.style.cssText = 'background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;';
-            btn.addEventListener('click', e => {
-                e.preventDefault();
-                localStorage.removeItem('waypath_usuario');
-                window.location.reload();
-            });
-        });
-    }
-});
 </script>
+<script type="module" src="js/auth-state.js"></script>
 </body>
 </html>

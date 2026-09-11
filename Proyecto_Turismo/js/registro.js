@@ -1,23 +1,20 @@
-document.getElementById('registroForm').addEventListener('submit', function(e) {
-    e.preventDefault(); 
-
-    const nombre = document.getElementById('regNombre').value;
-    const correo = document.getElementById('regCorreo').value;
-    const password = document.getElementById('regPassword').value;
-
-    localStorage.setItem('db_nombre', nombre);
-    localStorage.setItem('db_correo', correo);
-    localStorage.setItem('db_password', password);
-
-    Swal.fire({
-        title: '¡Registro exitoso!',
-        text: 'Tu cuenta ha sido creada. Ahora inicia sesión.',
-        icon: 'success',
-        confirmButtonColor: '#ff7a00',
-        confirmButtonText: 'Ir a Iniciar Sesión'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = 'login.html';
-        }
-    });
+import { api } from "./api.js";
+const form = document.getElementById("registerForm");
+const message = document.getElementById("authMessage");
+form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    message.textContent = "Creando cuenta...";
+    try {
+        await api("/api/auth/register", { method: "POST", body: {
+            nombre: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value
+        } });
+        form.reset();
+        location.assign("/login.html?registered=1");
+    } catch (error) { message.textContent = error.message; }
+    finally { button.disabled = false; }
 });

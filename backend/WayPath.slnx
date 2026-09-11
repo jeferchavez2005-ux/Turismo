@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/WayPath.Domain/WayPath.Domain.csproj" />
+  <Project Path="src/WayPath.Application/WayPath.Application.csproj" />
+  <Project Path="src/WayPath.Infrastructure/WayPath.Infrastructure.csproj" />
+  <Project Path="src/WayPath.Api/WayPath.Api.csproj" />
+  <Project Path="tests/WayPath.Tests/WayPath.Tests.csproj" />
+</Solution>
+

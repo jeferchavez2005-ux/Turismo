@@ -1,0 +1,12 @@
+.account-shell { max-width: 680px; margin: 32px auto; padding: 0 24px 48px; }
+.account-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.account-heading h1 { font-size: 28px; }
+.account-section { padding: 24px 0; border-bottom: 1px solid #d4d8dd; }
+.account-section h2 { font-size: 20px; margin-bottom: 16px; }
+.account-section label { display: block; margin: 12px 0 6px; }
+.account-section input { width: 100%; box-sizing: border-box; }
+.account-section button { margin-top: 16px; }
+.account-email { overflow-wrap: anywhere; }
+.auth-message { min-height: 24px; margin: 12px 0; overflow-wrap: anywhere; }
+button:disabled { opacity: .65; cursor: wait; }
+

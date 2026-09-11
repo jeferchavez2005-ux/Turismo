@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup><ProjectReference Include="../WayPath.Domain/WayPath.Domain.csproj" /></ItemGroup>
+</Project>
+

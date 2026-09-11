@@ -1,42 +1,26 @@
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault(); 
-
-    const emailIngresado = document.getElementById('logCorreo').value;
-    const passIngresado = document.getElementById('logPassword').value;
-
-    const correoRegistrado = localStorage.getItem('db_correo');
-    const passRegistrado = localStorage.getItem('db_password');
-    const nombreRegistrado = localStorage.getItem('db_nombre');
-
-    if (correoRegistrado && passRegistrado) {
-        if (emailIngresado === correoRegistrado && passIngresado === passRegistrado) {
-            
-            localStorage.setItem('waypath_usuario', nombreRegistrado);
-            
-            Swal.fire({
-                title: `¡Bienvenido, ${nombreRegistrado.split(' ')[0]}!`,
-                text: 'Ingresando a WayPath...',
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                window.location.href = 'servicios.html'; 
-            });
-            
-        } else {
-            Swal.fire({
-                title: 'Datos incorrectos',
-                text: 'El correo o la contraseña no coinciden.',
-                icon: 'error',
-                confirmButtonColor: '#0b2a4a'
-            });
-        }
-    } else {
-        Swal.fire({
-            title: 'No tienes cuenta',
-            text: 'Por favor, regístrate primero en WayPath.',
-            icon: 'warning',
-            confirmButtonColor: '#0b2a4a'
-        });
-    }
+import { api, broadcastAuthChange } from "./api.js";
+const form = document.getElementById("loginForm");
+const message = document.getElementById("authMessage");
+if (new URLSearchParams(location.search).get("registered") === "1")
+    message.textContent = "Cuenta creada. Inicia sesion para continuar.";
+form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    message.textContent = "Verificando...";
+    try {
+        await api("/api/auth/login", { method: "POST", body: {
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value
+        } });
+        form.reset();
+        broadcastAuthChange();
+        location.assign("/index.html");
+    } catch (error) { message.textContent = error.message; }
+    finally { button.disabled = false; }
+});
+document.querySelector(".forgot a").addEventListener("click", event => {
+    event.preventDefault();
+    message.textContent = "La recuperacion de cuentas por correo aun no esta disponible.";
 });

@@ -34,19 +34,5 @@
         });
     }
 
-    // Login state
-    const user = localStorage.getItem('waypath_usuario');
-    if (user) {
-        const name = user.split(' ')[0];
-        document.querySelectorAll('.login-btn').forEach(btn => {
-            btn.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Salir (${name})`;
-            btn.href = '#';
-            btn.style.cssText = 'background:linear-gradient(135deg,#dc2626,#ef4444)!important;color:#fff!important;';
-            btn.addEventListener('click', e => {
-                e.preventDefault();
-                localStorage.removeItem('waypath_usuario');
-                window.location.reload();
-            });
-        });
-    }
+    import('./auth-state.js');
 })();
