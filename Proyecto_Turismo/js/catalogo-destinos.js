@@ -1,4 +1,4 @@
-import { api } from "./api.js";
+import { ApiError, api } from "./api.js";
 
 const grid = document.getElementById("destinosGrid");
 const emptyState = document.getElementById("emptyState");
@@ -76,17 +76,78 @@ function card(destino) {
     const calendar = document.createElement("i");
     calendar.className = "fa-solid fa-calendar-plus";
     reserve.append(calendar, document.createTextNode(` ${t("common.reserve")}`));
-    reserve.addEventListener("click", () => {
-        localStorage.setItem("destinoIdSeleccionado", destino.destinoId);
-        localStorage.setItem("destinoSeleccionado", destino.nombre);
-        localStorage.setItem("precioSeleccionado", destino.precioDesde ?? "0");
-        localStorage.setItem("imgSeleccionada", fallbackImage(destino.imagenUrl));
-    });
+    reserve.addEventListener("click", event => handleReserveClick(event, destino));
 
     footer.append(priceInfo, reserve);
     body.append(title, location, desc, footer);
     article.append(imgWrap, body);
     return article;
+}
+
+async function handleReserveClick(event, destino) {
+    event.preventDefault();
+    saveReservationIntent(destino);
+    try {
+        const user = await api("/api/auth/me");
+        if (!(user.roles || []).includes("CLIENTE")) {
+            await notice("Acceso de cliente requerido", "Debes ingresar con una cuenta Cliente para realizar una reserva.");
+            return;
+        }
+        const client = await api("/api/clientes/me");
+        if (!isProfileComplete(client?.perfil)) {
+            await goTo("Completa tu perfil", "Antes de reservar necesitamos tus nombres, apellidos y teléfono.", "cuenta.html?returnUrl=reserva.html");
+            return;
+        }
+        window.location.href = "reserva.html";
+    } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+            await authPrompt();
+            return;
+        }
+        await notice("No se pudo iniciar la reserva", error.message || "Intenta nuevamente.");
+    }
+}
+
+function saveReservationIntent(destino) {
+    localStorage.setItem("destinoIdSeleccionado", destino.destinoId);
+    localStorage.setItem("destinoSeleccionado", destino.nombre);
+    localStorage.setItem("precioSeleccionado", destino.precioDesde ?? "0");
+    localStorage.setItem("imgSeleccionada", fallbackImage(destino.imagenUrl));
+    localStorage.setItem("wp_auth_return_url", "/reserva.html");
+}
+
+function isProfileComplete(profile) {
+    return Boolean(profile?.nombres?.trim() && profile?.apellidos?.trim() && profile?.telefono?.trim());
+}
+
+async function authPrompt() {
+    const loginUrl = "login.html?returnUrl=%2Freserva.html";
+    const registerUrl = "registro.html?returnUrl=%2Freserva.html";
+    if (!window.Swal) {
+        window.location.href = window.confirm("Debes iniciar sesión para realizar una reserva.\n\nAceptar: iniciar sesión\nCancelar: registrarse") ? loginUrl : registerUrl;
+        return;
+    }
+    const result = await Swal.fire({
+        title: "Debes iniciar sesión para realizar una reserva",
+        text: "Puedes entrar con tu cuenta o crear una nueva para continuar con el destino seleccionado.",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Iniciar sesión",
+        cancelButtonText: "Registrarse",
+        confirmButtonColor: "#f97316"
+    });
+    window.location.href = result.isConfirmed ? loginUrl : registerUrl;
+}
+
+async function goTo(title, text, url) {
+    if (window.Swal) await Swal.fire({ title, text, icon: "warning", confirmButtonColor: "#f97316" });
+    else alert(`${title}: ${text}`);
+    window.location.href = url;
+}
+
+async function notice(title, text) {
+    if (window.Swal) await Swal.fire({ title, text, icon: "warning", confirmButtonColor: "#f97316" });
+    else alert(`${title}: ${text}`);
 }
 function render(rows) {
     grid.replaceChildren();

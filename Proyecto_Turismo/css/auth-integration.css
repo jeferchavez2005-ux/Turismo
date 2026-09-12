@@ -1,6 +1,31 @@
 #authMessage { min-height: 24px; overflow-wrap: anywhere; line-height: 1.5; margin-bottom: 12px; }
 #loginForm button:disabled, #registerForm button:disabled { opacity: .65; cursor: wait; }
 .login-body .traductor-widget:empty, .auth-body .traductor-widget:empty { display: none; }
+.password-strength {
+    display: grid;
+    gap: 6px;
+    margin-top: 6px;
+}
+.password-strength span {
+    display: block;
+    width: 25%;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--danger);
+    transition: width var(--transition), background var(--transition);
+}
+.password-strength small {
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.password-strength.medium span { background: var(--warning); }
+.password-strength.strong span { background: var(--success); }
+.checkout-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
 @media (max-width: 600px) {
     .auth-body { flex-direction: column; gap: 16px; }
     .login-body > .accessibility-widget, .auth-body > .accessibility-widget {

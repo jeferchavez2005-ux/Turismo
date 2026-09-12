@@ -49,6 +49,7 @@
 
 
 .checkout-form { display: flex; flex-direction: column; gap: 32px; }
+.checkout-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .form-section h3 { font-size: 1.1rem; font-weight: 700; color: var(--blue-900); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .form-field { display: flex; flex-direction: column; gap: 6px; }

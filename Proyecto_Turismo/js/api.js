@@ -18,7 +18,7 @@ async function request(path, options = {}) {
     const body = (response.headers.get("content-type") || "").includes("json") ? await response.json() : null;
     if (!response.ok) {
         const message = response.status === 429 ? "Demasiados intentos. Espera un minuto."
-            : response.status === 401 ? "Correo o clave incorrectos, o sesion no disponible."
+            : response.status === 401 ? (path === "/api/auth/login" ? "Correo o clave incorrectos." : "Tu sesión expiró. Inicia sesión nuevamente.")
             : response.status === 403 ? "No tienes permiso para realizar esta operacion."
             : body?.title || "No se pudo completar la solicitud. Revisa los datos e intenta nuevamente.";
         throw new ApiError(message, response.status);
@@ -43,4 +43,3 @@ export function broadcastAuthChange() {
     }
 }
 removeDemoCredentials();
-
