@@ -6,8 +6,8 @@ export const adminLinks = [
     { href: "clientes.html", label: "Clientes", i18n: "admin.nav.clients", icon: "fa-address-card", permission: "SEGURIDAD_USUARIOS_GESTIONAR" },
     { href: "index.html#catalogo", label: "Catálogo", i18n: "admin.nav.catalog", icon: "fa-map-location-dot", permission: "CATALOGO_DESTINOS_GESTIONAR" },
     { href: "index.html#operacion", label: "Operación", i18n: "admin.nav.operation", icon: "fa-route", permission: "VENTAS_RESERVAS_GESTIONAR" },
-    { href: "index.html#reservas", label: "Reservas", i18n: "admin.nav.reservations", icon: "fa-calendar-check", permission: "VENTAS_RESERVAS_LEER" },
-    { href: "index.html#pagos", label: "Pagos", i18n: "admin.nav.payments", icon: "fa-credit-card", permission: "PAGOS_LEER" },
+    { href: "reservas.html", label: "Reservas", i18n: "admin.nav.reservations", icon: "fa-calendar-check", permission: "VENTAS_RESERVAS_LEER" },
+    { href: "pagos.html", label: "Pagos", i18n: "admin.nav.payments", icon: "fa-credit-card", permission: "PAGOS_LEER" },
     { href: "index.html#ventas", label: "Ventas", i18n: "admin.nav.sales", icon: "fa-receipt", permission: "VENTAS_RESERVAS_LEER" },
     { href: "index.html#reportes", label: "Reportes", i18n: "admin.nav.reports", icon: "fa-chart-pie", permission: "REPORTES_LEER" },
     { href: "index.html#auditoria", label: "Auditoría", i18n: "admin.nav.audit", icon: "fa-shield-halved", permission: "AUDITORIA_LEER" }
@@ -65,7 +65,15 @@ async function requireAdminAccess() {
         const user = await api("/api/auth/me");
         const hasAdminAccess = (user.roles || []).includes("ADMINISTRADOR")
             || (user.roles || []).includes("EMPLEADO")
-            || (user.permisos || []).some(permission => ["SEGURIDAD_USUARIOS_GESTIONAR", "REPORTES_LEER", "AUDITORIA_LEER"].includes(permission));
+            || (user.permisos || []).some(permission => [
+                "SEGURIDAD_USUARIOS_GESTIONAR",
+                "VENTAS_RESERVAS_LEER",
+                "VENTAS_RESERVAS_GESTIONAR",
+                "PAGOS_LEER",
+                "PAGOS_GESTIONAR",
+                "REPORTES_LEER",
+                "AUDITORIA_LEER"
+            ].includes(permission));
         if (!hasAdminAccess) throw new ApiError("Tu usuario no tiene acceso administrativo.", 403);
         return user;
     } catch (error) {

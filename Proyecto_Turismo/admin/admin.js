@@ -119,7 +119,12 @@ function primaryRole(user) {
 function applyPermissions(user) {
     const permissions = new Set(user?.permisos || []);
     const isAdmin = (user?.roles || []).includes("ADMINISTRADOR");
-    const canUseAdmin = isAdmin || permissions.has("SEGURIDAD_USUARIOS_GESTIONAR") || permissions.has("REPORTES_LEER") || permissions.has("AUDITORIA_LEER");
+    const canUseAdmin = isAdmin
+        || permissions.has("SEGURIDAD_USUARIOS_GESTIONAR")
+        || permissions.has("VENTAS_RESERVAS_LEER")
+        || permissions.has("PAGOS_LEER")
+        || permissions.has("REPORTES_LEER")
+        || permissions.has("AUDITORIA_LEER");
 
     if (!canUseAdmin) {
         showAccessDenied("Tu usuario no tiene acceso administrativo.");

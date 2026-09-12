@@ -432,6 +432,12 @@
     color: var(--text-primary);
 }
 
+:root[data-theme="dark"] .swal2-textarea {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
 @media (max-width: 1180px) {
     .admin-kpis {
         grid-template-columns: repeat(3, minmax(0, 1fr));

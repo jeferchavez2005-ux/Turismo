@@ -155,5 +155,15 @@
   "admin.clients.subtitle": "Consulte clientes, estado operacional e relacao com usuarios autenticados.",
   "admin.clients.search": "Buscar por nome, email, telefone ou estado...",
   "admin.clients.detail": "Detalhe",
-  "admin.clients.changeState": "Alterar estado"
+  "admin.clients.changeState": "Alterar estado",
+  "admin.reservations.title": "Gestao de reservas",
+  "admin.reservations.subtitle": "Consulte reservas, passageiros, detalhes e historico de estados.",
+  "admin.reservations.search": "Buscar por codigo, cliente, destino ou pacote...",
+  "admin.reservations.changeState": "Alterar estado",
+  "admin.reservations.detail": "Detalhe da reserva",
+  "admin.payments.title": "Gestao de pagamentos",
+  "admin.payments.subtitle": "Consulte ordens, pagamentos e estados de transacoes.",
+  "admin.payments.search": "Buscar por ordem, reserva, metodo ou transacao...",
+  "admin.payments.changeState": "Alterar estado",
+  "admin.payments.detail": "Detalhe do pagamento"
 }

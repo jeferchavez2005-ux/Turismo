@@ -155,5 +155,15 @@
   "admin.clients.subtitle": "Review clients, operational status, and authenticated user links.",
   "admin.clients.search": "Search by name, email, phone, or state...",
   "admin.clients.detail": "Detail",
-  "admin.clients.changeState": "Change state"
+  "admin.clients.changeState": "Change state",
+  "admin.reservations.title": "Booking management",
+  "admin.reservations.subtitle": "Review bookings, passengers, details, and state history.",
+  "admin.reservations.search": "Search by code, client, destination, or package...",
+  "admin.reservations.changeState": "Change state",
+  "admin.reservations.detail": "Booking detail",
+  "admin.payments.title": "Payment management",
+  "admin.payments.subtitle": "Review orders, payments, and transaction states.",
+  "admin.payments.search": "Search by order, booking, method, or transaction...",
+  "admin.payments.changeState": "Change state",
+  "admin.payments.detail": "Payment detail"
 }
