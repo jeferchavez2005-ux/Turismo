@@ -37,6 +37,7 @@ builder.Services.AddScoped<OperacionService>();
 builder.Services.AddScoped<ReservaService>();
 builder.Services.AddScoped<PagoService>();
 builder.Services.AddScoped<VentaService>();
+builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ISecurityStore, SecurityStore>();
 builder.Services.AddScoped<IClienteStore, ClienteStore>();
 builder.Services.AddScoped<ICatalogoStore, CatalogoStore>();
@@ -44,6 +45,7 @@ builder.Services.AddScoped<IOperacionStore, OperacionStore>();
 builder.Services.AddScoped<IReservaStore, ReservaStore>();
 builder.Services.AddScoped<IPagoStore, PagoStore>();
 builder.Services.AddScoped<IVentaStore, VentaStore>();
+builder.Services.AddScoped<IDashboardStore, DashboardStore>();
 builder.Services.AddDbContext<WayPathDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddControllers(options => options.Filters.Add<CsrfFilter>())
     .AddJsonOptions(options => options.JsonSerializerOptions.UnmappedMemberHandling =

@@ -66,9 +66,18 @@
         <div class="dashboard-header">
             <div>
                 <h1>Rendimiento Comercial y Ventas</h1>
-                <p>Análisis de conversiones, ingresos y métodos de pago.</p>
+                <p id="dashboardStatus">Cargando métricas reales de WayPathDB...</p>
             </div>
             <a href="dashboard-marketing.html" class="wp-btn wp-btn-outline"><i class="fa-solid fa-bullhorn"></i> Ver Marketing</a>
+        </div>
+
+        <div class="dashboard-kpis" aria-label="Resumen administrativo">
+            <div class="dashboard-kpi"><span>Usuarios</span><strong id="kpiUsuarios">0</strong></div>
+            <div class="dashboard-kpi"><span>Clientes activos</span><strong id="kpiClientes">0</strong></div>
+            <div class="dashboard-kpi"><span>Reservas</span><strong id="kpiReservas">0</strong></div>
+            <div class="dashboard-kpi"><span>Total vendido</span><strong id="kpiVentas">S/ 0.00</strong></div>
+            <div class="dashboard-kpi"><span>Compras</span><strong id="kpiCompras">0</strong></div>
+            <div class="dashboard-kpi"><span>Cupos disponibles</span><strong id="kpiCupos">0</strong></div>
         </div>
 
         <div class="graficos-grid">
@@ -132,7 +141,7 @@
 
 <script src="../js/accesibilidad.js"></script>
 <script src="../js/navbar.js"></script>
-<script src="dashboard-ventas.js"></script>
+<script type="module" src="dashboard-ventas.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
