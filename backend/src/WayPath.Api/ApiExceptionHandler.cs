@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -6,7 +7,8 @@ using WayPath.Application;
 
 namespace WayPath.Api;
 
-public sealed class ApiExceptionHandler(IProblemDetailsService problems, ILogger<ApiExceptionHandler> logger)
+public sealed class ApiExceptionHandler(IProblemDetailsService problems, ILogger<ApiExceptionHandler> logger,
+    IServiceScopeFactory scopes)
     : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken ct)
@@ -26,6 +28,8 @@ public sealed class ApiExceptionHandler(IProblemDetailsService problems, ILogger
         // Do not log exception messages: SQL errors can contain user data.
         if (status >= 500) logger.LogError("Request {TraceId} failed: {ExceptionType}",
             context.TraceIdentifier, exception.GetType().Name);
+        if (status >= 500)
+            await AuditError(context, exception, status, ct);
         context.Response.StatusCode = status;
         await problems.WriteAsync(new ProblemDetailsContext
         {
@@ -36,5 +40,28 @@ public sealed class ApiExceptionHandler(IProblemDetailsService problems, ILogger
         });
         return true;
     }
-}
 
+    private async Task AuditError(HttpContext context, Exception exception, int status, CancellationToken ct)
+    {
+        try
+        {
+            using var scope = scopes.CreateScope();
+            var audit = scope.ServiceProvider.GetRequiredService<AuditoriaService>();
+            var userId = long.TryParse(context.User.FindFirstValue("sub"), out var id) ? id : (long?)null;
+            var data = System.Text.Json.JsonSerializer.SerializeToElement(new
+            {
+                traceId = context.TraceIdentifier,
+                path = context.Request.Path.Value,
+                method = context.Request.Method,
+                status
+            });
+            await audit.RegisterError(userId, status >= 500 ? "ERROR" : "WARN",
+                exception.GetType().Name, "No se pudo completar la operacion.",
+                exception.StackTrace, data, ct);
+        }
+        catch (Exception auditException)
+        {
+            logger.LogWarning("Audit error registration failed: {ExceptionType}", auditException.GetType().Name);
+        }
+    }
+}

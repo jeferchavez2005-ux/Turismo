@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WayPath.Domain.Auditoria;
 using WayPath.Domain.Catalogo;
 using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
@@ -18,7 +19,7 @@ public sealed class MappingTests
     {
         using var db = new WayPathDbContext(new DbContextOptionsBuilder<WayPathDbContext>()
             .UseSqlServer("Server=unused;Database=unused;Integrated Security=True").Options);
-        Assert.Equal(63, db.Model.GetEntityTypes().Count());
+        Assert.Equal(66, db.Model.GetEntityTypes().Count());
         Assert.Equal("Usuarios", db.Model.FindEntityType(typeof(Usuario))!.GetTableName());
         Assert.Equal("Seguridad", db.Model.FindEntityType(typeof(Usuario))!.GetSchema());
         Assert.Equal("Clientes", db.Model.FindEntityType(typeof(ClientePerfil))!.GetTableName());
@@ -58,6 +59,10 @@ public sealed class MappingTests
         Assert.Equal("MetricasDiarias", db.Model.FindEntityType(typeof(MetricaDiaria))!.GetTableName());
         Assert.Equal("EventosAnalitica", db.Model.FindEntityType(typeof(EventoAnalitica))!.GetTableName());
         Assert.Equal("DashboardSnapshots", db.Model.FindEntityType(typeof(DashboardSnapshot))!.GetTableName());
+        Assert.Equal("AuditoriaCambios", db.Model.FindEntityType(typeof(AuditoriaCambio))!.GetTableName());
+        Assert.Equal("Auditoria", db.Model.FindEntityType(typeof(AuditoriaCambio))!.GetSchema());
+        Assert.Equal("AuditoriaAccesos", db.Model.FindEntityType(typeof(AuditoriaAcceso))!.GetTableName());
+        Assert.Equal("ErroresAplicacion", db.Model.FindEntityType(typeof(ErrorAplicacion))!.GetTableName());
         Assert.True(db.Model.FindEntityType(typeof(Usuario))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(ClientePerfil))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Destino))!.FindProperty("FilaVersion")!.IsConcurrencyToken);

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WayPath.Domain.Auditoria;
 using WayPath.Domain.Catalogo;
 using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
@@ -75,6 +76,9 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<MetricaDiaria> MetricasDiarias => Set<MetricaDiaria>();
     public DbSet<EventoAnalitica> EventosAnalitica => Set<EventoAnalitica>();
     public DbSet<DashboardSnapshot> DashboardSnapshots => Set<DashboardSnapshot>();
+    public DbSet<AuditoriaCambio> AuditoriaCambios => Set<AuditoriaCambio>();
+    public DbSet<AuditoriaAcceso> AuditoriaAccesos => Set<AuditoriaAcceso>();
+    public DbSet<ErrorAplicacion> ErroresAplicacion => Set<ErrorAplicacion>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -780,6 +784,42 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         snapshot.Property(x => x.GeneradoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
         snapshot.HasIndex(x => new { x.CodigoDashboard, x.GeneradoEn });
         snapshot.HasOne<Usuario>().WithMany().HasForeignKey(x => x.GeneradoPorUsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var auditChange = model.Entity<AuditoriaCambio>();
+        auditChange.ToTable("AuditoriaCambios", "Auditoria", t => t.ExcludeFromMigrations());
+        auditChange.HasKey(x => x.AuditoriaCambioId);
+        auditChange.Property(x => x.AuditoriaCambioId).UseIdentityColumn();
+        auditChange.Property(x => x.EsquemaNombre).HasMaxLength(80).IsRequired();
+        auditChange.Property(x => x.TablaNombre).HasMaxLength(120).IsRequired();
+        auditChange.Property(x => x.ClavePrimaria).HasMaxLength(120).IsRequired();
+        auditChange.Property(x => x.Operacion).HasMaxLength(20).IsRequired();
+        auditChange.Property(x => x.Ip).HasMaxLength(45);
+        auditChange.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        auditChange.HasIndex(x => new { x.EsquemaNombre, x.TablaNombre, x.CreadoEn });
+        auditChange.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var auditAccess = model.Entity<AuditoriaAcceso>();
+        auditAccess.ToTable("AuditoriaAccesos", "Auditoria", t => t.ExcludeFromMigrations());
+        auditAccess.HasKey(x => x.AuditoriaAccesoId);
+        auditAccess.Property(x => x.AuditoriaAccesoId).UseIdentityColumn();
+        auditAccess.Property(x => x.EmailIntentado).HasMaxLength(255);
+        auditAccess.Property(x => x.Resultado).HasMaxLength(40).IsRequired();
+        auditAccess.Property(x => x.Ip).HasMaxLength(45);
+        auditAccess.Property(x => x.UserAgent).HasMaxLength(500);
+        auditAccess.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        auditAccess.HasIndex(x => new { x.UsuarioId, x.CreadoEn });
+        auditAccess.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var appError = model.Entity<ErrorAplicacion>();
+        appError.ToTable("ErroresAplicacion", "Auditoria", t => t.ExcludeFromMigrations());
+        appError.HasKey(x => x.ErrorAplicacionId);
+        appError.Property(x => x.ErrorAplicacionId).UseIdentityColumn();
+        appError.Property(x => x.Nivel).HasMaxLength(20).IsRequired();
+        appError.Property(x => x.Origen).HasMaxLength(160).IsRequired();
+        appError.Property(x => x.Mensaje).IsRequired();
+        appError.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        appError.HasIndex(x => new { x.Nivel, x.CreadoEn });
+        appError.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

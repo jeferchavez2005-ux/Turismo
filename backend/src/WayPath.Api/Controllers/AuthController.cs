@@ -11,7 +11,7 @@ namespace WayPath.Api.Controllers;
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController(AuthenticationService service, ISecurityStore store,
-    JwtSession jwt, IAntiforgery antiforgery) : ControllerBase
+    JwtSession jwt, IAntiforgery antiforgery, AuditoriaService auditoria) : ControllerBase
 {
     [HttpGet("csrf"), AllowAnonymous]
     public IActionResult Csrf() => Ok(new { token = antiforgery.GetAndStoreTokens(HttpContext).RequestToken });
@@ -26,8 +26,19 @@ public sealed class AuthController(AuthenticationService service, ISecurityStore
     [HttpPost("login"), AllowAnonymous, EnableRateLimiting("credentials")]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken ct)
     {
-        var session = await service.Login(request, HttpContext.Connection.RemoteIpAddress?.ToString(),
-            Request.Headers.UserAgent.ToString(), ct);
+        LoginSession session;
+        try
+        {
+            session = await service.Login(request, HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Request.Headers.UserAgent.ToString(), ct);
+        }
+        catch (SecurityFault)
+        {
+            await AuditAccess(null, request.Email, "FALLIDO", ct);
+            throw;
+        }
+        await AuditAccess(long.Parse(session.User.UsuarioId, System.Globalization.CultureInfo.InvariantCulture),
+            session.User.Email, "EXITOSO", ct);
         jwt.Write(Response, session);
         return Ok(session.User);
     }
@@ -39,6 +50,7 @@ public sealed class AuthController(AuthenticationService service, ISecurityStore
     public async Task<IActionResult> Logout(CancellationToken ct)
     {
         await store.EndSession(UserId, User.FindFirstValue("jti")!, ct);
+        await AuditAccess(UserId, User.FindFirstValue("email"), "LOGOUT", ct);
         jwt.Clear(Response);
         return NoContent();
     }
@@ -59,5 +71,17 @@ public sealed class AuthController(AuthenticationService service, ISecurityStore
     }
 
     private long UserId => long.Parse(User.FindFirstValue("sub")!, System.Globalization.CultureInfo.InvariantCulture);
-}
 
+    private async Task AuditAccess(long? userId, string? email, string result, CancellationToken ct)
+    {
+        try
+        {
+            await auditoria.RegisterAccess(userId, email, result, HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Request.Headers.UserAgent.ToString(), ct);
+        }
+        catch
+        {
+            // Authentication must not fail because the audit trail could not be written.
+        }
+    }
+}
