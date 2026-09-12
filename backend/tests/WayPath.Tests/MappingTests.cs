@@ -4,6 +4,7 @@ using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
 using WayPath.Domain.Operacion;
 using WayPath.Domain.Pagos;
+using WayPath.Domain.Reportes;
 using WayPath.Domain.Seguridad;
 using WayPath.Domain.Ventas;
 using WayPath.Infrastructure;
@@ -17,7 +18,7 @@ public sealed class MappingTests
     {
         using var db = new WayPathDbContext(new DbContextOptionsBuilder<WayPathDbContext>()
             .UseSqlServer("Server=unused;Database=unused;Integrated Security=True").Options);
-        Assert.Equal(59, db.Model.GetEntityTypes().Count());
+        Assert.Equal(63, db.Model.GetEntityTypes().Count());
         Assert.Equal("Usuarios", db.Model.FindEntityType(typeof(Usuario))!.GetTableName());
         Assert.Equal("Seguridad", db.Model.FindEntityType(typeof(Usuario))!.GetSchema());
         Assert.Equal("Clientes", db.Model.FindEntityType(typeof(ClientePerfil))!.GetTableName());
@@ -52,6 +53,11 @@ public sealed class MappingTests
         Assert.Equal("TicketsViaje", db.Model.FindEntityType(typeof(TicketViaje))!.GetTableName());
         Assert.Equal("Vouchers", db.Model.FindEntityType(typeof(Voucher))!.GetTableName());
         Assert.Equal("Resenas", db.Model.FindEntityType(typeof(Resena))!.GetTableName());
+        Assert.Equal("KpiDefiniciones", db.Model.FindEntityType(typeof(KpiDefinicion))!.GetTableName());
+        Assert.Equal("Reportes", db.Model.FindEntityType(typeof(KpiDefinicion))!.GetSchema());
+        Assert.Equal("MetricasDiarias", db.Model.FindEntityType(typeof(MetricaDiaria))!.GetTableName());
+        Assert.Equal("EventosAnalitica", db.Model.FindEntityType(typeof(EventoAnalitica))!.GetTableName());
+        Assert.Equal("DashboardSnapshots", db.Model.FindEntityType(typeof(DashboardSnapshot))!.GetTableName());
         Assert.True(db.Model.FindEntityType(typeof(Usuario))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(ClientePerfil))!.FindProperty("FilaVersion")!.IsConcurrencyToken);
         Assert.True(db.Model.FindEntityType(typeof(Destino))!.FindProperty("FilaVersion")!.IsConcurrencyToken);

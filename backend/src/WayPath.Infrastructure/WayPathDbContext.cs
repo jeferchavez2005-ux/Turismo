@@ -4,6 +4,7 @@ using WayPath.Domain.Cliente;
 using WayPath.Domain.Configuracion;
 using WayPath.Domain.Operacion;
 using WayPath.Domain.Pagos;
+using WayPath.Domain.Reportes;
 using WayPath.Domain.Seguridad;
 using WayPath.Domain.Ventas;
 
@@ -70,6 +71,10 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
     public DbSet<TicketViaje> TicketsViaje => Set<TicketViaje>();
     public DbSet<Voucher> Vouchers => Set<Voucher>();
     public DbSet<Resena> Resenas => Set<Resena>();
+    public DbSet<KpiDefinicion> KpiDefiniciones => Set<KpiDefinicion>();
+    public DbSet<MetricaDiaria> MetricasDiarias => Set<MetricaDiaria>();
+    public DbSet<EventoAnalitica> EventosAnalitica => Set<EventoAnalitica>();
+    public DbSet<DashboardSnapshot> DashboardSnapshots => Set<DashboardSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -724,6 +729,57 @@ public sealed class WayPathDbContext(DbContextOptions<WayPathDbContext> options)
         resena.HasOne<Destino>().WithMany().HasForeignKey(x => x.DestinoId).OnDelete(DeleteBehavior.NoAction);
         resena.HasOne<Estado>().WithMany().HasForeignKey(x => x.EstadoModeracionId).OnDelete(DeleteBehavior.NoAction);
         resena.HasOne<Usuario>().WithMany().HasForeignKey(x => x.ModeradoPorUsuarioId).OnDelete(DeleteBehavior.NoAction);
+
+        var kpi = model.Entity<KpiDefinicion>();
+        kpi.ToTable("KpiDefiniciones", "Reportes", t => t.ExcludeFromMigrations());
+        kpi.HasKey(x => x.KpiDefinicionId);
+        kpi.Property(x => x.KpiDefinicionId).UseIdentityColumn();
+        kpi.Property(x => x.Codigo).HasMaxLength(80).IsRequired();
+        kpi.HasIndex(x => x.Codigo).IsUnique();
+        kpi.Property(x => x.Nombre).HasMaxLength(160).IsRequired();
+        kpi.Property(x => x.Descripcion).HasMaxLength(500);
+        kpi.Property(x => x.EsActivo).HasDefaultValue(true);
+
+        var metric = model.Entity<MetricaDiaria>();
+        metric.ToTable("MetricasDiarias", "Reportes", t => t.ExcludeFromMigrations());
+        metric.HasKey(x => x.MetricaDiariaId);
+        metric.Property(x => x.MetricaDiariaId).UseIdentityColumn();
+        metric.Property(x => x.Fecha).HasColumnType("date");
+        metric.Property(x => x.NombreMetrica).HasMaxLength(120).IsRequired();
+        metric.Property(x => x.DimensionNombre).HasMaxLength(120);
+        metric.Property(x => x.DimensionValor).HasMaxLength(180);
+        metric.Property(x => x.ValorDecimal).HasColumnType("decimal(18,4)");
+        metric.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        metric.HasIndex(x => new { x.Fecha, x.NombreMetrica, x.DimensionNombre, x.DimensionValor }).IsUnique();
+        metric.HasIndex(x => x.Fecha);
+        metric.HasOne<KpiDefinicion>().WithMany().HasForeignKey(x => x.KpiDefinicionId).OnDelete(DeleteBehavior.NoAction);
+
+        var analytic = model.Entity<EventoAnalitica>();
+        analytic.ToTable("EventosAnalitica", "Reportes", t => t.ExcludeFromMigrations());
+        analytic.HasKey(x => x.EventoAnaliticaId);
+        analytic.Property(x => x.EventoAnaliticaId).UseIdentityColumn();
+        analytic.Property(x => x.SesionId).HasMaxLength(120);
+        analytic.Property(x => x.TipoEvento).HasMaxLength(80).IsRequired();
+        analytic.Property(x => x.Pagina).HasMaxLength(250);
+        analytic.Property(x => x.RecursoId).HasMaxLength(80);
+        analytic.Property(x => x.Ip).HasMaxLength(45);
+        analytic.Property(x => x.UserAgent).HasMaxLength(500);
+        analytic.Property(x => x.CreadoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        analytic.HasIndex(x => new { x.TipoEvento, x.CreadoEn });
+        analytic.HasIndex(x => x.ClienteId);
+        analytic.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.NoAction);
+        analytic.HasOne<ClientePerfil>().WithMany().HasForeignKey(x => x.ClienteId).OnDelete(DeleteBehavior.NoAction);
+
+        var snapshot = model.Entity<DashboardSnapshot>();
+        snapshot.ToTable("DashboardSnapshots", "Reportes", t => t.ExcludeFromMigrations());
+        snapshot.HasKey(x => x.DashboardSnapshotId);
+        snapshot.Property(x => x.DashboardSnapshotId).UseIdentityColumn();
+        snapshot.Property(x => x.CodigoDashboard).HasMaxLength(80).IsRequired();
+        snapshot.Property(x => x.Titulo).HasMaxLength(160).IsRequired();
+        snapshot.Property(x => x.DatosJson).IsRequired();
+        snapshot.Property(x => x.GeneradoEn).HasColumnType("datetime2(0)").HasDefaultValueSql("sysutcdatetime()");
+        snapshot.HasIndex(x => new { x.CodigoDashboard, x.GeneradoEn });
+        snapshot.HasOne<Usuario>().WithMany().HasForeignKey(x => x.GeneradoPorUsuarioId).OnDelete(DeleteBehavior.NoAction);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
