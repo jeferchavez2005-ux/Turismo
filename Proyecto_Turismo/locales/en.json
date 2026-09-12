@@ -165,5 +165,13 @@
   "admin.payments.subtitle": "Review orders, payments, and transaction states.",
   "admin.payments.search": "Search by order, booking, method, or transaction...",
   "admin.payments.changeState": "Change state",
-  "admin.payments.detail": "Payment detail"
+  "admin.payments.detail": "Payment detail",
+  "admin.sales.title": "Sales management",
+  "admin.sales.subtitle": "Review purchases, receipts, tickets, vouchers, and reviews.",
+  "admin.sales.search": "Search by code, client, booking, destination, or state...",
+  "admin.sales.purchases": "Purchases",
+  "admin.sales.receipts": "Receipts",
+  "admin.sales.tickets": "Tickets",
+  "admin.sales.vouchers": "Vouchers",
+  "admin.sales.reviews": "Reviews"
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas | WayPath Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<a href="#admin-main" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto" title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegación administrativa">
+        <a href="index.html" class="admin-brand"><span>Way<span>Path</span></span><small>Admin</small></a>
+        <nav class="admin-nav" id="adminNav"></nav>
+    </aside>
+    <div class="admin-content">
+        <header class="admin-header">
+            <button id="adminMenuToggle" class="wp-icon-btn admin-menu-toggle" type="button" aria-label="Abrir menú administrativo"><i class="fa-solid fa-bars"></i></button>
+            <div><span class="admin-eyebrow">Ventas</span><h1 id="adminTitle">Ventas</h1></div>
+            <div class="admin-user-card"><div class="admin-user-avatar"><i class="fa-solid fa-user-shield"></i></div><div><strong id="adminUserName">Validando sesión...</strong><span id="adminUserRole">Rol no disponible</span></div></div>
+            <a href="../index.html" class="wp-btn wp-btn-outline admin-public-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="admin.common.publicSite">Sitio público</span></a>
+        </header>
+
+        <main id="admin-main" class="admin-main">
+            <section class="admin-section active">
+                <div class="admin-section-head">
+                    <div>
+                        <span class="section-tag"><i class="fa-solid fa-receipt"></i> Gestión comercial</span>
+                        <h2 data-i18n="admin.sales.title">Gestión de ventas</h2>
+                        <p id="ventasStatus" data-i18n="admin.sales.subtitle">Consulta compras, comprobantes, tickets, vouchers y reseñas.</p>
+                    </div>
+                </div>
+
+                <div class="admin-tabs" role="tablist" aria-label="Secciones de ventas">
+                    <button class="admin-tab active" type="button" data-tab="compras" data-i18n="admin.sales.purchases">Compras</button>
+                    <button class="admin-tab" type="button" data-tab="comprobantes" data-i18n="admin.sales.receipts">Comprobantes</button>
+                    <button class="admin-tab" type="button" data-tab="tickets" data-i18n="admin.sales.tickets">Tickets</button>
+                    <button class="admin-tab" type="button" data-tab="vouchers" data-i18n="admin.sales.vouchers">Vouchers</button>
+                    <button class="admin-tab" type="button" data-tab="resenas" data-i18n="admin.sales.reviews">Reseñas</button>
+                </div>
+
+                <div class="admin-toolbar">
+                    <div class="search-box admin-search"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarVentas" type="search" placeholder="Buscar por código, cliente, reserva, destino o estado..." data-i18n-placeholder="admin.sales.search"></div>
+                    <select id="filtroEstadoVentas" class="wp-select">
+                        <option value="" data-i18n="admin.common.allStates">Todos los estados</option>
+                        <option value="EMITIDA">Emitida</option>
+                        <option value="APROBADA">Aprobada</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="RECHAZADA">Rechazada</option>
+                        <option value="ANULADA">Anulada</option>
+                    </select>
+                    <button id="recargarVentas" class="wp-btn wp-btn-outline" type="button"><i class="fa-solid fa-rotate"></i> <span data-i18n="admin.common.reload">Actualizar</span></button>
+                </div>
+                <div id="ventasTableHost"></div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="../js/accesibilidad.js"></script>
+<script type="module" src="../js/i18n.js"></script>
+<script type="module" src="ventas.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

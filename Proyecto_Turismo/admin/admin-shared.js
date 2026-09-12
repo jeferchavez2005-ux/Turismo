@@ -8,7 +8,7 @@ export const adminLinks = [
     { href: "index.html#operacion", label: "Operación", i18n: "admin.nav.operation", icon: "fa-route", permission: "VENTAS_RESERVAS_GESTIONAR" },
     { href: "reservas.html", label: "Reservas", i18n: "admin.nav.reservations", icon: "fa-calendar-check", permission: "VENTAS_RESERVAS_LEER" },
     { href: "pagos.html", label: "Pagos", i18n: "admin.nav.payments", icon: "fa-credit-card", permission: "PAGOS_LEER" },
-    { href: "index.html#ventas", label: "Ventas", i18n: "admin.nav.sales", icon: "fa-receipt", permission: "VENTAS_RESERVAS_LEER" },
+    { href: "ventas.html", label: "Ventas", i18n: "admin.nav.sales", icon: "fa-receipt", permission: "VENTAS_RESERVAS_LEER" },
     { href: "index.html#reportes", label: "Reportes", i18n: "admin.nav.reports", icon: "fa-chart-pie", permission: "REPORTES_LEER" },
     { href: "index.html#auditoria", label: "Auditoría", i18n: "admin.nav.audit", icon: "fa-shield-halved", permission: "AUDITORIA_LEER" }
 ];
@@ -26,11 +26,11 @@ export function can(user, permission) {
 
 export function stateBadge(value) {
     const normalized = String(value || "").toUpperCase();
-    const type = ["ACTIVO", "APROBADO", "CONFIRMADA", "EMITIDA"].includes(normalized)
+    const type = ["ACTIVO", "APROBADO", "APROBADA", "CONFIRMADA", "COMPLETADA", "EMITIDA"].includes(normalized)
         ? "success"
         : ["PENDIENTE", "PENDIENTE_PAGO", "BORRADOR"].includes(normalized)
             ? "warning"
-            : ["BLOQUEADO", "INACTIVO", "CANCELADA", "RECHAZADO", "ANULADA"].includes(normalized)
+            : ["BLOQUEADO", "INACTIVO", "CANCELADA", "RECHAZADO", "RECHAZADA", "ANULADA"].includes(normalized)
                 ? "danger"
                 : "muted";
     return `<span class="wp-status wp-status-${type}">${escapeHtml(value || "Sin estado")}</span>`;

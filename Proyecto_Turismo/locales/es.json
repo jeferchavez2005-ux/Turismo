@@ -165,5 +165,13 @@
   "admin.payments.subtitle": "Consulta órdenes, pagos y estados de transacciones.",
   "admin.payments.search": "Buscar por orden, reserva, método o transacción...",
   "admin.payments.changeState": "Cambiar estado",
-  "admin.payments.detail": "Detalle de pago"
+  "admin.payments.detail": "Detalle de pago",
+  "admin.sales.title": "Gestión de ventas",
+  "admin.sales.subtitle": "Consulta compras, comprobantes, tickets, vouchers y reseñas.",
+  "admin.sales.search": "Buscar por código, cliente, reserva, destino o estado...",
+  "admin.sales.purchases": "Compras",
+  "admin.sales.receipts": "Comprobantes",
+  "admin.sales.tickets": "Tickets",
+  "admin.sales.vouchers": "Vouchers",
+  "admin.sales.reviews": "Reseñas"
 }
