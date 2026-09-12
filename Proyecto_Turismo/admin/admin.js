@@ -76,8 +76,10 @@ function bindLayout() {
 
     document.querySelectorAll(".admin-nav a").forEach(link => {
         link.addEventListener("click", event => {
+            const href = link.getAttribute("href") || "";
+            if (!href.startsWith("#")) return;
             event.preventDefault();
-            activateSection(link.getAttribute("href")?.replace("#", "") || "dashboard");
+            activateSection(href.replace("#", "") || "dashboard");
             document.getElementById("adminSidebar")?.classList.remove("open");
         });
     });
@@ -117,7 +119,7 @@ function primaryRole(user) {
 function applyPermissions(user) {
     const permissions = new Set(user?.permisos || []);
     const isAdmin = (user?.roles || []).includes("ADMINISTRADOR");
-    const canUseAdmin = isAdmin || permissions.has("REPORTES_LEER") || permissions.has("AUDITORIA_LEER");
+    const canUseAdmin = isAdmin || permissions.has("SEGURIDAD_USUARIOS_GESTIONAR") || permissions.has("REPORTES_LEER") || permissions.has("AUDITORIA_LEER");
 
     if (!canUseAdmin) {
         showAccessDenied("Tu usuario no tiene acceso administrativo.");
@@ -133,7 +135,11 @@ function applyPermissions(user) {
     const requested = location.hash.replace("#", "");
     const requestedLink = requested ? document.querySelector(`.admin-nav a[href="#${CSS.escape(requested)}"]:not([hidden])`) : null;
     if (requestedLink) activateSection(requested);
-    else if (firstVisible) activateSection(firstVisible.getAttribute("href").replace("#", ""));
+    else if (firstVisible) {
+        const href = firstVisible.getAttribute("href") || "#dashboard";
+        if (href.startsWith("#")) activateSection(href.replace("#", ""));
+        else window.location.href = href;
+    }
 }
 
 function renderPlaceholders() {

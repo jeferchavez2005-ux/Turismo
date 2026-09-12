@@ -319,6 +319,119 @@
     font-size: .78rem;
 }
 
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    margin-bottom: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-search {
+    flex: 1;
+    min-width: 260px;
+}
+
+.admin-toolbar .wp-select {
+    width: auto;
+    min-width: 180px;
+}
+
+.admin-table-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.admin-table-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: .86rem;
+    font-weight: 800;
+}
+
+.admin-row-title {
+    display: grid;
+    gap: 2px;
+}
+
+.admin-row-title strong {
+    color: var(--text-primary);
+    font-size: .92rem;
+}
+
+.admin-row-title span {
+    color: var(--text-muted);
+    font-size: .8rem;
+}
+
+.admin-muted {
+    color: var(--text-muted);
+    font-size: .82rem;
+    font-weight: 800;
+}
+
+.admin-actions-cell {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-action-btn {
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: .8rem;
+    font-weight: 900;
+}
+
+.admin-action-btn:hover {
+    border-color: var(--orange-500);
+    color: var(--orange-500);
+}
+
+.admin-action-btn.danger:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.admin-detail-list {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+}
+
+.admin-detail-list p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+:root[data-theme="dark"] .swal2-popup {
+    background: var(--surface-raised);
+    color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .swal2-input {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
 @media (max-width: 1180px) {
     .admin-kpis {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -388,5 +501,16 @@
 
     .admin-chart {
         min-height: 240px;
+    }
+
+    .admin-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-toolbar .wp-select,
+    .admin-search {
+        width: 100%;
+        min-width: 0;
     }
 }
