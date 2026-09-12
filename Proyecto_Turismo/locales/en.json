@@ -179,5 +179,16 @@
   "admin.catalog.search": "Search by name, destination, city, or state...",
   "admin.catalog.destinations": "Destinations",
   "admin.catalog.packages": "Packages",
-  "admin.catalog.rates": "Rates"
+  "admin.catalog.rates": "Rates",
+  "admin.operation.title": "Operation management",
+  "admin.operation.subtitle": "Manage departures, capacity, providers, services, resources, blocks, and itineraries.",
+  "admin.operation.search": "Search by package, provider, service, resource, or state...",
+  "admin.operation.departures": "Departures",
+  "admin.operation.capacity": "Capacity",
+  "admin.operation.providers": "Providers",
+  "admin.operation.services": "Services",
+  "admin.operation.resources": "Hotels / Transport / Guides",
+  "admin.operation.blocks": "Blocks",
+  "admin.operation.itineraries": "Itineraries",
+  "admin.operation.assignments": "Assignments"
 }

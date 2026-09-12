@@ -179,5 +179,16 @@
   "admin.catalog.search": "Rechercher par nom, destination, ville ou etat...",
   "admin.catalog.destinations": "Destinations",
   "admin.catalog.packages": "Forfaits",
-  "admin.catalog.rates": "Tarifs"
+  "admin.catalog.rates": "Tarifs",
+  "admin.operation.title": "Gestion des operations",
+  "admin.operation.subtitle": "Administrez departs, capacites, fournisseurs, services, ressources, blocages et itineraires.",
+  "admin.operation.search": "Rechercher par forfait, fournisseur, service, ressource ou etat...",
+  "admin.operation.departures": "Departs",
+  "admin.operation.capacity": "Capacites",
+  "admin.operation.providers": "Fournisseurs",
+  "admin.operation.services": "Services",
+  "admin.operation.resources": "Hotels / Transport / Guides",
+  "admin.operation.blocks": "Blocages",
+  "admin.operation.itineraries": "Itineraires",
+  "admin.operation.assignments": "Affectations"
 }

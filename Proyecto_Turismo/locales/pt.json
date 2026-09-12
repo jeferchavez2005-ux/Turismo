@@ -179,5 +179,16 @@
   "admin.catalog.search": "Buscar por nome, destino, cidade ou estado...",
   "admin.catalog.destinations": "Destinos",
   "admin.catalog.packages": "Pacotes",
-  "admin.catalog.rates": "Tarifas"
+  "admin.catalog.rates": "Tarifas",
+  "admin.operation.title": "Gestao de operacao",
+  "admin.operation.subtitle": "Administre saidas, cupos, fornecedores, servicos, recursos, bloqueios e itinerarios.",
+  "admin.operation.search": "Buscar por pacote, fornecedor, servico, recurso ou estado...",
+  "admin.operation.departures": "Saidas",
+  "admin.operation.capacity": "Cupos",
+  "admin.operation.providers": "Fornecedores",
+  "admin.operation.services": "Servicos",
+  "admin.operation.resources": "Hoteis / Transporte / Guias",
+  "admin.operation.blocks": "Bloqueios",
+  "admin.operation.itineraries": "Itinerarios",
+  "admin.operation.assignments": "Atribuicoes"
 }
