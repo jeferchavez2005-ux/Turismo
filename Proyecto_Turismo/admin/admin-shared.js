@@ -10,7 +10,7 @@ export const adminLinks = [
     { href: "pagos.html", label: "Pagos", i18n: "admin.nav.payments", icon: "fa-credit-card", permission: "PAGOS_LEER" },
     { href: "ventas.html", label: "Ventas", i18n: "admin.nav.sales", icon: "fa-receipt", permission: "VENTAS_RESERVAS_LEER" },
     { href: "index.html#reportes", label: "Reportes", i18n: "admin.nav.reports", icon: "fa-chart-pie", permission: "REPORTES_LEER" },
-    { href: "index.html#auditoria", label: "Auditoría", i18n: "admin.nav.audit", icon: "fa-shield-halved", permission: "AUDITORIA_LEER" }
+    { href: "auditoria.html", label: "Auditoría", i18n: "admin.nav.audit", icon: "fa-shield-halved", permission: "AUDITORIA_LEER" }
 ];
 
 export async function initAdminPage({ active, title }) {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría | WayPath Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<a href="#admin-main" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto" title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegación administrativa">
+        <a href="index.html" class="admin-brand"><span>Way<span>Path</span></span><small>Admin</small></a>
+        <nav class="admin-nav" id="adminNav"></nav>
+    </aside>
+    <div class="admin-content">
+        <header class="admin-header">
+            <button id="adminMenuToggle" class="wp-icon-btn admin-menu-toggle" type="button" aria-label="Abrir menú administrativo"><i class="fa-solid fa-bars"></i></button>
+            <div><span class="admin-eyebrow">Auditoría</span><h1 id="adminTitle">Auditoría</h1></div>
+            <div class="admin-user-card"><div class="admin-user-avatar"><i class="fa-solid fa-user-shield"></i></div><div><strong id="adminUserName">Validando sesión...</strong><span id="adminUserRole">Rol no disponible</span></div></div>
+            <a href="../index.html" class="wp-btn wp-btn-outline admin-public-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="admin.common.publicSite">Sitio público</span></a>
+        </header>
+
+        <main id="admin-main" class="admin-main">
+            <section class="admin-section active">
+                <div class="admin-section-head">
+                    <div>
+                        <span class="section-tag"><i class="fa-solid fa-shield-halved"></i> Trazabilidad</span>
+                        <h2 data-i18n="admin.audit.title">Auditoría administrativa</h2>
+                        <p id="auditoriaStatus" data-i18n="admin.audit.subtitle">Consulta accesos, cambios, errores y actividad reciente del sistema.</p>
+                    </div>
+                </div>
+
+                <div class="admin-kpis" aria-label="Resumen de auditoría">
+                    <article class="admin-kpi"><span>Cambios</span><strong id="auditCambios">0</strong><small>registrados</small></article>
+                    <article class="admin-kpi"><span>Accesos OK</span><strong id="auditAccesosOk">0</strong><small>exitosos</small></article>
+                    <article class="admin-kpi"><span>Accesos fallidos</span><strong id="auditAccesosFail">0</strong><small>fallidos</small></article>
+                    <article class="admin-kpi"><span>Errores</span><strong id="auditErrores">0</strong><small>registrados</small></article>
+                    <article class="admin-kpi"><span>Críticos</span><strong id="auditCriticos">0</strong><small>prioridad alta</small></article>
+                </div>
+
+                <div class="admin-tabs" role="tablist" aria-label="Secciones de auditoría">
+                    <button class="admin-tab active" type="button" data-tab="accesos" data-i18n="admin.audit.accesses">Accesos</button>
+                    <button class="admin-tab" type="button" data-tab="cambios" data-i18n="admin.audit.changes">Cambios</button>
+                    <button class="admin-tab" type="button" data-tab="errores" data-i18n="admin.audit.errors">Errores</button>
+                    <button class="admin-tab" type="button" data-tab="reciente" data-i18n="admin.audit.recent">Actividad reciente</button>
+                </div>
+
+                <div class="admin-toolbar">
+                    <div class="search-box admin-search"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarAuditoria" type="search" placeholder="Buscar por usuario, tabla, operación, resultado o mensaje..." data-i18n-placeholder="admin.audit.search"></div>
+                    <select id="filtroAuditoria" class="wp-select">
+                        <option value="">Todos</option>
+                        <option value="EXITOSO">EXITOSO</option>
+                        <option value="FALLIDO">FALLIDO</option>
+                        <option value="LOGOUT">LOGOUT</option>
+                        <option value="REFRESH">REFRESH</option>
+                        <option value="INSERT">INSERT</option>
+                        <option value="UPDATE">UPDATE</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARN">WARN</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                    <input id="filtroDesdeAuditoria" class="wp-input" type="datetime-local" aria-label="Fecha desde">
+                    <input id="filtroHastaAuditoria" class="wp-input" type="datetime-local" aria-label="Fecha hasta">
+                    <button id="recargarAuditoria" class="wp-btn wp-btn-outline" type="button"><i class="fa-solid fa-rotate"></i> <span data-i18n="admin.common.reload">Actualizar</span></button>
+                </div>
+                <div id="auditoriaTableHost"></div>
+                <div class="admin-table-meta admin-pager">
+                    <button id="auditPrev" class="admin-action-btn" type="button"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+                    <span id="auditPageInfo">Página 1</span>
+                    <button id="auditNext" class="admin-action-btn" type="button">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="../js/accesibilidad.js"></script>
+<script type="module" src="../js/i18n.js"></script>
+<script type="module" src="auditoria.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -190,5 +190,12 @@
   "admin.operation.resources": "Hoteis / Transporte / Guias",
   "admin.operation.blocks": "Bloqueios",
   "admin.operation.itineraries": "Itinerarios",
-  "admin.operation.assignments": "Atribuicoes"
+  "admin.operation.assignments": "Atribuicoes",
+  "admin.audit.title": "Auditoria administrativa",
+  "admin.audit.subtitle": "Consulte acessos, alteracoes, erros e atividade recente do sistema.",
+  "admin.audit.search": "Buscar por usuario, tabela, operacao, resultado ou mensagem...",
+  "admin.audit.accesses": "Acessos",
+  "admin.audit.changes": "Alteracoes",
+  "admin.audit.errors": "Erros",
+  "admin.audit.recent": "Atividade recente"
 }
