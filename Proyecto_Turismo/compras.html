@@ -58,9 +58,9 @@
 </nav>
 
 <section class="wp-page-hero" id="main-content">
-    <span class="section-tag"><i class="fa-solid fa-bag-shopping"></i> Tu historial</span>
+    <span class="section-tag"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Tu historial</span>
     <h1>Mis compras</h1>
-    <p>Visualiza y gestiona todos tus viajes reservados con WayPath.</p>
+    <p>Consulta tus compras emitidas, comprobantes, tickets y vouchers digitales.</p>
 </section>
 
 <main>
@@ -68,19 +68,19 @@
     <div class="wp-container">
         <!-- Stats strip -->
         <div class="compras-stats">
-            <div class="cstat"><span class="cstat-num" id="totalViajes">3</span><span class="cstat-label">Viajes reservados</span></div>
+            <div class="cstat"><span class="cstat-num" id="totalViajes">0</span><span class="cstat-label">Compras</span></div>
             <div class="cstat-div"></div>
-            <div class="cstat"><span class="cstat-num">S/ 2,329</span><span class="cstat-label">Total invertido</span></div>
+            <div class="cstat"><span class="cstat-num">0</span><span class="cstat-label">Próximas</span></div>
             <div class="cstat-div"></div>
-            <div class="cstat"><span class="cstat-num">1</span><span class="cstat-label">Próximo viaje</span></div>
+            <div class="cstat"><span class="cstat-num">0</span><span class="cstat-label">Completadas</span></div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs-bar" role="tablist">
-            <button class="tab-btn active" data-filter="all"        role="tab" aria-selected="true">Todas</button>
-            <button class="tab-btn"        data-filter="proxima"    role="tab">Próximas</button>
-            <button class="tab-btn"        data-filter="completado" role="tab">Completadas</button>
-            <button class="tab-btn"        data-filter="cancelado"  role="tab">Canceladas</button>
+            <button class="tab-btn active" data-filter="all" role="tab" aria-selected="true">Todas</button>
+            <button class="tab-btn" data-filter="proxima" role="tab" aria-selected="false">Próximas</button>
+            <button class="tab-btn" data-filter="completado" role="tab" aria-selected="false">Completadas</button>
+            <button class="tab-btn" data-filter="cancelado" role="tab" aria-selected="false">Canceladas</button>
         </div>
 
         <!-- List -->

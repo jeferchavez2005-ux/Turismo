@@ -1,5 +1,33 @@
 
-.reserva-section { padding: 40px 0 80px; background: var(--bg-50); min-height: calc(100vh - 70px); }
+.reserva-section { padding: 34px 0 88px; background: var(--bg-50); min-height: calc(100vh - 70px); }
+
+.checkout-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.checkout-steps span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: .88rem;
+}
+
+.checkout-steps span.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--blue-800), var(--orange-500));
+    border-color: transparent;
+    box-shadow: var(--shadow-sm);
+}
 
 .reserva-layout {
     display: grid;
@@ -10,9 +38,9 @@
 
 
 .checkout-panel {
-    background: var(--white);
+    background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
     padding: 36px;
     box-shadow: var(--shadow-sm);
 }
@@ -28,9 +56,9 @@
 
 
 .summary-card {
-    background: var(--white);
+    background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
     padding: 24px;
     box-shadow: var(--shadow-sm);
     position: sticky;
@@ -43,16 +71,17 @@
 .sum-divider { height: 1px; background: var(--border); margin: 16px 0; }
 .sum-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-700); margin-bottom: 8px; }
 .sum-total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 800; color: var(--blue-900); }
-.sum-guarantee { margin-top: 20px; text-align: center; font-size: 0.8rem; color: #15803d; font-weight: 600; background: #dcfce7; padding: 10px; border-radius: var(--radius-sm); }
+.sum-guarantee { margin-top: 20px; text-align: center; font-size: 0.8rem; color: var(--success); font-weight: 800; background: rgba(21,128,61,.12); padding: 10px; border-radius: var(--radius-sm); }
+.summary-note { margin-top: 12px; color: var(--text-muted); font-size: .8rem; text-align: center; }
 
 
 .metodos-pago { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
 .metodo-label {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     cursor: pointer; transition: border-color var(--transition);
 }
-.metodo-label:hover { border-color: var(--blue-300); }
+.metodo-label:hover { border-color: var(--blue-500); }
 .metodo-info { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--blue-900); }
 .metodo-icons { display: flex; gap: 8px; color: var(--text-500); font-size: 1.2rem; }
 input[type="radio"]:checked + .metodo-label { border-color: var(--orange-500); background: rgba(249,115,22,.03); }
@@ -68,4 +97,6 @@ input[type="radio"]:checked + .metodo-label { border-color: var(--orange-500); b
 }
 @media (max-width: 560px) {
     .form-row { grid-template-columns: 1fr; }
+    .checkout-steps { grid-template-columns: 1fr; }
+    .checkout-panel { padding: 24px; }
 }

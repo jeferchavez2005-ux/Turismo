@@ -117,5 +117,14 @@
   "services.cards.security.cta": "Learn more",
   "services.cta.title": "Ready to plan your next experience",
   "services.cta.text": "Explore available destinations and continue with a real booking connected to WayPath.",
-  "services.cta.button": "View destinations"
+  "services.cta.button": "View destinations",
+  "client.account.title": "My account",
+  "client.account.subtitle": "Manage your profile, documents, addresses, and preferences.",
+  "client.checkout.reservation": "Booking",
+  "client.checkout.payment": "Payment",
+  "client.checkout.purchase": "Purchase",
+  "client.purchases.title": "My purchases",
+  "client.purchases.empty": "You do not have issued purchases yet.",
+  "client.reviews.title": "Reviews",
+  "client.reviews.empty": "There are no published reviews yet."
 }

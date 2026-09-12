@@ -28,12 +28,17 @@
 
 <main class="reserva-section">
     <div class="wp-container">
+        <div class="checkout-steps" aria-label="Progreso de compra">
+            <span class="active"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Reserva</span>
+            <span><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Pago</span>
+            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> Compra</span>
+        </div>
         <div class="reserva-layout">
 
             <!-- Form Col -->
             <div class="reserva-form-col">
                 <div class="checkout-panel">
-                    <h2><i class="fa-solid fa-calendar-check"></i> Detalles de la reserva</h2>
+                    <h2><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Detalles de la reserva</h2>
                     <p class="checkout-sub">Completa la información para asegurar tu lugar en esta aventura.</p>
 
                     <form id="formReserva" class="checkout-form">
@@ -41,21 +46,21 @@
                             <h3>1. Tus datos</h3>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label>Nombres</label>
+                                    <label for="resNombres">Nombres</label>
                                     <input type="text" class="wp-input" id="resNombres" required>
                                 </div>
                                 <div class="form-field">
-                                    <label>Apellidos</label>
+                                    <label for="resApellidos">Apellidos</label>
                                     <input type="text" class="wp-input" id="resApellidos" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label>Correo electrónico</label>
+                                    <label for="resEmail">Correo electrónico</label>
                                     <input type="email" class="wp-input" id="resEmail" required>
                                 </div>
                                 <div class="form-field">
-                                    <label>Teléfono</label>
+                                    <label for="resTel">Teléfono</label>
                                     <input type="tel" class="wp-input" id="resTel" required>
                                 </div>
                             </div>
@@ -65,11 +70,11 @@
                             <h3>2. Detalles del viaje</h3>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label>Fecha de inicio</label>
+                                    <label for="resFecha">Fecha de inicio</label>
                                     <input type="date" class="wp-input" id="resFecha" required>
                                 </div>
                                 <div class="form-field">
-                                    <label>Número de viajeros</label>
+                                    <label for="resPasajeros">Número de viajeros</label>
                                     <select class="wp-select" id="resPasajeros">
                                         <option value="1">1 Persona</option>
                                         <option value="2">2 Personas</option>
@@ -80,7 +85,7 @@
                                 </div>
                             </div>
                             <div class="form-field">
-                                <label>Requerimientos especiales (Opcional)</label>
+                                <label for="resObservaciones">Requerimientos especiales (Opcional)</label>
                                 <textarea class="wp-textarea" id="resObservaciones" placeholder="Alergias, necesidades de movilidad..."></textarea>
                             </div>
                         </div>
@@ -114,8 +119,9 @@
                         <span id="sumTotal">S/ 0</span>
                     </div>
                     <div class="sum-guarantee">
-                        <i class="fa-solid fa-lock"></i> Pago 100% seguro y encriptado
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i> Pago 100% seguro y encriptado
                     </div>
+                    <div class="summary-note">La reserva se confirma cuando el pago sea aprobado.</div>
                 </div>
             </div>
 

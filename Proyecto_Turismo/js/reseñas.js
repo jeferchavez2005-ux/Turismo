@@ -144,7 +144,7 @@ function formatDate(value) {
 }
 
 function empty(text) {
-    return `<article class="review-card"><div class="review-body"><h5 class="review-title">${escapeHtml(text)}</h5><p class="review-text">Las resenas aprobadas apareceran aqui cuando existan en WayPathDB.</p></div></article>`;
+    return `<div class="wp-empty-state"><i class="fa-solid fa-star" aria-hidden="true"></i><strong>${escapeHtml(text)}</strong><p>Las resenas aprobadas apareceran aqui cuando existan en WayPathDB.</p></div>`;
 }
 
 function escapeHtml(value) {

@@ -99,6 +99,7 @@ async function submitPayment(event) {
         showAlert("No se pudo procesar el pago", error instanceof ApiError ? error.message : "Intenta nuevamente.");
     } finally {
         button.disabled = false;
+        button.innerHTML = 'Confirmar y pagar <i class="fa-solid fa-lock" aria-hidden="true"></i>';
     }
 }
 

@@ -140,7 +140,7 @@ function formatDate(value) {
 }
 
 function state(text) {
-    return `<article class="purchase-card"><div class="purchase-info"><h3>${escapeHtml(text)}</h3><p>WayPath mostrara aqui las compras generadas desde pagos aprobados.</p></div></article>`;
+    return `<div class="wp-empty-state"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><strong>${escapeHtml(text)}</strong><p>WayPath mostrara aqui las compras generadas desde pagos aprobados.</p></div>`;
 }
 
 function escapeHtml(value) {

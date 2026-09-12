@@ -10,13 +10,40 @@
     <link rel="stylesheet" href="css/accesibilidad.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto" title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<header class="wp-navbar" role="banner">
+    <div class="nav-inner">
+        <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
+        <nav class="wp-nav-links" aria-label="Menu principal"></nav>
+        <a href="login.html" class="wp-btn-login desktop login-btn"><i class="fa-regular fa-user"></i> Iniciar sesion</a>
+        <button class="wp-hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+</header>
+<nav class="wp-mobile-menu" id="mobileMenu" aria-label="Menu movil"></nav>
+
 <main class="account-shell">
-    <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
-    <div class="account-heading">
-        <h1>Mi cuenta</h1>
-        <button id="logout" type="button" class="wp-btn wp-btn-outline" disabled>
+    <section class="account-hero" id="main-content">
+        <div>
+            <span class="section-tag"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Area cliente</span>
+            <h1>Mi cuenta</h1>
+            <p>Gestiona tu perfil, documentos, direcciones y preferencias para reservar con menos friccion.</p>
+        </div>
+        <button id="logout" type="button" class="wp-btn wp-btn-outline account-logout" disabled>
             <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Cerrar sesion
         </button>
+    </section>
+    <div class="account-progress" aria-label="Modulos de cuenta">
+        <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Perfil</span>
+        <span><i class="fa-solid fa-file-shield" aria-hidden="true"></i> Documentos</span>
+        <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Direcciones</span>
+        <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</span>
     </div>
     <p id="accountMessage" class="auth-message" role="status" aria-live="polite">Cargando cuenta...</p>
     <div id="accountContent" hidden>
@@ -130,6 +157,8 @@
     </div>
 </main>
 <script src="js/accesibilidad.js"></script>
+<script src="js/navbar.js"></script>
 <script type="module" src="js/cuenta.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

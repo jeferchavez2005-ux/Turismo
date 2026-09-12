@@ -27,12 +27,17 @@
 
 <main class="reserva-section">
     <div class="wp-container">
+        <div class="checkout-steps" aria-label="Progreso de compra">
+            <span><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Reserva</span>
+            <span class="active"><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Pago</span>
+            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> Compra</span>
+        </div>
         <div class="reserva-layout">
 
             <!-- Form Col -->
             <div class="reserva-form-col">
                 <div class="checkout-panel">
-                    <h2><i class="fa-solid fa-credit-card"></i> Método de pago</h2>
+                    <h2><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Método de pago</h2>
                     <p class="checkout-sub">Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.</p>
 
                     <form id="formPago" class="checkout-form">
@@ -43,32 +48,32 @@
                                 <input type="radio" name="metodo" id="metodo-tarjeta" value="tarjeta" class="sr-only" checked>
                                 <label for="metodo-tarjeta" class="metodo-label">
                                     <div class="metodo-info">
-                                        <i class="fa-regular fa-credit-card"></i> Tarjeta de Crédito / Débito
+                                        <i class="fa-regular fa-credit-card" aria-hidden="true"></i> Tarjeta de Crédito / Débito
                                     </div>
                                     <div class="metodo-icons">
-                                        <i class="fa-brands fa-cc-visa"></i>
-                                        <i class="fa-brands fa-cc-mastercard"></i>
-                                        <i class="fa-brands fa-cc-amex"></i>
+                                        <i class="fa-brands fa-cc-visa" aria-hidden="true"></i>
+                                        <i class="fa-brands fa-cc-mastercard" aria-hidden="true"></i>
+                                        <i class="fa-brands fa-cc-amex" aria-hidden="true"></i>
                                     </div>
                                 </label>
                                 <div class="pago-details tarjeta-info">
                                     <div class="form-field" style="margin-bottom:12px;">
-                                        <label>Número de Tarjeta</label>
-                                        <input type="text" class="wp-input" placeholder="0000 0000 0000 0000" maxlength="19">
+                                        <label for="cardNumber">Número de Tarjeta</label>
+                                        <input id="cardNumber" type="text" class="wp-input" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-field">
-                                            <label>Vencimiento</label>
-                                            <input type="text" class="wp-input" placeholder="MM/AA" maxlength="5">
+                                            <label for="cardExpiry">Vencimiento</label>
+                                            <input id="cardExpiry" type="text" class="wp-input" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
                                         </div>
                                         <div class="form-field">
-                                            <label>CVV</label>
-                                            <input type="text" class="wp-input" placeholder="123" maxlength="4">
+                                            <label for="cardCvv">CVV</label>
+                                            <input id="cardCvv" type="text" class="wp-input" placeholder="123" maxlength="4" autocomplete="cc-csc">
                                         </div>
                                     </div>
                                     <div class="form-field" style="margin-top:12px;">
-                                        <label>Nombre del Titular</label>
-                                        <input type="text" class="wp-input" placeholder="Como aparece en la tarjeta">
+                                        <label for="cardHolder">Nombre del Titular</label>
+                                        <input id="cardHolder" type="text" class="wp-input" placeholder="Como aparece en la tarjeta" autocomplete="cc-name">
                                     </div>
                                 </div>
                             </div>
@@ -78,7 +83,7 @@
                                 <input type="radio" name="metodo" id="metodo-yape" value="yape" class="sr-only">
                                 <label for="metodo-yape" class="metodo-label">
                                     <div class="metodo-info">
-                                        <i class="fa-solid fa-mobile-screen"></i> Yape / Plin
+                                        <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Yape / Plin
                                     </div>
                                     <div class="metodo-icons">
                                         <span style="font-size:.8rem;font-weight:700;color:#7c3aed;">YAPE</span>
@@ -93,7 +98,7 @@
                         </div>
 
                         <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
-                            Confirmar y pagar <i class="fa-solid fa-lock"></i>
+                            Confirmar y pagar <i class="fa-solid fa-lock" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>

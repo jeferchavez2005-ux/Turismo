@@ -155,11 +155,13 @@ function showMessage(message, isError = false) {
     if (!box) {
         box = document.createElement("p");
         box.id = "reservaMensaje";
-        box.className = "checkout-sub";
+        box.className = "wp-alert";
+        box.setAttribute("role", "status");
+        box.setAttribute("aria-live", "polite");
         document.getElementById("formReserva")?.prepend(box);
     }
     box.textContent = message;
-    box.style.color = isError ? "#b42318" : "#0f766e";
+    box.className = `wp-alert ${isError ? "wp-alert-danger" : "wp-alert-success"}`;
 }
 
 function clearMessage() {
