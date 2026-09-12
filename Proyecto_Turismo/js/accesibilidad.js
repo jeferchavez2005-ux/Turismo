@@ -133,9 +133,13 @@
 })();
 
 function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-        pageLanguage: "es",
-        includedLanguages: "en,pt,fr",
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    }, "google_translate_element");
+    if (!window.WayPathI18n && window.google?.translate) {
+        new google.translate.TranslateElement({
+            pageLanguage: "es",
+            includedLanguages: "en,pt,fr",
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, "google_translate_element");
+    }
 }
+
+import("./i18n.js").catch(() => {});

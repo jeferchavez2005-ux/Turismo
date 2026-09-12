@@ -1,38 +1,186 @@
-// navbar.js – Inyecta el navbar y footer en todas las páginas
-// Incluir ANTES de cerrar </body>
+(function () {
+    const path = window.location.pathname.replace(/\\/g, "/");
+    const page = path.split("/").pop() || "index.html";
+    const section = path.includes("/dashboards/")
+        ? "dashboards"
+        : path.includes("/landings_pages/")
+            ? "landings_pages"
+            : "root";
+    const prefix = section === "root" ? "" : "../";
 
-(function() {
-    // Detectar página activa
-    const path = window.location.pathname.split('/').pop() || 'index.html';
-
-    const links = [
-        { href: 'servicios.html', label: 'Nuestros servicios', icon: 'fa-concierge-bell' },
-        { href: 'Destinos.html',  label: 'Destinos',           icon: 'fa-map-location-dot' },
-        { href: 'compras.html',   label: 'Mis compras',        icon: 'fa-bag-shopping' },
-        { href: 'reseñas.html',   label: 'Nuestras reseñas',   icon: 'fa-star' },
-        { href: 'contacto.html',  label: 'Contacto',           icon: 'fa-envelope' },
+    const publicLinks = [
+        { href: "index.html", key: "nav.home", icon: "fa-house" },
+        { href: "Destinos.html", key: "nav.destinations", icon: "fa-map-location-dot" },
+        { href: "servicios.html", key: "nav.services", icon: "fa-concierge-bell" }
+    ];
+    const clientLinks = [
+        { href: "cuenta.html", key: "nav.account", icon: "fa-user" },
+        { href: "reserva.html", key: "nav.reservations", icon: "fa-calendar-check" },
+        { href: "compras.html", key: "nav.purchases", icon: "fa-bag-shopping" },
+        { href: "reseñas.html", key: "nav.reviews", icon: "fa-star" }
+    ];
+    const adminLinks = [
+        { href: "dashboards/dashboard-ventas.html", key: "nav.dashboard", icon: "fa-chart-line" },
+        { href: "dashboards/dashboard-marketing.html", key: "nav.reports", icon: "fa-chart-pie" }
     ];
 
-    function navLinkHTML(l, mobile = false) {
-        const active = path === l.href ? ' active' : '';
-        if (mobile) {
-            return `<a href="${l.href}" class="nav-link${active}"><i class="fa-solid ${l.icon}"></i> ${l.label}</a>`;
-        }
-        return `<a href="${l.href}" class="nav-link${active}">${l.label}</a>`;
+    function t(key) {
+        return window.WayPathI18n?.t(key) || fallback[key] || key;
     }
 
-    const navEl = document.querySelector('.wp-navbar');
-    const mobileEl = document.getElementById('mobileMenu');
+    const fallback = {
+        "nav.home": "Inicio",
+        "nav.destinations": "Destinos",
+        "nav.services": "Servicios",
+        "nav.login": "Iniciar sesion",
+        "nav.register": "Registrarse",
+        "nav.account": "Mi cuenta",
+        "nav.reservations": "Reservas",
+        "nav.purchases": "Mis compras",
+        "nav.reviews": "Resenas",
+        "nav.dashboard": "Dashboard",
+        "nav.reports": "Reportes",
+        "nav.landings": "Landing Pages",
+        "footer.tagline": "Tu agencia de viajes digital para explorar el Peru y el mundo con confianza.",
+        "footer.pages": "Paginas",
+        "footer.legal": "Legal",
+        "footer.privacy": "Privacidad",
+        "footer.terms": "Terminos",
+        "footer.support": "Soporte",
+        "footer.rights": "Todos los derechos reservados."
+    };
 
-    // Hamburger
-    const hamburger = document.getElementById('hamburger');
-    if (hamburger && mobileEl) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileEl.classList.toggle('open');
-            hamburger.setAttribute('aria-expanded', mobileEl.classList.contains('open'));
+    function href(target) {
+        if (target.startsWith("dashboards/") && section === "dashboards") {
+            return target.replace("dashboards/", "");
+        }
+        if (target.startsWith("landings_pages/") && section === "landings_pages") {
+            return target.replace("landings_pages/", "");
+        }
+        return `${prefix}${target}`;
+    }
+
+    function isActive(target) {
+        return target.endsWith(page) || page === target;
+    }
+
+    function linkTemplate(link, mobile = false) {
+        const active = isActive(link.href) ? " active" : "";
+        const icon = mobile ? `<i class="fa-solid ${link.icon}" aria-hidden="true"></i>` : "";
+        return `<a href="${href(link.href)}" class="nav-link${active}" data-i18n="${link.key}">${icon}${t(link.key)}</a>`;
+    }
+
+    function hasRole(user, role) {
+        return Array.isArray(user?.roles) && user.roles.some(value => value.toUpperCase() === role);
+    }
+
+    function canSeeAdmin(user) {
+        if (hasRole(user, "ADMINISTRADOR") || hasRole(user, "EMPLEADO")) return true;
+        return Array.isArray(user?.permisos) && user.permisos.includes("REPORTES_LEER");
+    }
+
+    function buildLinks(user) {
+        if (!user) {
+            return {
+                desktop: [
+                    ...publicLinks,
+                    { href: "login.html", key: "nav.login", icon: "fa-right-to-bracket" },
+                    { href: "registro.html", key: "nav.register", icon: "fa-user-plus" }
+                ],
+                mobile: [
+                    ...publicLinks,
+                    { href: "login.html", key: "nav.login", icon: "fa-right-to-bracket" },
+                    { href: "registro.html", key: "nav.register", icon: "fa-user-plus" }
+                ]
+            };
+        }
+
+        const links = [...publicLinks, ...clientLinks];
+        if (canSeeAdmin(user)) links.push(...adminLinks);
+        return { desktop: links, mobile: links };
+    }
+
+    function renderNav(user) {
+        const desktopNav = document.querySelector(".wp-nav-links");
+        const mobileNav = document.getElementById("mobileMenu");
+        if (!desktopNav && !mobileNav) return;
+
+        const links = buildLinks(user);
+        if (desktopNav) desktopNav.innerHTML = links.desktop.map(link => linkTemplate(link)).join("");
+        if (mobileNav) mobileNav.innerHTML = links.mobile.map(link => linkTemplate(link, true)).join("");
+
+        const loginTargets = document.querySelectorAll(".login-btn");
+        loginTargets.forEach(button => {
+            const isAuthenticated = Boolean(user);
+            button.href = isAuthenticated ? href("cuenta.html") : href("login.html");
+            button.title = user?.nombre || user?.email || t("nav.login");
+            button.innerHTML = `<i class="fa-solid ${isAuthenticated ? "fa-user" : "fa-right-to-bracket"}" aria-hidden="true"></i> ${isAuthenticated ? t("nav.account") : t("nav.login")}`;
+        });
+
+        window.WayPathI18n?.applyTranslations();
+    }
+
+    function renderFooter() {
+        const footer = document.querySelector(".wp-footer");
+        if (!footer) return;
+        footer.setAttribute("role", "contentinfo");
+        footer.innerHTML = `
+            <div class="wp-footer-inner">
+                <div>
+                    <span class="wp-footer-logo">Way<span class="accent">Path</span></span>
+                    <p class="wp-footer-tagline" data-i18n="footer.tagline">${t("footer.tagline")}</p>
+                </div>
+                <div class="wp-footer-col">
+                    <h4 data-i18n="footer.pages">${t("footer.pages")}</h4>
+                    ${publicLinks.concat(clientLinks.slice(1, 4)).map(link => `<a href="${href(link.href)}" data-i18n="${link.key}">${t(link.key)}</a>`).join("")}
+                </div>
+                <div class="wp-footer-col">
+                    <h4 data-i18n="footer.legal">${t("footer.legal")}</h4>
+                    <a href="#" data-i18n="footer.privacy">${t("footer.privacy")}</a>
+                    <a href="#" data-i18n="footer.terms">${t("footer.terms")}</a>
+                    <a href="${href("contacto.html")}" data-i18n="footer.support">${t("footer.support")}</a>
+                </div>
+            </div>
+            <div class="wp-footer-bottom">
+                <span>© 2026 WayPath. <span data-i18n="footer.rights">${t("footer.rights")}</span></span>
+            </div>`;
+    }
+
+    function bindHamburger() {
+        const hamburger = document.getElementById("hamburger");
+        const mobileMenu = document.getElementById("mobileMenu");
+        if (!hamburger || !mobileMenu || hamburger.dataset.wpBound === "true") return;
+        hamburger.dataset.wpBound = "true";
+        hamburger.addEventListener("click", () => {
+            const isOpen = !mobileMenu.classList.contains("open");
+            hamburger.classList.toggle("open", isOpen);
+            mobileMenu.classList.toggle("open", isOpen);
+            hamburger.setAttribute("aria-expanded", String(isOpen));
         });
     }
 
-    import('./auth-state.js');
+    async function getUser() {
+        try {
+            const module = await import("./api.js");
+            return await module.api("/api/auth/me");
+        } catch {
+            return null;
+        }
+    }
+
+    async function init() {
+        bindHamburger();
+        renderFooter();
+        renderNav(null);
+        renderNav(await getUser());
+    }
+
+    init();
+    window.addEventListener("waypath:languagechange", () => {
+        renderFooter();
+        getUser().then(renderNav);
+    });
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) getUser().then(renderNav);
+    });
 })();
