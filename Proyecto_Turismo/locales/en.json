@@ -173,5 +173,11 @@
   "admin.sales.receipts": "Receipts",
   "admin.sales.tickets": "Tickets",
   "admin.sales.vouchers": "Vouchers",
-  "admin.sales.reviews": "Reviews"
+  "admin.sales.reviews": "Reviews",
+  "admin.catalog.title": "Catalog management",
+  "admin.catalog.subtitle": "Manage destinations and packages; review rates published from WayPathDB.",
+  "admin.catalog.search": "Search by name, destination, city, or state...",
+  "admin.catalog.destinations": "Destinations",
+  "admin.catalog.packages": "Packages",
+  "admin.catalog.rates": "Rates"
 }

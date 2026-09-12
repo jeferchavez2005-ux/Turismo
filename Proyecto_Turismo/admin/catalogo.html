@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo | WayPath Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<a href="#admin-main" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto" title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegación administrativa">
+        <a href="index.html" class="admin-brand"><span>Way<span>Path</span></span><small>Admin</small></a>
+        <nav class="admin-nav" id="adminNav"></nav>
+    </aside>
+    <div class="admin-content">
+        <header class="admin-header">
+            <button id="adminMenuToggle" class="wp-icon-btn admin-menu-toggle" type="button" aria-label="Abrir menú administrativo"><i class="fa-solid fa-bars"></i></button>
+            <div><span class="admin-eyebrow">Catálogo turístico</span><h1 id="adminTitle">Catálogo</h1></div>
+            <div class="admin-user-card"><div class="admin-user-avatar"><i class="fa-solid fa-user-shield"></i></div><div><strong id="adminUserName">Validando sesión...</strong><span id="adminUserRole">Rol no disponible</span></div></div>
+            <a href="../index.html" class="wp-btn wp-btn-outline admin-public-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="admin.common.publicSite">Sitio público</span></a>
+        </header>
+
+        <main id="admin-main" class="admin-main">
+            <section class="admin-section active">
+                <div class="admin-section-head">
+                    <div>
+                        <span class="section-tag"><i class="fa-solid fa-map-location-dot"></i> Inventario turístico</span>
+                        <h2 data-i18n="admin.catalog.title">Gestión de catálogo</h2>
+                        <p id="catalogoStatus" data-i18n="admin.catalog.subtitle">Administra destinos y paquetes; consulta tarifas publicadas desde WayPathDB.</p>
+                    </div>
+                    <div class="admin-actions">
+                        <button id="crearCatalogo" class="wp-btn wp-btn-primary" type="button"><i class="fa-solid fa-plus"></i> <span data-i18n="common.save">Nuevo</span></button>
+                    </div>
+                </div>
+
+                <div class="admin-tabs" role="tablist" aria-label="Secciones de catálogo">
+                    <button class="admin-tab active" type="button" data-tab="destinos" data-i18n="admin.catalog.destinations">Destinos</button>
+                    <button class="admin-tab" type="button" data-tab="paquetes" data-i18n="admin.catalog.packages">Paquetes</button>
+                    <button class="admin-tab" type="button" data-tab="tarifas" data-i18n="admin.catalog.rates">Tarifas</button>
+                </div>
+
+                <div class="admin-toolbar">
+                    <div class="search-box admin-search"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarCatalogo" type="search" placeholder="Buscar por nombre, destino, ciudad o estado..." data-i18n-placeholder="admin.catalog.search"></div>
+                    <select id="filtroDestacadoCatalogo" class="wp-select">
+                        <option value="">Todos</option>
+                        <option value="true">Destacados</option>
+                        <option value="false">No destacados</option>
+                    </select>
+                    <button id="recargarCatalogo" class="wp-btn wp-btn-outline" type="button"><i class="fa-solid fa-rotate"></i> <span data-i18n="admin.common.reload">Actualizar</span></button>
+                </div>
+                <div id="catalogoTableHost"></div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="../js/accesibilidad.js"></script>
+<script type="module" src="../js/i18n.js"></script>
+<script type="module" src="catalogo.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

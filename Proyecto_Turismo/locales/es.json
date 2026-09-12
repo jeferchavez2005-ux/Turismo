@@ -173,5 +173,11 @@
   "admin.sales.receipts": "Comprobantes",
   "admin.sales.tickets": "Tickets",
   "admin.sales.vouchers": "Vouchers",
-  "admin.sales.reviews": "Reseñas"
+  "admin.sales.reviews": "Reseñas",
+  "admin.catalog.title": "Gestión de catálogo",
+  "admin.catalog.subtitle": "Administra destinos y paquetes; consulta tarifas publicadas desde WayPathDB.",
+  "admin.catalog.search": "Buscar por nombre, destino, ciudad o estado...",
+  "admin.catalog.destinations": "Destinos",
+  "admin.catalog.packages": "Paquetes",
+  "admin.catalog.rates": "Tarifas"
 }

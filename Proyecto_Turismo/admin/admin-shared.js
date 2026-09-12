@@ -4,8 +4,8 @@ export const adminLinks = [
     { href: "index.html#dashboard", label: "Dashboard", i18n: "admin.nav.dashboard", icon: "fa-chart-line", permission: "REPORTES_LEER" },
     { href: "usuarios.html", label: "Usuarios", i18n: "admin.nav.users", icon: "fa-users-gear", permission: "SEGURIDAD_USUARIOS_GESTIONAR" },
     { href: "clientes.html", label: "Clientes", i18n: "admin.nav.clients", icon: "fa-address-card", permission: "SEGURIDAD_USUARIOS_GESTIONAR" },
-    { href: "index.html#catalogo", label: "Catálogo", i18n: "admin.nav.catalog", icon: "fa-map-location-dot", permission: "CATALOGO_DESTINOS_GESTIONAR" },
-    { href: "index.html#operacion", label: "Operación", i18n: "admin.nav.operation", icon: "fa-route", permission: "VENTAS_RESERVAS_GESTIONAR" },
+    { href: "catalogo.html", label: "Catálogo", i18n: "admin.nav.catalog", icon: "fa-map-location-dot", permission: "CATALOGO_DESTINOS_GESTIONAR" },
+    { href: "operacion.html", label: "Operación", i18n: "admin.nav.operation", icon: "fa-route", permission: "VENTAS_RESERVAS_GESTIONAR" },
     { href: "reservas.html", label: "Reservas", i18n: "admin.nav.reservations", icon: "fa-calendar-check", permission: "VENTAS_RESERVAS_LEER" },
     { href: "pagos.html", label: "Pagos", i18n: "admin.nav.payments", icon: "fa-credit-card", permission: "PAGOS_LEER" },
     { href: "ventas.html", label: "Ventas", i18n: "admin.nav.sales", icon: "fa-receipt", permission: "VENTAS_RESERVAS_LEER" },
@@ -67,6 +67,7 @@ async function requireAdminAccess() {
             || (user.roles || []).includes("EMPLEADO")
             || (user.permisos || []).some(permission => [
                 "SEGURIDAD_USUARIOS_GESTIONAR",
+                "CATALOGO_DESTINOS_GESTIONAR",
                 "VENTAS_RESERVAS_LEER",
                 "VENTAS_RESERVAS_GESTIONAR",
                 "PAGOS_LEER",

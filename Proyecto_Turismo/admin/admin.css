@@ -445,6 +445,27 @@
     color: var(--text-secondary);
 }
 
+.admin-form-grid {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+}
+
+.admin-check-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.admin-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-weight: 800;
+}
+
 :root[data-theme="dark"] .swal2-popup {
     background: var(--surface-raised);
     color: var(--text-primary);
