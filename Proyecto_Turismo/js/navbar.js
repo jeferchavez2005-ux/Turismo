@@ -20,7 +20,7 @@
         { href: "reseñas.html", key: "nav.reviews", icon: "fa-star" }
     ];
     const adminLinks = [
-        { href: "dashboards/dashboard-ventas.html", key: "nav.dashboard", icon: "fa-chart-line" },
+        { href: "admin/index.html", key: "nav.dashboard", icon: "fa-table-columns" },
         { href: "dashboards/dashboard-marketing.html", key: "nav.reports", icon: "fa-chart-pie" }
     ];
 

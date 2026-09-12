@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | WayPath</title>
+    <meta name="description" content="Panel administrativo de WayPath para gestionar operación, ventas, reportes y auditoría.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <link rel="stylesheet" href="../css/accesibilidad.css">
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-body">
+<a href="#admin-main" class="skip-link">Saltar al contenido principal</a>
+<div id="google_translate_element" class="traductor-widget"></div>
+<div class="accessibility-widget">
+    <button id="btn-aumentar-texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
+    <button id="btn-reducir-texto" title="Texto normal"><i class="fa-solid fa-minus"></i></button>
+    <button id="btn-alto-contraste" title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
+</div>
+
+<div class="admin-shell">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navegación administrativa">
+        <a href="index.html" class="admin-brand" aria-label="WayPath admin">
+            <span>Way<span>Path</span></span>
+            <small>Admin</small>
+        </a>
+
+        <nav class="admin-nav" id="adminNav">
+            <a href="#dashboard" class="active" data-permission="REPORTES_LEER"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a href="#usuarios" data-permission="SEGURIDAD_USUARIOS_GESTIONAR"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+            <a href="#clientes" data-permission="SEGURIDAD_USUARIOS_GESTIONAR"><i class="fa-solid fa-address-card"></i> Clientes</a>
+            <a href="#catalogo" data-permission="CATALOGO_DESTINOS_GESTIONAR"><i class="fa-solid fa-map-location-dot"></i> Catálogo</a>
+            <a href="#operacion" data-permission="VENTAS_RESERVAS_GESTIONAR"><i class="fa-solid fa-route"></i> Operación</a>
+            <a href="#reservas" data-permission="VENTAS_RESERVAS_LEER"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+            <a href="#pagos" data-permission="PAGOS_LEER"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+            <a href="#ventas" data-permission="VENTAS_RESERVAS_LEER"><i class="fa-solid fa-receipt"></i> Ventas</a>
+            <a href="#reportes" data-permission="REPORTES_LEER"><i class="fa-solid fa-chart-pie"></i> Reportes</a>
+            <a href="#auditoria" data-permission="AUDITORIA_LEER"><i class="fa-solid fa-shield-halved"></i> Auditoría</a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        <header class="admin-header">
+            <button id="adminMenuToggle" class="wp-icon-btn admin-menu-toggle" type="button" aria-label="Abrir menú administrativo">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <div>
+                <span class="admin-eyebrow">Panel empresarial</span>
+                <h1 id="adminTitle">Dashboard Administrativo</h1>
+            </div>
+            <div class="admin-user-card" id="adminUserCard">
+                <div class="admin-user-avatar"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></div>
+                <div>
+                    <strong id="adminUserName">Validando sesión...</strong>
+                    <span id="adminUserRole">Rol no disponible</span>
+                </div>
+            </div>
+            <a href="../index.html" class="wp-btn wp-btn-outline admin-public-link">
+                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Sitio público
+            </a>
+        </header>
+
+        <main id="admin-main" class="admin-main">
+            <section id="dashboard" class="admin-section active" data-title="Dashboard Administrativo">
+                <div class="admin-section-head">
+                    <div>
+                        <span class="section-tag"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Datos reales</span>
+                        <h2>Resumen general</h2>
+                        <p id="dashboardStatus">Cargando métricas reales de WayPathDB...</p>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="wp-btn wp-btn-outline" id="refreshDashboard" type="button">
+                            <i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-kpis" aria-label="Resumen administrativo">
+                    <article class="admin-kpi"><span>Usuarios</span><strong id="kpiUsuarios">0</strong><small>Registrados</small></article>
+                    <article class="admin-kpi"><span>Clientes</span><strong id="kpiClientes">0</strong><small>Activos</small></article>
+                    <article class="admin-kpi"><span>Reservas</span><strong id="kpiReservas">0</strong><small>Totales</small></article>
+                    <article class="admin-kpi"><span>Total vendido</span><strong id="kpiVentas">S/ 0.00</strong><small>Compras emitidas</small></article>
+                    <article class="admin-kpi"><span>Compras</span><strong id="kpiCompras">0</strong><small>Generadas</small></article>
+                    <article class="admin-kpi"><span>Cupos</span><strong id="kpiCupos">0</strong><small>Disponibles</small></article>
+                </div>
+
+                <div class="admin-grid two">
+                    <article class="admin-card">
+                        <div class="admin-card-head"><h3>Embudo de conversión</h3><i class="fa-solid fa-filter"></i></div>
+                        <div class="admin-chart"><canvas id="graficoConversion"></canvas></div>
+                    </article>
+                    <article class="admin-card">
+                        <div class="admin-card-head"><h3>Ingresos mensuales</h3><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="admin-chart"><canvas id="graficoIngresos"></canvas></div>
+                    </article>
+                    <article class="admin-card">
+                        <div class="admin-card-head"><h3>Destinos más vendidos</h3><i class="fa-solid fa-map-location-dot"></i></div>
+                        <div class="admin-chart"><canvas id="graficoDestinos"></canvas></div>
+                    </article>
+                    <article class="admin-card">
+                        <div class="admin-card-head"><h3>Métodos de pago</h3><i class="fa-solid fa-credit-card"></i></div>
+                        <div class="admin-chart"><canvas id="graficoPagos"></canvas></div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="reportes" class="admin-section" data-title="Reportes">
+                <div class="admin-section-head">
+                    <div>
+                        <span class="section-tag"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Analítica</span>
+                        <h2>Reportes y marketing</h2>
+                        <p id="reportesStatus">Cargando reportes reales de WayPathDB...</p>
+                    </div>
+                </div>
+                <div class="admin-grid two">
+                    <article class="admin-card"><div class="admin-card-head"><h3>Eventos registrados</h3><i class="fa-solid fa-bullhorn"></i></div><div class="admin-chart"><canvas id="graficoCampanas"></canvas></div></article>
+                    <article class="admin-card"><div class="admin-card-head"><h3>Clientes nuevos</h3><i class="fa-solid fa-users"></i></div><div class="admin-chart"><canvas id="graficoSocial"></canvas></div></article>
+                    <article class="admin-card"><div class="admin-card-head"><h3>Reseñas</h3><i class="fa-solid fa-star"></i></div><div class="admin-chart"><canvas id="graficoEdades"></canvas></div></article>
+                    <article class="admin-card"><div class="admin-card-head"><h3>Salidas por estado</h3><i class="fa-solid fa-route"></i></div><div class="admin-chart"><canvas id="graficoDispositivos"></canvas></div></article>
+                </div>
+            </section>
+
+            <section id="usuarios" class="admin-section" data-title="Usuarios">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="clientes" class="admin-section" data-title="Clientes">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="catalogo" class="admin-section" data-title="Catálogo">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="operacion" class="admin-section" data-title="Operación">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="reservas" class="admin-section" data-title="Reservas">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="pagos" class="admin-section" data-title="Pagos">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="ventas" class="admin-section" data-title="Ventas">
+                <div class="admin-placeholder"></div>
+            </section>
+            <section id="auditoria" class="admin-section" data-title="Auditoría">
+                <div class="admin-placeholder"></div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="../js/accesibilidad.js"></script>
+<script type="module" src="admin.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
