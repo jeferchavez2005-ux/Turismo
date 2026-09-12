@@ -63,22 +63,33 @@
 </nav>
 
 <section class="wp-page-hero" id="main-content">
-    <span class="section-tag"><i class="fa-solid fa-map-location-dot"></i> Perú te espera</span>
-    <h1>Explora nuestros destinos</h1>
-    <p>Descubre lugares increíbles y vive experiencias únicas en los mejores rincones del Perú.</p>
+    <span class="section-tag"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> <span data-i18n="destinations.hero.tag">Peru te espera</span></span>
+    <h1 data-i18n="destinations.hero.title">Explora destinos turísticos</h1>
+    <p data-i18n="destinations.hero.subtitle">Encuentra experiencias culturales, naturaleza, aventura y playa conectadas al catálogo real de WayPath.</p>
 </section>
 
 <main>
 <section class="destinos-section">
     <div class="wp-container">
-        <!-- Filters -->
-        <div class="destinos-filters">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="buscador-destinos" placeholder="Buscar destino...">
+        <div class="destinos-intro">
+            <div>
+                <span class="section-tag"><i class="fa-solid fa-compass" aria-hidden="true"></i> <span data-i18n="destinations.list.tag">Catálogo turístico</span></span>
+                <h2 class="section-title" data-i18n="destinations.list.title">Elige tu próxima experiencia</h2>
+                <p class="section-sub" data-i18n="destinations.list.subtitle">Filtra por nombre o presupuesto y continúa hacia la reserva cuando encuentres el destino ideal.</p>
             </div>
-            <select id="filtro-precio" class="wp-select" style="width:auto;min-width:180px;">
-                <option value="">Todos los precios</option>
+            <div class="destinos-trust">
+                <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <span data-i18n="destinations.trust.secure">Reserva segura</span></span>
+                <span><i class="fa-solid fa-clock" aria-hidden="true"></i> <span data-i18n="destinations.trust.availability">Disponibilidad real</span></span>
+            </div>
+        </div>
+        <!-- Filters -->
+        <div class="destinos-filters" aria-label="Filtros de destinos">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="text" id="buscador-destinos" placeholder="Buscar destino..." data-i18n-placeholder="destinations.search.placeholder" aria-label="Buscar destino">
+            </div>
+            <select id="filtro-precio" class="wp-select" style="width:auto;min-width:180px;" aria-label="Filtrar por precio">
+                <option value="" data-i18n="destinations.filter.all">Todos los precios</option>
                 <option value="0-200">S/ 0 – 200</option>
                 <option value="200-500">S/ 200 – 500</option>
                 <option value="500-9999">S/ 500+</option>
@@ -312,9 +323,9 @@
 
         <!-- Empty state -->
         <div id="emptyState" class="empty-state" style="display:none;">
-            <i class="fa-solid fa-map-location-dot"></i>
-            <h3>No encontramos destinos</h3>
-            <p>Intenta con otro nombre o ajusta los filtros de precio.</p>
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+            <h3 data-i18n="destinations.empty.title">No encontramos destinos</h3>
+            <p data-i18n="destinations.empty.text">Intenta con otro nombre o ajusta los filtros de precio.</p>
         </div>
     </div>
 </section>

@@ -6,6 +6,14 @@ const buscador = document.getElementById("buscador-destinos");
 const filtroPrecio = document.getElementById("filtro-precio");
 let destinos = [];
 
+function t(key) {
+    return window.WayPathI18n?.t(key) || {
+        "destinations.from": "Desde",
+        "destinations.featured": "Destacado",
+        "common.reserve": "Reservar"
+    }[key] || key;
+}
+
 function money(value, currency) {
     if (value === null || value === undefined) return "Consultar";
     const prefix = currency === "USD" ? "$" : "S/";
@@ -30,7 +38,7 @@ function card(destino) {
     badge.className = destino.esDestacado ? "dest-badge-img dest-badge-popular" : "dest-badge-img";
     const badgeIcon = document.createElement("i");
     badgeIcon.className = destino.esDestacado ? "fa-solid fa-fire" : "fa-solid fa-location-dot";
-    badge.append(badgeIcon, document.createTextNode(` ${destino.esDestacado ? "Destacado" : destino.region}`));
+    badge.append(badgeIcon, document.createTextNode(` ${destino.esDestacado ? t("destinations.featured") : destino.region}`));
     imgWrap.append(img, badge);
 
     const body = document.createElement("div");
@@ -52,7 +60,7 @@ function card(destino) {
     priceInfo.className = "price-info";
     const from = document.createElement("span");
     from.className = "price-from";
-    from.textContent = "Desde";
+    from.textContent = t("destinations.from");
     const amount = document.createElement("span");
     amount.className = "price-amount";
     amount.textContent = money(destino.precioDesde, destino.moneda);
@@ -67,7 +75,7 @@ function card(destino) {
     reserve.dataset.img = fallbackImage(destino.imagenUrl);
     const calendar = document.createElement("i");
     calendar.className = "fa-solid fa-calendar-plus";
-    reserve.append(calendar, document.createTextNode(" Reservar"));
+    reserve.append(calendar, document.createTextNode(` ${t("common.reserve")}`));
     reserve.addEventListener("click", () => {
         localStorage.setItem("destinoIdSeleccionado", destino.destinoId);
         localStorage.setItem("destinoSeleccionado", destino.nombre);
@@ -115,3 +123,4 @@ async function loadDestinations() {
 buscador.addEventListener("input", filterLocal);
 filtroPrecio.addEventListener("change", filterLocal);
 await loadDestinations();
+window.addEventListener("waypath:languagechange", filterLocal);

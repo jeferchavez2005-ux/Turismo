@@ -94,12 +94,12 @@
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content animate-fadeup">
-        <span class="hero-tag"><i class="fa-solid fa-compass"></i> &nbsp;Agencia de viajes digital</span>
-        <h1>Descubre la magia<br><span class="highlight-text">del Perú</span></h1>
-        <p>Explora milenios de historia, culturas vivas y paisajes que te quitarán el aliento. Tu próxima gran historia comienza con nosotros.</p>
+        <span class="hero-tag"><i class="fa-solid fa-compass" aria-hidden="true"></i> <span data-i18n="home.hero.tag">Agencia de viajes digital</span></span>
+        <h1><span data-i18n="home.hero.title">Descubre la magia del Peru</span></h1>
+        <p data-i18n="home.hero.subtitle">Explora destinos, reserva paquetes y gestiona tu experiencia turística desde una sola plataforma.</p>
         <div class="hero-ctas">
-            <a href="Destinos.html"  class="wp-btn wp-btn-primary"><i class="fa-solid fa-map"></i> Explorar destinos</a>
-            <a href="contacto.html"  class="wp-btn wp-btn-secondary"><i class="fa-regular fa-envelope"></i> Contáctanos</a>
+            <a href="Destinos.html"  class="wp-btn wp-btn-primary"><i class="fa-solid fa-map" aria-hidden="true"></i> <span data-i18n="home.hero.primary">Explorar destinos</span></a>
+            <a href="servicios.html"  class="wp-btn wp-btn-secondary"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i> <span data-i18n="home.hero.secondary">Ver servicios</span></a>
         </div>
     </div>
     <div class="hero-dots">
@@ -108,11 +108,11 @@
         <button class="dot"        data-idx="2" aria-label="Slide 3"></button>
     </div>
     <div class="hero-stats">
-        <div class="stat"><span class="stat-num">+500</span><span class="stat-label">Destinos</span></div>
+        <div class="stat"><span class="stat-num">+500</span><span class="stat-label" data-i18n="home.stats.destinations">Destinos</span></div>
         <div class="stat-divider"></div>
-        <div class="stat"><span class="stat-num">+10k</span><span class="stat-label">Viajeros</span></div>
+        <div class="stat"><span class="stat-num">+10k</span><span class="stat-label" data-i18n="home.stats.travelers">Viajeros</span></div>
         <div class="stat-divider"></div>
-        <div class="stat"><span class="stat-num">4.9★</span><span class="stat-label">Calificación</span></div>
+        <div class="stat"><span class="stat-num">4.9</span><span class="stat-label" data-i18n="home.stats.rating">Calificacion</span></div>
     </div>
 </section>
 
@@ -121,9 +121,9 @@
 <section class="section-destinations">
     <div class="wp-container">
         <div class="section-head animate-fadeup">
-            <span class="section-tag"><i class="fa-solid fa-location-dot"></i> Destinos destacados</span>
-            <h2 class="section-title">Joyas arqueológicas del Perú</h2>
-            <p class="section-sub">Paquetes turísticos diseñados para conectarte con el pasado milenario.</p>
+            <span class="section-tag"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span data-i18n="home.destinations.tag">Destinos destacados</span></span>
+            <h2 class="section-title" data-i18n="home.destinations.title">Experiencias listas para reservar</h2>
+            <p class="section-sub" data-i18n="home.destinations.subtitle">Una selección inicial de rutas culturales, naturaleza y playa para planear tu próximo viaje.</p>
         </div>
         <div class="dest-grid">
             <article class="dest-card animate-fadeup delay-1">
@@ -161,7 +161,34 @@
             </article>
         </div>
         <div style="text-align:center;margin-top:2.5rem;">
-            <a href="Destinos.html" class="wp-btn wp-btn-primary"><i class="fa-solid fa-compass"></i> Ver todos los destinos</a>
+            <a href="Destinos.html" class="wp-btn wp-btn-primary"><i class="fa-solid fa-compass" aria-hidden="true"></i> <span data-i18n="home.destinations.cta">Ver todos los destinos</span></a>
+        </div>
+    </div>
+</section>
+
+<section class="section-process">
+    <div class="wp-container process-grid">
+        <div>
+            <span class="section-tag"><i class="fa-solid fa-route" aria-hidden="true"></i> <span data-i18n="home.process.tag">Viaja en tres pasos</span></span>
+            <h2 class="section-title" data-i18n="home.process.title">De la inspiración a la compra sin perder el ritmo</h2>
+            <p class="section-sub" data-i18n="home.process.subtitle">WayPath conecta catálogo, reservas, pagos y compras para que el viajero tenga claridad desde la búsqueda hasta sus vouchers.</p>
+        </div>
+        <div class="process-steps">
+            <article class="process-step">
+                <span>01</span>
+                <h3 data-i18n="home.process.search">Explora</h3>
+                <p data-i18n="home.process.searchText">Compara destinos y paquetes con información clara.</p>
+            </article>
+            <article class="process-step">
+                <span>02</span>
+                <h3 data-i18n="home.process.book">Reserva</h3>
+                <p data-i18n="home.process.bookText">Selecciona fecha, pasajeros y disponibilidad real.</p>
+            </article>
+            <article class="process-step">
+                <span>03</span>
+                <h3 data-i18n="home.process.travel">Viaja</h3>
+                <p data-i18n="home.process.travelText">Recibe tickets, comprobantes y vouchers digitales.</p>
+            </article>
         </div>
     </div>
 </section>
@@ -170,29 +197,29 @@
 <section class="section-why">
     <div class="wp-container">
         <div class="section-head" style="text-align:center;">
-            <span class="section-tag"><i class="fa-solid fa-star"></i> ¿Por qué WayPath?</span>
-            <h2 class="section-title" style="margin:0 auto;">Lo que nos hace diferentes</h2>
+            <span class="section-tag"><i class="fa-solid fa-star" aria-hidden="true"></i> <span data-i18n="home.why.tag">Por que WayPath</span></span>
+            <h2 class="section-title" style="margin:0 auto;" data-i18n="home.why.title">Una plataforma pensada para viajeros reales</h2>
         </div>
         <div class="why-grid">
             <div class="why-card">
                 <div class="why-icon" style="background:rgba(249,115,22,.1);color:var(--orange-500)"><i class="fa-solid fa-shield-halved"></i></div>
-                <h3>Reserva 100% segura</h3>
-                <p>Tus datos y pagos están protegidos con los más altos estándares de seguridad.</p>
+                <h3 data-i18n="home.why.secure">Reserva segura</h3>
+                <p data-i18n="home.why.secureText">Autenticación, permisos y pagos preparados para operar con confianza.</p>
             </div>
             <div class="why-card">
                 <div class="why-icon" style="background:rgba(0,57,184,.1);color:var(--blue-500)"><i class="fa-solid fa-headset"></i></div>
-                <h3>Soporte 24/7</h3>
-                <p>Asistencia personalizada antes, durante y después de tu viaje.</p>
+                <h3 data-i18n="home.why.support">Soporte al viajero</h3>
+                <p data-i18n="home.why.supportText">Acompañamiento antes, durante y después de cada experiencia.</p>
             </div>
             <div class="why-card">
                 <div class="why-icon" style="background:rgba(21,128,61,.1);color:#15803d"><i class="fa-solid fa-tags"></i></div>
-                <h3>Mejores precios</h3>
-                <p>Garantizamos los precios más competitivos del mercado sin costos ocultos.</p>
+                <h3 data-i18n="home.why.prices">Precios transparentes</h3>
+                <p data-i18n="home.why.pricesText">Tarifas visibles y procesos comerciales trazables.</p>
             </div>
             <div class="why-card">
                 <div class="why-icon" style="background:rgba(139,92,246,.1);color:#7c3aed"><i class="fa-solid fa-mobile-screen"></i></div>
-                <h3>Todo digital</h3>
-                <p>Reserva, paga y gestiona todo tu viaje desde cualquier dispositivo.</p>
+                <h3 data-i18n="home.why.digital">Todo digital</h3>
+                <p data-i18n="home.why.digitalText">Perfil, reservas, pagos y compras desde cualquier dispositivo.</p>
             </div>
         </div>
     </div>
@@ -233,15 +260,6 @@
 <script src="js/accesibilidad.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-// Hamburger
-const hamburger = document.getElementById('hamburger');
-const mobileMenu = document.getElementById('mobileMenu');
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-    hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('open'));
-});
-
 // Hero slider
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
@@ -257,6 +275,7 @@ dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.idx)));
 setInterval(() => goTo(currentSlide + 1), 5000);
 
 </script>
+<script src="js/navbar.js"></script>
 <script type="module" src="js/auth-state.js"></script>
 </body>
 </html>
