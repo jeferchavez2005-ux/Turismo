@@ -1,196 +1,41 @@
-.skip-link {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.95);
-    
-    color: #f8fafc;
-    padding: 14px 32px;
-    z-index: 999999;
-    font-weight: 600;
-    font-size: 1.05rem;
-    letter-spacing: 0.5px;
-    border-radius: 50px;
-    
-    text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(249, 115, 22, 0.5);
-    
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.skip-link::before {
-    content: '\f061';
-    
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    color: #f97316;
-    
-}
-
-.skip-link:focus {
-    top: 20px;
-    
-    outline: none;
-    
-}
-
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 4px solid #f97316 !important;
-    outline-offset: 3px;
-}
-
-
-.traductor-widget {
-    position: fixed;
-    bottom: 25px;
-    left: 25px;
-    z-index: 9999;
-    background: white;
-    padding: 6px 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-
-.goog-te-banner-frame {
-    display: none !important;
-}
-
-body {
-    top: 0 !important;
-}
-
-
-.accessibility-widget {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    z-index: 9999;
-}
-
-.accessibility-widget button {
-    background: #002244;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    transition: transform 0.2s, background 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.accessibility-widget button:hover {
-    transform: scale(1.1);
-    background: #f97316;
-}
-
-
-body.large-text {
-    font-size: 1.25rem !important;
-}
-
-body.large-text h1 {
-    font-size: 3.2rem !important;
-}
-
-body.large-text h2 {
-    font-size: 2.4rem !important;
-}
-
-body.large-text h3 {
-    font-size: 1.6rem !important;
-}
-
-body.large-text p,
-body.large-text a,
-body.large-text span,
-body.large-text label,
-body.large-text input {
-    font-size: 1.15rem !important;
-}
+/*
+  Capa de compatibilidad de accesibilidad.
+  Los tokens, temas y componentes globales viven en shared.css.
+*/
 
 body.high-contrast {
-    
-    --bg-color: #0f172a !important;
-    
-    --white: #1e293b !important;
-    
-    --text-dark: #f8fafc !important;
-    
-    --text-gray: #94a3b8 !important;
-    
-    --border-color: #334155 !important;
-    
-    --primary-blue: #38bdf8 !important;
-    
-    --primary-orange: #f97316 !important;
-    
     color-scheme: dark;
 }
 
-body.high-contrast .navbar,
-body.high-contrast .card,
-body.high-contrast .box-panel,
-body.high-contrast .purchase-wrapper,
-body.high-contrast .review-card,
-body.high-contrast footer,
-body.high-contrast .dropdown-menu {
-    background-color: var(--white) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-dark) !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+.accessibility-widget [data-font-size="small"] {
+    font-size: .78rem;
 }
 
-body.high-contrast input,
-body.high-contrast select,
-body.high-contrast textarea {
-    background-color: var(--bg-color) !important;
-    color: var(--text-dark) !important;
-    border: 1px solid var(--border-color) !important;
+.accessibility-widget [data-font-size="normal"] {
+    font-size: .9rem;
 }
 
-body.high-contrast input:focus,
-body.high-contrast select:focus,
-body.high-contrast textarea:focus {
-    border-color: var(--primary-orange) !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2) !important;
+.accessibility-widget [data-font-size="large"] {
+    font-size: 1.05rem;
 }
 
+@media (max-width: 560px) {
+    .accessibility-widget {
+        right: 12px;
+        bottom: 12px;
+        gap: 4px;
+        padding: 6px;
+    }
 
-body.high-contrast a,
-body.high-contrast h1,
-body.high-contrast h2,
-body.high-contrast h3,
-body.high-contrast h4,
-body.high-contrast h5,
-body.high-contrast h6 {
-    color: var(--text-dark) !important;
-}
+    .accessibility-widget button,
+    .wp-icon-btn {
+        width: 36px;
+        height: 36px;
+    }
 
-body.high-contrast .primary-text {
-    color: var(--primary-orange) !important;
-}
-
-body.high-contrast a:hover {
-    color: var(--primary-orange) !important;
+    .traductor-widget {
+        left: 12px;
+        bottom: 12px;
+        max-width: 150px;
+    }
 }
