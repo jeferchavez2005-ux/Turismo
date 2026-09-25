@@ -41,6 +41,7 @@
     </section>
     <div class="account-progress" aria-label="Modulos de cuenta">
         <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Perfil</span>
+        <a href="#passengersSection" data-i18n="account.passengers.tab"><i class="fa-solid fa-users" aria-hidden="true"></i> Pasajeros</a>
         <span><i class="fa-solid fa-file-shield" aria-hidden="true"></i> Documentos</span>
         <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Direcciones</span>
         <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</span>
@@ -79,6 +80,31 @@
                 </select>
                 <button type="submit" class="wp-btn wp-btn-primary">
                     <i class="fa-solid fa-id-card" aria-hidden="true"></i> Guardar cliente
+                </button>
+            </form>
+        </section>
+        <section class="account-section account-section-wide" id="passengersSection" aria-labelledby="passengersTitle">
+            <div class="account-section-heading">
+                <div>
+                    <h2 id="passengersTitle"><i class="fa-solid fa-users" aria-hidden="true"></i> <span data-i18n="account.passengers.title">Pasajeros</span></h2>
+                    <p data-i18n="account.passengers.description">Registra a las personas que podrás seleccionar al reservar un viaje.</p>
+                </div>
+                <a class="wp-btn wp-btn-outline" href="reserva.html" data-i18n="account.passengers.goBooking">Ir a reservar</a>
+            </div>
+            <div id="passengersStatus" class="account-collection-status" role="status" aria-live="polite" data-i18n="account.passengers.loading">Cargando pasajeros...</div>
+            <div id="passengersList" class="account-list" aria-live="polite"></div>
+            <form id="passengerForm" class="account-grid">
+                <label for="passengerNames" data-i18n="account.passengers.names">Nombres</label>
+                <input id="passengerNames" class="wp-input" required maxlength="120" autocomplete="given-name">
+                <label for="passengerLastNames" data-i18n="account.passengers.lastNames">Apellidos</label>
+                <input id="passengerLastNames" class="wp-input" required maxlength="120" autocomplete="family-name">
+                <label for="passengerBirthDate" data-i18n="account.passengers.birthDate">Fecha de nacimiento</label>
+                <input id="passengerBirthDate" class="wp-input" type="date" autocomplete="bday">
+                <label for="passengerRequirements" data-i18n="account.passengers.requirements">Requerimientos especiales</label>
+                <textarea id="passengerRequirements" class="wp-input" maxlength="500" rows="3" data-i18n-placeholder="account.passengers.requirementsPlaceholder" placeholder="Alergias, movilidad u otra información relevante"></textarea>
+                <p class="account-form-hint" data-i18n="account.passengers.apiNotice">Podrás seleccionar y clasificar a cada pasajero durante la reserva.</p>
+                <button type="submit" class="wp-btn wp-btn-primary">
+                    <i class="fa-solid fa-user-plus" aria-hidden="true"></i> <span data-i18n="account.passengers.add">Agregar pasajero</span>
                 </button>
             </form>
         </section>

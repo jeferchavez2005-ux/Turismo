@@ -54,6 +54,43 @@
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 .form-field label { font-size: 0.85rem; font-weight: 600; color: var(--text-700); }
+.form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-700); }
+.reservation-travelers-count strong { color: var(--blue-900); font-size: 1.35rem; }
+
+.passenger-picker {
+    min-width: 0;
+    margin: 0;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-50);
+}
+.passenger-picker legend { padding: 0 8px; color: var(--blue-900); font-weight: 800; }
+.passenger-picker-help,
+.passenger-picker-status { color: var(--text-muted); font-size: .88rem; }
+.passenger-picker-status { min-height: 22px; margin: 12px 0; font-weight: 700; }
+.passenger-picker-status.is-error { color: var(--danger, #b42318); }
+.passenger-picker-list { display: grid; gap: 12px; }
+.passenger-option {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(150px, .65fr);
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+}
+.passenger-option:has(.passenger-select:checked),
+.passenger-option.is-selected { border-color: var(--orange-500); }
+.passenger-option-main { min-width: 0; }
+.passenger-option-name { display: block; color: var(--blue-900); overflow-wrap: anywhere; }
+.passenger-option-meta { display: block; margin-top: 3px; color: var(--text-muted); font-size: .8rem; overflow-wrap: anywhere; }
+.passenger-option-controls { display: grid; gap: 8px; }
+.passenger-type { width: 100%; }
+.passenger-holder { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: .82rem; font-weight: 700; }
+.passenger-option:not(.is-selected) .passenger-option-controls { opacity: .6; }
+.passenger-add-link { margin-top: 14px; }
 
 
 .summary-card {
@@ -100,4 +137,6 @@ input[type="radio"]:checked + .metodo-label { border-color: var(--orange-500); b
     .form-row { grid-template-columns: 1fr; }
     .checkout-steps { grid-template-columns: 1fr; }
     .checkout-panel { padding: 24px; }
+    .passenger-option { grid-template-columns: auto minmax(0, 1fr); }
+    .passenger-option-controls { grid-column: 1 / -1; }
 }

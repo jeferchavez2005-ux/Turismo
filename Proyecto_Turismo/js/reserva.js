@@ -9,12 +9,17 @@ const state = {
     tarifa: null,
     precio: Number.parseFloat(localStorage.getItem("precioSeleccionado") || "0") || 0,
     user: null,
-    client: null
+    client: null,
+    pasajeros: []
+};
+
+const t = (key, fallback) => {
+    const translated = window.WayPathI18n?.t(key);
+    return translated && translated !== key ? translated : fallback;
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
     bindSummary();
-    document.getElementById("resPasajeros")?.addEventListener("change", updateTotal);
     document.getElementById("formReserva")?.addEventListener("submit", submitReservation);
     document.getElementById("selectorDestinoReserva")?.addEventListener("change", selectDestination);
     try {
@@ -22,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await ensureDestinationSelected();
         await loadReservationContext();
         await loadProfile();
+        await loadPassengers();
         updateTotal();
     } catch (error) {
         handleInitialError(error);
@@ -133,6 +139,99 @@ async function loadProfile() {
     }
 }
 
+async function loadPassengers() {
+    const status = document.getElementById("passengerPickerStatus");
+    status.textContent = t("booking.passengers.loading", "Cargando pasajeros...");
+    status.classList.remove("is-error");
+    try {
+        state.pasajeros = await api("/api/reservas/me/pasajeros");
+        renderPassengerPicker();
+        status.textContent = state.pasajeros.length ? "" : t("booking.passengers.empty", "No tienes pasajeros registrados. Agrégalos en Mi cuenta antes de continuar.");
+    } catch (error) {
+        status.textContent = error.message || t("booking.passengers.loadError", "No pudimos cargar tus pasajeros.");
+        status.classList.add("is-error");
+    }
+}
+
+function renderPassengerPicker(selection = new Map()) {
+    const list = document.getElementById("passengerPickerList");
+    list.replaceChildren();
+    state.pasajeros.forEach(passenger => {
+        const row = document.createElement("div");
+        row.className = "passenger-option";
+        row.dataset.passengerId = passenger.pasajeroId;
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "passenger-select";
+        checkbox.id = `passenger-${passenger.pasajeroId}`;
+        checkbox.setAttribute("aria-label", `${t("booking.passengers.select", "Seleccionar a")} ${passenger.nombres} ${passenger.apellidos}`);
+
+        const main = document.createElement("label");
+        main.className = "passenger-option-main";
+        main.htmlFor = checkbox.id;
+        const name = document.createElement("strong");
+        name.className = "passenger-option-name";
+        name.textContent = `${passenger.nombres} ${passenger.apellidos}`;
+        const meta = document.createElement("span");
+        meta.className = "passenger-option-meta";
+        meta.textContent = passenger.fechaNacimiento || t("booking.passengers.noBirthDate", "Sin fecha de nacimiento");
+        main.append(name, meta);
+
+        const controls = document.createElement("div");
+        controls.className = "passenger-option-controls";
+        const type = document.createElement("select");
+        type.className = "wp-select passenger-type";
+        type.disabled = true;
+        type.setAttribute("aria-label", `${t("booking.passengers.typeFor", "Categoría de")} ${passenger.nombres}`);
+        [
+            ["ADULTO", t("booking.passengers.adult", "Adulto")],
+            ["NINO", t("booking.passengers.child", "Niño")],
+            ["INFANTE", t("booking.passengers.infant", "Infante")],
+            ["ADULTO_MAYOR", t("booking.passengers.senior", "Adulto mayor")]
+        ].forEach(([value, label]) => type.add(new Option(label, value)));
+
+        const holderLabel = document.createElement("label");
+        holderLabel.className = "passenger-holder";
+        const holder = document.createElement("input");
+        holder.type = "radio";
+        holder.name = "passengerHolder";
+        holder.className = "passenger-holder-input";
+        holder.disabled = true;
+        holderLabel.append(holder, document.createTextNode(t("booking.passengers.holder", "Titular de la reserva")));
+        const saved = selection.get(String(passenger.pasajeroId));
+        if (saved) {
+            checkbox.checked = true;
+            row.classList.add("is-selected");
+            type.disabled = false;
+            type.value = saved.tipoPasajero;
+            holder.disabled = false;
+            holder.checked = saved.esTitular;
+        }
+        controls.append(type, holderLabel);
+        row.append(checkbox, main, controls);
+        list.append(row);
+
+        checkbox.addEventListener("change", () => {
+            row.classList.toggle("is-selected", checkbox.checked);
+            type.disabled = !checkbox.checked;
+            holder.disabled = !checkbox.checked;
+            if (!checkbox.checked) holder.checked = false;
+            updateTotal();
+        });
+        type.addEventListener("change", updateTotal);
+    });
+}
+
+function currentPassengerSelection() {
+    return new Map([...document.querySelectorAll(".passenger-option")]
+        .filter(row => row.querySelector(".passenger-select")?.checked)
+        .map(row => [String(row.dataset.passengerId), {
+            tipoPasajero: row.querySelector(".passenger-type").value,
+            esTitular: row.querySelector(".passenger-holder-input").checked
+        }]));
+}
+
 async function submitReservation(event) {
     event.preventDefault();
     clearMessage();
@@ -148,25 +247,21 @@ async function submitReservation(event) {
     button.disabled = true;
     button.textContent = "Creando reserva...";
     try {
+        const passengers = ensurePassengers();
         await ensureClientProfile();
-        const passengerIds = await ensurePassengers();
         const reserva = await api("/api/reservas", {
             method: "POST",
             body: {
                 salidaId: Number(state.salida.salidaId),
                 tarifaId: Number(state.tarifa.tarifaId),
-                pasajeros: passengerIds.map((id, index) => ({
-                    pasajeroId: Number(id),
-                    tipoPasajero: "ADULTO",
-                    esTitular: index === 0
-                })),
+                pasajeros: passengers,
                 observaciones: value("resObservaciones")
             }
         });
         localStorage.setItem("wp_reserva_id", reserva.reservaId);
         localStorage.setItem("wp_codigo_reserva", reserva.codigoReserva);
         localStorage.setItem("wp_total_pagar", money(reserva.total));
-        localStorage.setItem("wp_detalle_pasajeros", `${passengerIds.length}x Adultos (${money(state.precio)} c/u)`);
+        localStorage.setItem("wp_detalle_pasajeros", `${passengers.length} ${t("booking.passengers.travelers", "pasajeros")}`);
         localStorage.setItem("totalReserva", String(reserva.total));
         localStorage.setItem("fechaReserva", state.salida.fechaInicio);
         window.location.href = "pago.html";
@@ -195,13 +290,23 @@ async function ensureClientProfile() {
     });
 }
 
-async function ensurePassengers() {
-    const count = Number.parseInt(document.getElementById("resPasajeros")?.value || "1", 10);
-    const existing = await api("/api/reservas/me/pasajeros");
-    if (existing.length < count) {
-        throw new ApiError("Debes registrar un pasajero antes de continuar. Ve a Mi cuenta y agrega los pasajeros del viaje.", 400);
+function ensurePassengers() {
+    const selected = [...document.querySelectorAll(".passenger-option")]
+        .filter(row => row.querySelector(".passenger-select")?.checked)
+        .map(row => ({
+            pasajeroId: Number(row.dataset.passengerId),
+            tipoPasajero: row.querySelector(".passenger-type").value,
+            esTitular: row.querySelector(".passenger-holder-input").checked
+        }));
+    if (!selected.length) {
+        throw new ApiError(t("booking.passengers.required", "Selecciona al menos un pasajero para continuar."), 400);
     }
-    const selected = existing.slice(0, count).map(x => x.pasajeroId);
+    if (selected.length > 20) {
+        throw new ApiError(t("booking.passengers.maximum", "Puedes seleccionar hasta 20 pasajeros."), 400);
+    }
+    if (selected.filter(passenger => passenger.esTitular).length !== 1) {
+        throw new ApiError(t("booking.passengers.holderRequired", "Elige exactamente un titular de la reserva."), 400);
+    }
     return selected;
 }
 
@@ -210,10 +315,25 @@ function isProfileComplete() {
 }
 
 function updateTotal() {
-    const count = Number.parseInt(document.getElementById("resPasajeros")?.value || "1", 10);
+    const selectedRows = [...document.querySelectorAll(".passenger-option")]
+        .filter(row => row.querySelector(".passenger-select")?.checked);
+    const count = selectedRows.length;
+    const childPrice = Number(state.tarifa?.precioNino ?? state.precio);
+    const estimatedTotal = selectedRows.reduce((total, row) => {
+        const type = row.querySelector(".passenger-type").value;
+        return total + (type === "NINO" || type === "INFANTE" ? childPrice : state.precio);
+    }, 0);
+    text("resPasajerosCount", String(count));
     text("sumPasajerosNum", String(count));
-    text("sumTotal", money(state.precio * count));
+    text("sumTotal", money(estimatedTotal));
 }
+
+window.addEventListener("waypath:languagechange", () => {
+    if (!state.pasajeros.length) return;
+    const selection = currentPassengerSelection();
+    renderPassengerPicker(selection);
+    updateTotal();
+});
 
 function showMessage(message, isError = false) {
     let box = document.getElementById("reservaMensaje");

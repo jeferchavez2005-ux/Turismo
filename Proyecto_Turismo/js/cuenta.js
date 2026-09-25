@@ -2,7 +2,14 @@ import { api, broadcastAuthChange } from "./api.js";
 
 const message = document.getElementById("accountMessage");
 const logout = document.getElementById("logout");
-const state = { user: null, cliente: null, catalogos: null, documentos: [], direcciones: [] };
+const state = { user: null, cliente: null, catalogos: null, documentos: [], direcciones: [], pasajeros: [] };
+
+const t = (key, fallback) => {
+    const translated = window.WayPathI18n?.t(key);
+    return translated && translated !== key ? translated : fallback;
+};
+
+window.addEventListener("waypath:languagechange", () => renderPassengers());
 
 function showMessage(text) { message.textContent = text || ""; }
 function showError(error) {
@@ -24,6 +31,11 @@ function ensureClient() {
 function setBusy(form, busy) {
     const button = form.querySelector('button[type="submit"]');
     if (button) button.disabled = busy;
+}
+function setPassengersStatus(text, isError = false) {
+    const status = document.getElementById("passengersStatus");
+    status.textContent = text || "";
+    status.classList.toggle("is-error", isError);
 }
 function fillSelect(id, rows, valueKey, label, emptyText = "Seleccionar") {
     const select = document.getElementById(id);
@@ -68,8 +80,14 @@ async function loadAccount() {
     renderClient();
     document.getElementById("accountContent").hidden = false;
     logout.disabled = false;
-    if (state.cliente) await loadClientCollections();
-    else showMessage("Completa tu perfil de cliente para habilitar documentos, direcciones y preferencias.");
+    if (state.cliente) {
+        await Promise.all([loadClientCollections(), loadPassengers()]);
+    }
+    else {
+        showMessage("Completa tu perfil de cliente para habilitar documentos, direcciones, pasajeros y preferencias.");
+        setPassengersStatus(t("account.passengers.profileRequired", "Completa primero tu perfil de cliente para registrar pasajeros."), true);
+        document.querySelectorAll("#passengerForm input, #passengerForm textarea, #passengerForm button").forEach(control => { control.disabled = true; });
+    }
 }
 
 function renderUser() {
@@ -112,6 +130,38 @@ async function loadClientCollections() {
     renderAddresses();
     renderPreferences(preferencias);
     showMessage("");
+}
+
+async function loadPassengers() {
+    setPassengersStatus(t("account.passengers.loading", "Cargando pasajeros..."));
+    try {
+        state.pasajeros = await api("/api/reservas/me/pasajeros");
+        renderPassengers();
+        setPassengersStatus("");
+    } catch (error) {
+        setPassengersStatus(error.message || t("account.passengers.loadError", "No pudimos cargar tus pasajeros. Inténtalo nuevamente."), true);
+    }
+}
+
+function renderPassengers() {
+    const box = document.getElementById("passengersList");
+    box.replaceChildren();
+    if (!state.pasajeros.length) {
+        const empty = document.createElement("p");
+        empty.className = "account-empty";
+        empty.textContent = t("account.passengers.empty", "Aún no registras pasajeros. Agrega el primero para poder reservar.");
+        box.append(empty);
+        return;
+    }
+    state.pasajeros.forEach(passenger => {
+        const birthDate = passenger.fechaNacimiento
+            ? new Intl.DateTimeFormat(document.documentElement.lang || "es", { dateStyle: "medium" }).format(new Date(`${passenger.fechaNacimiento}T00:00:00`))
+            : t("account.passengers.noBirthDate", "Fecha de nacimiento no indicada");
+        const requirements = passenger.requerimientosEspeciales
+            ? `${birthDate} · ${passenger.requerimientosEspeciales}`
+            : birthDate;
+        item(box, `${passenger.nombres} ${passenger.apellidos}`, requirements, []);
+    });
 }
 
 function renderDocuments() {
@@ -229,11 +279,44 @@ document.getElementById("clientProfileForm").addEventListener("submit", async ev
             fechaNacimiento: nullable("clientBirthDate"),
             genero: nullable("clientGender")
         } });
-        await loadClientCollections();
+        document.querySelectorAll("#passengerForm input, #passengerForm textarea, #passengerForm button").forEach(control => { control.disabled = false; });
+        await Promise.all([loadClientCollections(), loadPassengers()]);
         showMessage("Perfil de cliente actualizado.");
     } catch (error) { showError(error); }
     finally { setBusy(form, false); }
 });
+
+document.getElementById("passengerForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const birthDate = nullable("passengerBirthDate");
+    const today = new Date().toISOString().slice(0, 10);
+    if (birthDate && birthDate > today) {
+        setPassengersStatus(t("account.passengers.futureBirthDate", "La fecha de nacimiento no puede estar en el futuro."), true);
+        document.getElementById("passengerBirthDate").focus();
+        return;
+    }
+    setBusy(form, true);
+    setPassengersStatus(t("account.passengers.saving", "Guardando pasajero..."));
+    try {
+        ensureClient();
+        await api("/api/reservas/me/pasajeros", { method: "POST", body: {
+            nombres: value("passengerNames"),
+            apellidos: value("passengerLastNames"),
+            fechaNacimiento: birthDate,
+            requerimientosEspeciales: nullable("passengerRequirements")
+        } });
+        form.reset();
+        await loadPassengers();
+        setPassengersStatus(t("account.passengers.saved", "Pasajero agregado correctamente."));
+    } catch (error) {
+        if (error.status === 401) { showError(error); return; }
+        setPassengersStatus(error.message || t("account.passengers.saveError", "No pudimos guardar el pasajero."), true);
+    } finally { setBusy(form, false); }
+});
+
+document.getElementById("passengerBirthDate").max = new Date().toISOString().slice(0, 10);
 
 document.getElementById("documentForm").addEventListener("submit", async event => {
     event.preventDefault();

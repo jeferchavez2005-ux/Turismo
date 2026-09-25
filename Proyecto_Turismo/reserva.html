@@ -79,17 +79,20 @@
                                     <label for="resFecha">Fecha de inicio</label>
                                     <input type="date" class="wp-input" id="resFecha" required>
                                 </div>
-                                <div class="form-field">
-                                    <label for="resPasajeros">Número de viajeros</label>
-                                    <select class="wp-select" id="resPasajeros">
-                                        <option value="1">1 Persona</option>
-                                        <option value="2">2 Personas</option>
-                                        <option value="3">3 Personas</option>
-                                        <option value="4">4 Personas</option>
-                                        <option value="5">5 Personas</option>
-                                    </select>
+                                <div class="form-field reservation-travelers-count">
+                                    <span class="form-label" data-i18n="booking.passengers.count">Viajeros seleccionados</span>
+                                    <strong id="resPasajerosCount" aria-live="polite">0</strong>
                                 </div>
                             </div>
+                            <fieldset class="passenger-picker" id="passengerPicker">
+                                <legend data-i18n="booking.passengers.legend">3. Elige quién viaja</legend>
+                                <p class="passenger-picker-help" data-i18n="booking.passengers.help">Selecciona al menos un pasajero, indica su categoría y elige exactamente un titular.</p>
+                                <div id="passengerPickerStatus" class="passenger-picker-status" role="status" aria-live="polite" data-i18n="booking.passengers.loading">Cargando pasajeros...</div>
+                                <div id="passengerPickerList" class="passenger-picker-list"></div>
+                                <a class="wp-btn wp-btn-outline passenger-add-link" href="cuenta.html?returnUrl=%2Freserva.html#passengersSection">
+                                    <i class="fa-solid fa-user-plus" aria-hidden="true"></i> <span data-i18n="booking.passengers.add">Agregar pasajero en Mi cuenta</span>
+                                </a>
+                            </fieldset>
                             <div class="form-field">
                                 <label for="resObservaciones">Requerimientos especiales (Opcional)</label>
                                 <textarea class="wp-textarea" id="resObservaciones" placeholder="Alergias, necesidades de movilidad..."></textarea>
@@ -117,7 +120,7 @@
                     </div>
                     <div class="sum-row">
                         <span>Viajeros</span>
-                        <span id="sumPasajerosNum">1</span>
+                        <span id="sumPasajerosNum">0</span>
                     </div>
                     <div class="sum-divider"></div>
                     <div class="sum-total-row">
