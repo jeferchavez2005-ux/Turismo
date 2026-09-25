@@ -1,4 +1,4 @@
-import { api, broadcastAuthChange } from "./api.js";
+import { api, appUrl, broadcastAuthChange } from "./api.js";
 
 const message = document.getElementById("accountMessage");
 const logout = document.getElementById("logout");
@@ -13,7 +13,7 @@ window.addEventListener("waypath:languagechange", () => renderPassengers());
 
 function showMessage(text) { message.textContent = text || ""; }
 function showError(error) {
-    if (error.status === 401) { location.replace("/login.html"); return; }
+    if (error.status === 401) { location.replace(appUrl("login.html")); return; }
     showMessage(error.message);
 }
 function value(id) { return document.getElementById(id).value.trim(); }
@@ -250,7 +250,7 @@ logout.addEventListener("click", async () => {
     try {
         await api("/api/auth/logout", { method: "POST" });
         broadcastAuthChange();
-        location.replace("/login.html");
+        location.replace(appUrl("login.html"));
     } catch (error) { showError(error); }
     finally { logout.disabled = false; }
 });
@@ -394,7 +394,7 @@ document.getElementById("passwordForm").addEventListener("submit", async event =
         } });
         form.reset();
         broadcastAuthChange();
-        location.replace("/login.html");
+        location.replace(appUrl("login.html"));
     } catch (error) { showError(error); }
     finally { setBusy(form, false); }
 });

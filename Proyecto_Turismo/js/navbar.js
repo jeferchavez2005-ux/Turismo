@@ -7,6 +7,7 @@
             ? "landings_pages"
             : "root";
     const prefix = section === "root" ? "" : "../";
+    let currentUser = null;
 
     const publicLinks = [
         { href: "index.html", key: "nav.home", icon: "fa-house" },
@@ -172,15 +173,19 @@
         bindHamburger();
         renderFooter();
         renderNav(null);
-        renderNav(await getUser());
+        currentUser = await getUser();
+        renderNav(currentUser);
     }
 
     init();
     window.addEventListener("waypath:languagechange", () => {
         renderFooter();
-        getUser().then(renderNav);
+        renderNav(currentUser);
     });
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) getUser().then(renderNav);
+        if (!document.hidden) getUser().then(user => {
+            currentUser = user;
+            renderNav(currentUser);
+        });
     });
 })();

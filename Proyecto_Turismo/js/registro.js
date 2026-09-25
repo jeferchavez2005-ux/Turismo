@@ -1,4 +1,4 @@
-import { api } from "./api.js";
+import { api, appPath, appUrl } from "./api.js";
 const form = document.getElementById("registerForm");
 const message = document.getElementById("authMessage");
 const password = document.getElementById("password");
@@ -29,7 +29,7 @@ form.addEventListener("submit", async event => {
         } });
         form.reset();
         const suffix = requestedReturn ? `&returnUrl=${encodeURIComponent(requestedReturn)}` : "";
-        location.assign(`/login.html?registered=1${suffix}`);
+        location.assign(`${appPath("login.html")}?registered=1${suffix}`);
     } catch (error) { message.textContent = error.message; }
     finally { button.disabled = false; }
 });
@@ -66,5 +66,9 @@ function isStrongPassword(value) {
 function safeReturnUrl(value) {
     if (!value) return "";
     if (!value.startsWith("/") || value.startsWith("//")) return "";
-    return value;
+    const candidate = new URL(value, location.origin);
+    const appRoot = new URL(appUrl());
+    return candidate.origin === location.origin && candidate.pathname.startsWith(appRoot.pathname)
+        ? `${candidate.pathname}${candidate.search}${candidate.hash}`
+        : "";
 }

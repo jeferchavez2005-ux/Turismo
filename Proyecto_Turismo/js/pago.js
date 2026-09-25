@@ -1,4 +1,4 @@
-import { ApiError, api } from "./api.js";
+import { ApiError, api, appUrl } from "./api.js";
 
 const state = {
     reservaId: localStorage.getItem("wp_reserva_id"),
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadPaymentContext();
     } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
-            window.location.href = "login.html";
+            window.location.href = appUrl("login.html");
             return;
         }
         showAlert("No se pudo cargar el pago", error instanceof ApiError ? error.message : "Intenta nuevamente.");
@@ -93,7 +93,7 @@ async function submitPayment(event) {
         if (payment.estado === "APROBADO") {
             localStorage.setItem("wp_pago_exitoso", "true");
             localStorage.setItem("wp_pago_id", payment.pagoId);
-            window.location.href = "compras.html";
+            window.location.href = appUrl("compras.html");
         }
     } catch (error) {
         showAlert("No se pudo procesar el pago", error instanceof ApiError ? error.message : "Intenta nuevamente.");

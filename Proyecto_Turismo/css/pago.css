@@ -9,7 +9,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-body { background: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+body { background: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100dvh; }
 a { text-decoration: none; }
 ul { list-style: none; }
 

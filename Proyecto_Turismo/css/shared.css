@@ -29,6 +29,8 @@
     --radius-full: 9999px;
     --transition: 0.25s cubic-bezier(.4,0,.2,1);
     --navbar-h:   68px;
+    --container-max: 1440px;
+    --page-gutter: clamp(20px, 3vw, 40px);
     --font: 'Plus Jakarta Sans', 'Inter', sans-serif;
     --surface: #ffffff;
     --surface-muted: #f8fafc;
@@ -104,7 +106,7 @@ body {
     background: var(--bg-50);
     color: var(--text-900);
     font-size: calc(16px * var(--font-scale));
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     line-height: 1.65;
@@ -131,9 +133,9 @@ button { cursor: pointer; font-family: var(--font); }
 }
 
 .wp-navbar .nav-inner {
-    max-width: 1320px;
+    width: min(100%, var(--container-max));
     margin: 0 auto;
-    padding: 0 24px;
+    padding-inline: var(--page-gutter);
     height: 100%;
     display: flex;
     align-items: center;
@@ -306,7 +308,7 @@ button { cursor: pointer; font-family: var(--font); }
     z-index: 999;
     flex-direction: column;
     gap: 4px;
-    max-height: calc(100vh - var(--navbar-h));
+    max-height: calc(100dvh - var(--navbar-h));
     overflow-y: auto;
 }
 .wp-mobile-menu.open { display: flex; }
@@ -351,10 +353,10 @@ button { cursor: pointer; font-family: var(--font); }
     background: var(--blue-900);
     color: rgba(255,255,255,.75);
     margin-top: auto;
-    padding: 40px 24px 24px;
+    padding: 40px var(--page-gutter) 24px;
 }
 .wp-footer-inner {
-    max-width: 1320px;
+    width: min(100%, var(--container-max));
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr;
@@ -389,7 +391,7 @@ button { cursor: pointer; font-family: var(--font); }
 }
 .wp-footer-col a:hover { color: var(--orange-400); }
 .wp-footer-bottom {
-    max-width: 1320px;
+    width: min(100%, var(--container-max));
     margin: 0 auto;
     padding-top: 20px;
     display: flex;
@@ -440,8 +442,8 @@ button { cursor: pointer; font-family: var(--font); }
 }
 .accessibility-widget button,
 .wp-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--surface);
     color: var(--text-secondary);
@@ -577,9 +579,9 @@ body.large-text { font-size: calc(16px * var(--font-scale)); }
 
 
 .wp-container {
-    max-width: 1320px;
+    width: min(100%, var(--container-max));
     margin: 0 auto;
-    padding: 0 24px;
+    padding-inline: var(--page-gutter);
 }
 
 .section-tag {
@@ -857,6 +859,8 @@ body.large-text { font-size: calc(16px * var(--font-scale)); }
     .wp-page-hero h1 { font-size: 2rem; }
     .section-title { font-size: 1.7rem; }
     .wp-footer-inner { grid-template-columns: 1fr; gap: 24px; }
+    .accessibility-widget button,
+    .wp-icon-btn { width: 44px; height: 44px; }
 }
 
 

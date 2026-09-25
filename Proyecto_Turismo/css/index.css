@@ -3,7 +3,7 @@
 
 .hero {
     position: relative;
-    min-height: calc(100vh - var(--navbar-h));
+    min-height: calc(100dvh - var(--navbar-h));
     padding: 92px 0 110px;
     display: flex;
     align-items: center;
@@ -208,25 +208,6 @@
 .why-card p  { color: rgba(255,255,255,.65); font-size: 0.875rem; line-height: 1.65; }
 
 
-@media (max-width: 900px) {
-    .dest-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid  { grid-template-columns: repeat(2, 1fr); }
-    .process-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 560px) {
-    .hero {
-        min-height: 680px;
-        padding: 72px 0 150px;
-    }
-    .hero-dots { bottom: 170px; }
-    .hero-content { padding: 0 24px; }
-    .dest-grid { grid-template-columns: 1fr; }
-    .why-grid  { grid-template-columns: 1fr; }
-    .process-steps { grid-template-columns: 1fr; }
-    .hero-stats { flex-wrap: wrap; gap: 16px; }
-    .stat-divider { display: none; }
-    .hero-ctas { flex-direction: column; }
-}
 .section-process {
     padding: 88px 0;
     background: var(--surface-raised);
@@ -273,4 +254,41 @@
     color: var(--text-500);
     font-size: .9rem;
     line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .dest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .process-grid { grid-template-columns: minmax(0, 1fr); }
+    .process-steps { width: 100%; }
+}
+
+@media (max-width: 560px) {
+    .hero {
+        min-height: max(640px, calc(100dvh - var(--navbar-h)));
+        padding: 64px 0 152px;
+    }
+    .hero-content { width: 100%; padding-inline: var(--page-gutter); }
+    .hero-content h1 { font-size: clamp(2.15rem, 11vw, 3rem); }
+    .hero-content p { font-size: 1rem; line-height: 1.55; }
+    .hero-dots { left: var(--page-gutter); bottom: 142px; }
+    .hero-ctas { flex-direction: column; align-items: stretch; }
+    .hero-ctas .wp-btn { justify-content: center; }
+    .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        padding: 16px var(--page-gutter);
+    }
+    .stat { min-width: 0; padding-inline: 8px; }
+    .stat-num { font-size: 1.25rem; }
+    .stat-label { font-size: .7rem; }
+    .stat-divider { display: none; }
+    .dest-grid,
+    .why-grid,
+    .process-steps { grid-template-columns: minmax(0, 1fr); }
+    .process-step { min-height: auto; }
+    .section-destinations,
+    .section-process,
+    .section-why { padding-block: 64px; }
 }

@@ -1,4 +1,4 @@
-import { api, broadcastAuthChange } from "./api.js";
+import { api, appPath, appUrl, broadcastAuthChange } from "./api.js";
 const form = document.getElementById("loginForm");
 const message = document.getElementById("authMessage");
 const params = new URLSearchParams(location.search);
@@ -20,7 +20,7 @@ form.addEventListener("submit", async event => {
         } });
         form.reset();
         broadcastAuthChange();
-        const next = requestedReturn || "/index.html";
+        const next = requestedReturn || appPath("index.html");
         localStorage.removeItem("wp_auth_return_url");
         location.assign(next);
     } catch (error) { message.textContent = error.message; }
@@ -34,5 +34,9 @@ document.querySelector(".forgot a").addEventListener("click", event => {
 function safeReturnUrl(value) {
     if (!value) return "";
     if (!value.startsWith("/") || value.startsWith("//")) return "";
-    return value;
+    const candidate = new URL(value, location.origin);
+    const appRoot = new URL(appUrl());
+    return candidate.origin === location.origin && candidate.pathname.startsWith(appRoot.pathname)
+        ? `${candidate.pathname}${candidate.search}${candidate.hash}`
+        : "";
 }

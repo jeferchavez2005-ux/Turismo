@@ -1,4 +1,4 @@
-import { api } from "./api.js";
+import { api, appUrl } from "./api.js";
 async function renderSession() {
     let user = null;
     try { user = await api("/api/auth/me"); } catch { /* Never trust demo storage for authentication. */ }
@@ -7,7 +7,7 @@ async function renderSession() {
         icon.className = user ? "fa-solid fa-user" : "fa-solid fa-right-to-bracket";
         icon.setAttribute("aria-hidden", "true");
         button.replaceChildren(icon, document.createTextNode(user ? " Mi cuenta" : " Iniciar sesion"));
-        button.href = user ? "/cuenta.html" : "/login.html";
+        button.href = user ? appUrl("cuenta.html") : appUrl("login.html");
         button.title = user?.nombre || (user ? user.email : "Iniciar sesion");
     });
 }
@@ -17,4 +17,3 @@ if ("BroadcastChannel" in window) {
     const channel = new BroadcastChannel("waypath-auth");
     channel.addEventListener("message", renderSession);
 }
-

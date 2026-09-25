@@ -1,6 +1,29 @@
 export class ApiError extends Error {
     constructor(message, status) { super(message); this.status = status; }
 }
+
+const APP_ROOT_URL = new URL("../", import.meta.url);
+const configuredApiBase = window.WAYPATH_API_BASE?.trim();
+const isStaticDevelopmentServer = ["127.0.0.1", "localhost"].includes(location.hostname)
+    && location.port === "5500";
+
+export const API_BASE_URL = new URL(
+    configuredApiBase || (isStaticDevelopmentServer ? "http://localhost:5187" : location.origin)
+);
+
+export function appUrl(path = "") {
+    return new URL(String(path).replace(/^\/+/, ""), APP_ROOT_URL).href;
+}
+
+export function appPath(path = "") {
+    const url = new URL(appUrl(path));
+    return `${url.pathname}${url.search}${url.hash}`;
+}
+
+function apiUrl(path) {
+    const normalizedPath = String(path).startsWith("/") ? String(path) : `/${path}`;
+    return new URL(normalizedPath, API_BASE_URL).href;
+}
 export function removeDemoCredentials() {
     try {
         ["waypath_usuario", "db_password", "db_correo", "db_nombre"].forEach(key => localStorage.removeItem(key));
@@ -9,8 +32,8 @@ export function removeDemoCredentials() {
 async function request(path, options = {}) {
     let response;
     try {
-        response = await fetch(path, {
-            ...options, credentials: "same-origin", signal: AbortSignal.timeout(15000),
+        response = await fetch(apiUrl(path), {
+            ...options, credentials: "include", signal: AbortSignal.timeout(15000),
             headers: { Accept: "application/json", ...options.headers }
         });
     } catch { throw new ApiError("No se pudo conectar con WayPath. Intenta nuevamente.", 0); }

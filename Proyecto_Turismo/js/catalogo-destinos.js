@@ -1,4 +1,4 @@
-import { ApiError, api } from "./api.js";
+import { ApiError, api, appPath, appUrl } from "./api.js";
 
 const grid = document.getElementById("destinosGrid");
 const emptyState = document.getElementById("emptyState");
@@ -67,7 +67,7 @@ function card(destino) {
     priceInfo.append(from, amount);
 
     const reserve = document.createElement("a");
-    reserve.href = "reserva.html";
+    reserve.href = appUrl("reserva.html");
     reserve.className = "wp-btn wp-btn-primary btn-reserva";
     reserve.dataset.destinoId = destino.destinoId;
     reserve.dataset.nombre = destino.nombre;
@@ -95,10 +95,10 @@ async function handleReserveClick(event, destino) {
         }
         const client = await api("/api/clientes/me");
         if (!isProfileComplete(client?.perfil)) {
-            await goTo("Completa tu perfil", "Antes de reservar necesitamos tus nombres, apellidos y teléfono.", "cuenta.html?returnUrl=reserva.html");
+            await goTo("Completa tu perfil", "Antes de reservar necesitamos tus nombres, apellidos y teléfono.", `${appUrl("cuenta.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`);
             return;
         }
-        window.location.href = "reserva.html";
+        window.location.href = appUrl("reserva.html");
     } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
             await authPrompt();
@@ -113,7 +113,7 @@ function saveReservationIntent(destino) {
     localStorage.setItem("destinoSeleccionado", destino.nombre);
     localStorage.setItem("precioSeleccionado", destino.precioDesde ?? "0");
     localStorage.setItem("imgSeleccionada", fallbackImage(destino.imagenUrl));
-    localStorage.setItem("wp_auth_return_url", "/reserva.html");
+    localStorage.setItem("wp_auth_return_url", appPath("reserva.html"));
 }
 
 function isProfileComplete(profile) {
@@ -121,8 +121,9 @@ function isProfileComplete(profile) {
 }
 
 async function authPrompt() {
-    const loginUrl = "login.html?returnUrl=%2Freserva.html";
-    const registerUrl = "registro.html?returnUrl=%2Freserva.html";
+    const returnUrl = encodeURIComponent(appPath("reserva.html"));
+    const loginUrl = `${appUrl("login.html")}?returnUrl=${returnUrl}`;
+    const registerUrl = `${appUrl("registro.html")}?returnUrl=${returnUrl}`;
     if (!window.Swal) {
         window.location.href = window.confirm("Debes iniciar sesión para realizar una reserva.\n\nAceptar: iniciar sesión\nCancelar: registrarse") ? loginUrl : registerUrl;
         return;

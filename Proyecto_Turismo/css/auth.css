@@ -1,7 +1,7 @@
 
 .auth-body {
     background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;

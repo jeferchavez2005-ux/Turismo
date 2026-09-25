@@ -1,4 +1,4 @@
-import { ApiError, api } from "./api.js";
+import { ApiError, api, appPath, appUrl } from "./api.js";
 
 const state = {
     destinoId: localStorage.getItem("destinoIdSeleccionado"),
@@ -19,6 +19,10 @@ const t = (key, fallback) => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const addPassengerLink = document.querySelector(".passenger-add-link");
+    if (addPassengerLink) {
+        addPassengerLink.href = `${appUrl("cuenta.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}#passengersSection`;
+    }
     bindSummary();
     document.getElementById("formReserva")?.addEventListener("submit", submitReservation);
     document.getElementById("selectorDestinoReserva")?.addEventListener("change", selectDestination);
@@ -52,11 +56,11 @@ function handleInitialError(error) {
         const form = document.getElementById("formReserva");
         const login = document.createElement("a");
         login.className = "wp-btn wp-btn-primary";
-        login.href = "login.html?returnUrl=%2Freserva.html";
+        login.href = `${appUrl("login.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`;
         login.textContent = "Iniciar sesión";
         const register = document.createElement("a");
         register.className = "wp-btn wp-btn-outline";
-        register.href = "registro.html?returnUrl=%2Freserva.html";
+        register.href = `${appUrl("registro.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`;
         register.textContent = "Registrarse";
         const actions = document.createElement("div");
         actions.className = "checkout-actions";
@@ -69,7 +73,7 @@ async function validateAuthenticatedClient() {
     try {
         state.user = await api("/api/auth/me");
     } catch (error) {
-        localStorage.setItem("wp_auth_return_url", "/reserva.html");
+        localStorage.setItem("wp_auth_return_url", appPath("reserva.html"));
         throw new ApiError("Debes iniciar sesión para realizar una reserva.", error.status || 401);
     }
     if (!(state.user.roles || []).includes("CLIENTE")) {
@@ -264,10 +268,10 @@ async function submitReservation(event) {
         localStorage.setItem("wp_detalle_pasajeros", `${passengers.length} ${t("booking.passengers.travelers", "pasajeros")}`);
         localStorage.setItem("totalReserva", String(reserva.total));
         localStorage.setItem("fechaReserva", state.salida.fechaInicio);
-        window.location.href = "pago.html";
+        window.location.href = appUrl("pago.html");
     } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
-            window.location.href = "login.html";
+            window.location.href = appUrl("login.html");
             return;
         }
         showMessage(error instanceof ApiError ? error.message : "No se pudo crear la reserva.", true);
