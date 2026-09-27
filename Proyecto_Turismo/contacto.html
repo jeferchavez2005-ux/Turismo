@@ -71,7 +71,6 @@
 <main>
 <section class="contacto-section">
     <div class="wp-container">
-        <!-- Contact cards -->
         <div class="contact-cards-grid">
             <div class="contact-card">
                 <div class="contact-icon" style="background:rgba(249,115,22,.1);color:var(--orange-500)"><i class="fa-solid fa-headset"></i></div>
@@ -99,9 +98,7 @@
             </div>
         </div>
 
-        <!-- Main content -->
         <div class="contacto-main">
-            <!-- Form -->
             <div class="box-panel">
                 <h2 class="box-title">Envíanos un mensaje</h2>
                 <p class="box-sub">Completa el formulario y nuestro equipo te responderá en menos de 24 horas.</p>
@@ -139,9 +136,7 @@
                 </form>
             </div>
 
-            <!-- Right column -->
             <div class="right-col">
-                <!-- FAQ -->
                 <div class="box-panel">
                     <h2 class="box-title">Preguntas frecuentes</h2>
                     <div class="faq-list" id="faqList">
@@ -176,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- Info -->
                 <div class="box-panel">
                     <h2 class="box-title">Información adicional</h2>
                     <div class="info-list">
@@ -209,7 +203,6 @@
 <script src="js/accesibilidad.js"></script>
 <script src="js/navbar.js"></script>
 <script>
-// FAQ accordion
 document.querySelectorAll('.faq-q').forEach(btn => {
     btn.addEventListener('click', () => {
         const item = btn.closest('.faq-item');
@@ -219,7 +212,6 @@ document.querySelectorAll('.faq-q').forEach(btn => {
         btn.setAttribute('aria-expanded', !isOpen);
     });
 });
-// Form success
 document.getElementById('contactoForm')?.addEventListener('submit', e => {
     e.preventDefault();
     document.getElementById('form-success').style.display = 'flex';

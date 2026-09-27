@@ -14,17 +14,14 @@
 <body>
 <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
-<!-- Traductor -->
 <div id="google_translate_element" class="traductor-widget"></div>
 
-<!-- Widgets de accesibilidad -->
 <div class="accessibility-widget">
     <button id="btn-aumentar-texto" aria-label="Aumentar tamaño de texto" title="Texto grande"><i class="fa-solid fa-plus"></i></button>
     <button id="btn-reducir-texto"  aria-label="Reducir tamaño de texto"  title="Texto normal"><i class="fa-solid fa-minus"></i></button>
     <button id="btn-alto-contraste" aria-label="Modo oscuro"               title="Modo oscuro"><i class="fa-solid fa-moon"></i></button>
 </div>
 
-<!-- ─── NAVBAR ─── -->
 <header class="wp-navbar" role="banner">
     <div class="nav-inner">
         <a href="index.html" class="wp-logo" aria-label="WayPath inicio">Way<span class="accent">Path</span></a>
@@ -69,7 +66,6 @@
     </div>
 </header>
 
-<!-- Mobile menu -->
 <nav class="wp-mobile-menu" id="mobileMenu" role="navigation" aria-label="Menú móvil">
     <a href="servicios.html"><i class="fa-solid fa-concierge-bell"></i> Nuestros servicios</a>
     <a href="Destinos.html"><i class="fa-solid fa-map-location-dot"></i> Destinos</a>
@@ -85,7 +81,6 @@
     <a href="login.html" class="mobile-login login-btn"><i class="fa-regular fa-user"></i> Iniciar sesión</a>
 </nav>
 
-<!-- ─── HERO ─── -->
 <section class="hero" id="main-content" role="main">
     <div class="hero-slider" id="heroSlider">
         <div class="hero-slide active" style="background-image:url('Img/machupichu.jpg')"></div>
@@ -116,7 +111,6 @@
     </div>
 </section>
 
-<!-- ─── DESTINATIONS ─── -->
 <main>
 <section class="section-destinations">
     <div class="wp-container">
@@ -193,7 +187,6 @@
     </div>
 </section>
 
-<!-- ─── WHY US ─── -->
 <section class="section-why">
     <div class="wp-container">
         <div class="section-head" style="text-align:center;">
@@ -226,7 +219,6 @@
 </section>
 </main>
 
-<!-- ─── FOOTER ─── -->
 <footer class="wp-footer" role="contentinfo">
     <div class="wp-footer-inner">
         <div>
@@ -260,7 +252,6 @@
 <script src="js/accesibilidad.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-// Hero slider
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
 const dots   = document.querySelectorAll('.dot');
