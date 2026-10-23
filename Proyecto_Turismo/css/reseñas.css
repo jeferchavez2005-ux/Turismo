@@ -1,11 +1,12 @@
 
-.reseñas-section { padding: 56px 0 96px; }
+.reseñas-section { padding: clamp(48px, 6vw, 56px) 0 clamp(72px, 8vw, 96px); }
 
 
 .reseñas-top {
-    display: flex;
-    gap: 32px;
-    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+    gap: clamp(20px, 2.5vw, 32px);
+    margin-bottom: clamp(32px, 4vw, 48px);
     align-items: stretch;
 }
 
@@ -14,12 +15,12 @@
     flex: 1;
     background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 32px;
+    border-radius: var(--radius-md);
+    padding: clamp(24px, 3vw, 32px);
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: clamp(24px, 4vw, 40px);
 }
 .score-big { text-align: center; }
 .score-num { font-size: 4rem; font-weight: 800; color: var(--blue-900); line-height: 1; }
@@ -34,11 +35,11 @@
 
 
 .filter-panel {
-    width: 320px;
+    width: auto;
     background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 32px;
+    border-radius: var(--radius-md);
+    padding: clamp(24px, 3vw, 32px);
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
@@ -50,31 +51,31 @@
 
 .reseñas-layout {
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 32px;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+    gap: clamp(20px, 2.5vw, 32px);
     align-items: start;
 }
 
 
 .reviews-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
 }
 .review-card {
     background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     transition: transform var(--transition), box-shadow var(--transition);
 }
-.review-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.review-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
 .review-img { width: 100%; height: 160px; object-fit: cover; }
-.review-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
+.review-body { padding: clamp(20px, 2.5vw, 24px); display: flex; flex-direction: column; flex: 1; }
 .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
 
 .reviewer-info { display: flex; gap: 12px; align-items: center; }
@@ -98,7 +99,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
-    color: var(--text-300);
+    color: var(--text-500);
     padding-top: 16px;
     border-top: 1px solid var(--border);
 }
@@ -109,7 +110,7 @@
 .sidebar-card {
     background: var(--surface-raised);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     padding: 28px;
     text-align: center;
 }
@@ -138,7 +139,7 @@
 }
 
 @media (max-width: 1024px) {
-    .reseñas-top { flex-direction: column; gap: 24px; }
+    .reseñas-top { grid-template-columns: 1fr; gap: 24px; }
     .filter-panel { width: 100%; }
     .filter-grid { flex-direction: row; }
     .filter-grid .wp-select { flex: 1; }
@@ -149,4 +150,13 @@
     .score-panel { flex-direction: column; gap: 24px; text-align: center; }
     .score-bars { width: 100%; }
     .filter-grid { flex-direction: column; }
+    .review-meta { align-items: flex-start; flex-direction: column; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+    .score-num { font-size: 3.25rem; }
+    .score-panel,
+    .filter-panel,
+    .sidebar-card { padding: 22px 20px; }
+    .bar-row { gap: 8px; }
 }
