@@ -7,12 +7,14 @@
             ? "landings_pages"
             : "root";
     const prefix = section === "root" ? "" : "../";
+    const currentRoute = section === "root" ? page : `${section}/${page}`;
     let currentUser = null;
 
     const publicLinks = [
         { href: "index.html", key: "nav.home", icon: "fa-house" },
         { href: "Destinos.html", key: "nav.destinations", icon: "fa-map-location-dot" },
-        { href: "servicios.html", key: "nav.services", icon: "fa-concierge-bell" }
+        { href: "servicios.html", key: "nav.services", icon: "fa-concierge-bell" },
+        { href: "contacto.html", key: "nav.contact", icon: "fa-envelope" }
     ];
     const clientLinks = [
         { href: "cuenta.html", key: "nav.account", icon: "fa-user" },
@@ -33,6 +35,7 @@
         "nav.home": "Inicio",
         "nav.destinations": "Destinos",
         "nav.services": "Servicios",
+        "nav.contact": "Contacto",
         "nav.login": "Iniciar sesion",
         "nav.register": "Registrarse",
         "nav.account": "Mi cuenta",
@@ -62,13 +65,14 @@
     }
 
     function isActive(target) {
-        return target.endsWith(page) || page === target;
+        return target === currentRoute;
     }
 
     function linkTemplate(link, mobile = false) {
         const active = isActive(link.href) ? " active" : "";
         const icon = mobile ? `<i class="fa-solid ${link.icon}" aria-hidden="true"></i>` : "";
-        return `<a href="${href(link.href)}" class="nav-link${active}" data-i18n="${link.key}">${icon}${t(link.key)}</a>`;
+        const extraClass = link.className ? ` ${link.className}` : "";
+        return `<a href="${href(link.href)}" class="nav-link${active}${extraClass}" data-i18n="${link.key}">${icon}${t(link.key)}</a>`;
     }
 
     function hasRole(user, role) {
@@ -85,26 +89,32 @@
             return {
                 desktop: [
                     ...publicLinks,
-                    { href: "login.html", key: "nav.login", icon: "fa-right-to-bracket" },
                     { href: "registro.html", key: "nav.register", icon: "fa-user-plus" }
                 ],
                 mobile: [
                     ...publicLinks,
-                    { href: "login.html", key: "nav.login", icon: "fa-right-to-bracket" },
+                    { href: "login.html", key: "nav.login", icon: "fa-right-to-bracket", className: "mobile-login login-btn" },
                     { href: "registro.html", key: "nav.register", icon: "fa-user-plus" }
                 ]
             };
         }
 
-        const links = [...publicLinks, ...clientLinks];
-        if (canSeeAdmin(user)) links.push(...adminLinks);
-        return { desktop: links, mobile: links };
+        const desktop = [...publicLinks, ...clientLinks.filter(link => link.key !== "nav.account")];
+        const mobile = [...publicLinks, ...clientLinks];
+        if (canSeeAdmin(user)) {
+            desktop.push(...adminLinks);
+            mobile.push(...adminLinks);
+        }
+        return { desktop, mobile };
     }
 
     function renderNav(user) {
         const desktopNav = document.querySelector(".wp-nav-links");
         const mobileNav = document.getElementById("mobileMenu");
         if (!desktopNav && !mobileNav) return;
+
+        if (desktopNav) desktopNav.setAttribute("aria-label", "Menu principal");
+        if (mobileNav) mobileNav.setAttribute("aria-label", "Menu movil");
 
         const links = buildLinks(user);
         if (desktopNav) desktopNav.innerHTML = links.desktop.map(link => linkTemplate(link)).join("");
@@ -133,12 +143,10 @@
                 </div>
                 <div class="wp-footer-col">
                     <h4 data-i18n="footer.pages">${t("footer.pages")}</h4>
-                    ${publicLinks.concat(clientLinks.slice(1, 4)).map(link => `<a href="${href(link.href)}" data-i18n="${link.key}">${t(link.key)}</a>`).join("")}
+                    ${publicLinks.map(link => `<a href="${href(link.href)}" data-i18n="${link.key}">${t(link.key)}</a>`).join("")}
                 </div>
                 <div class="wp-footer-col">
-                    <h4 data-i18n="footer.legal">${t("footer.legal")}</h4>
-                    <a href="#" data-i18n="footer.privacy">${t("footer.privacy")}</a>
-                    <a href="#" data-i18n="footer.terms">${t("footer.terms")}</a>
+                    <h4 data-i18n="footer.support">${t("footer.support")}</h4>
                     <a href="${href("contacto.html")}" data-i18n="footer.support">${t("footer.support")}</a>
                 </div>
             </div>
@@ -152,12 +160,42 @@
         const mobileMenu = document.getElementById("mobileMenu");
         if (!hamburger || !mobileMenu || hamburger.dataset.wpBound === "true") return;
         hamburger.dataset.wpBound = "true";
-        hamburger.addEventListener("click", () => {
-            const isOpen = !mobileMenu.classList.contains("open");
+
+        const updateMenuPosition = () => {
+            if (!mobileMenu.classList.contains("open")) return;
+            const navbar = document.querySelector(".wp-navbar");
+            const top = Math.max(0, navbar?.getBoundingClientRect().bottom || 0);
+            mobileMenu.style.top = `${top}px`;
+            mobileMenu.style.maxHeight = `${Math.max(180, window.innerHeight - top)}px`;
+        };
+
+        const setMenuOpen = (isOpen, returnFocus = false) => {
             hamburger.classList.toggle("open", isOpen);
             mobileMenu.classList.toggle("open", isOpen);
             hamburger.setAttribute("aria-expanded", String(isOpen));
+            hamburger.setAttribute("aria-label", isOpen ? "Cerrar menu" : "Abrir menu");
+            if (isOpen) {
+                updateMenuPosition();
+                mobileMenu.querySelector("a")?.focus();
+            } else {
+                mobileMenu.style.removeProperty("top");
+                mobileMenu.style.removeProperty("max-height");
+                if (returnFocus) hamburger.focus();
+            }
+        };
+
+        hamburger.addEventListener("click", () => {
+            const isOpen = !mobileMenu.classList.contains("open");
+            setMenuOpen(isOpen);
         });
+        mobileMenu.addEventListener("click", event => {
+            if (event.target.closest("a")) setMenuOpen(false);
+        });
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && mobileMenu.classList.contains("open")) setMenuOpen(false, true);
+        });
+        window.addEventListener("resize", updateMenuPosition);
+        window.addEventListener("scroll", updateMenuPosition, { passive: true });
     }
 
     async function getUser() {

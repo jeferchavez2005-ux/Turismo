@@ -244,6 +244,14 @@
 .wp-modal-price { display: flex; flex-direction: column; }
 
 @media (max-width: 760px) {
+    .tabs-bar {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: thin;
+    }
+    .tab-btn { flex: 0 0 auto; }
     .purchase-card { flex-direction: column; }
     .purchase-card > img { width: 100%; min-height: 180px; }
     .pc-img { width: 100%; height: 180px; }
