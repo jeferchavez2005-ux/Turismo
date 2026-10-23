@@ -20,22 +20,6 @@ body.high-contrast {
 }
 
 @media (max-width: 560px) {
-    .accessibility-widget {
-        right: 12px;
-        bottom: 12px;
-        gap: 4px;
-        padding: 6px;
-    }
-
-    .accessibility-widget button,
-    .wp-icon-btn {
-        width: 36px;
-        height: 36px;
-    }
-
-    .traductor-widget {
-        left: 12px;
-        bottom: 12px;
-        max-width: 150px;
-    }
+    .wp-utility-bar .accessibility-widget,
+    .wp-utility-bar .traductor-widget { position: static; inset: auto; max-width: none; }
 }

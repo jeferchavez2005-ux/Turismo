@@ -27,11 +27,7 @@
     margin-bottom: 14px;
 }
 @media (max-width: 600px) {
-    .auth-body { flex-direction: column; gap: 16px; }
-    .login-body > .accessibility-widget, .auth-body > .accessibility-widget {
-        position: static; flex-direction: row; justify-content: flex-end; align-self: flex-end; padding: 8px 16px;
-    }
-    .login-body .overlay-content { position: relative; inset: auto; padding: 140px 24px 28px; }
-    .login-body .right-panel h1 { font-size: 36px; }
-    .login-body .top-actions { align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .auth-body { flex-direction: column; }
+    .login-body .right-panel h1 { font-size: clamp(2rem, 10vw, 2.7rem); }
+    .login-body .top-actions { align-items: center; gap: 10px; flex-wrap: wrap; }
 }

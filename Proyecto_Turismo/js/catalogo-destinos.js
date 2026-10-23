@@ -171,12 +171,16 @@ async function loadDestinations() {
         render(destinos);
     } catch {
         destinos = Array.from(document.querySelectorAll("#destinosGrid .dest-card")).map(card => ({
+            destinoId: card.querySelector(".btn-reserva")?.dataset.destinoId || "",
             nombre: card.dataset.nombre,
             precioDesde: Number(card.dataset.precio || 0),
             descripcionCorta: card.querySelector(".desc")?.textContent || "",
             ciudad: card.querySelector(".location")?.textContent?.replace(/\s+/g, " ").trim() || "",
-            region: "",
-            pais: "Peru"
+            region: card.querySelector(".dest-badge-img")?.textContent?.replace(/\s+/g, " ").trim() || "Peru",
+            pais: "Peru",
+            imagenUrl: card.querySelector(".dest-img-wrap img")?.getAttribute("src") || "",
+            imagenAlt: card.querySelector(".dest-img-wrap img")?.getAttribute("alt") || card.dataset.nombre,
+            esDestacado: card.querySelector(".dest-badge-popular") !== null
         }));
         filterLocal();
     }

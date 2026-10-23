@@ -188,3 +188,23 @@
     .dest-footer { align-items: stretch; flex-direction: column; }
     .dest-footer .wp-btn { justify-content: center; width: 100%; }
 }
+
+/* V2 catalog */
+.destinos-section { padding-block: clamp(56px, 7vw, 96px); }
+.destinos-intro { margin-bottom: 32px; }
+.destinos-filters { border-radius: var(--radius-md); box-shadow: var(--shadow-sm); gap: 12px; }
+.search-box input,
+.destinos-filters select { min-height: 48px; }
+.destinos-grid { gap: clamp(18px, 2vw, 28px); }
+.dest-card { border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+.dest-card:hover { transform: translateY(-3px); }
+.dest-img-wrap { height: 220px; }
+.dest-body { padding: 22px; }
+.dest-body .desc { line-height: 1.65; }
+.dest-footer { gap: 16px; }
+.dest-footer .wp-btn { min-width: 118px; justify-content: center; }
+
+@media (max-width: 500px) {
+    .destinos-section { padding-top: 40px; }
+    .dest-img-wrap { height: 210px; }
+}

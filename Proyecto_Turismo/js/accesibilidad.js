@@ -95,11 +95,31 @@
         }
     }
 
+    function ensureUtilityBar() {
+        const accessibilityWidget = document.querySelector(".accessibility-widget");
+        const languageWidget = document.querySelector(".traductor-widget");
+        if (!accessibilityWidget && !languageWidget) return;
+
+        let utilityBar = document.querySelector(".wp-utility-bar");
+        if (!utilityBar) {
+            utilityBar = document.createElement("div");
+            utilityBar.className = "wp-utility-bar";
+            utilityBar.setAttribute("role", "region");
+            utilityBar.setAttribute("aria-label", "Preferencias de visualizacion");
+            const firstWidget = languageWidget || accessibilityWidget;
+            firstWidget.parentNode.insertBefore(utilityBar, firstWidget);
+        }
+
+        if (languageWidget && languageWidget.parentNode !== utilityBar) utilityBar.append(languageWidget);
+        if (accessibilityWidget && accessibilityWidget.parentNode !== utilityBar) utilityBar.append(accessibilityWidget);
+    }
+
     function init() {
         const theme = readTheme();
         const scale = readFontScale();
         applyTheme(theme);
         applyFontScale(scale);
+        ensureUtilityBar();
         ensureAccessibilityControls();
         setButtonState(theme, scale);
 

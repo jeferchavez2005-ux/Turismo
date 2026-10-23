@@ -156,3 +156,62 @@ input[type="radio"]:checked + .metodo-label { border-color: var(--orange-500); b
     .passenger-option { grid-template-columns: auto minmax(0, 1fr); }
     .passenger-option-controls { grid-column: 1 / -1; }
 }
+
+/* WayPath V2 reservation flow */
+.reserva-section { padding-block: clamp(28px, 5vw, 64px) clamp(64px, 8vw, 96px); }
+.checkout-steps {
+    max-width: 760px;
+    margin: 0 auto clamp(24px, 4vw, 40px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+.reserva-layout { grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: clamp(20px, 3vw, 36px); align-items: start; }
+.checkout-panel { padding: clamp(24px, 4vw, 40px); border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
+.checkout-sub { margin-bottom: 24px; }
+.checkout-form { gap: 24px; }
+.form-section {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-muted);
+}
+.form-section h3 { color: var(--text-primary); }
+.form-field label,
+.form-label { color: var(--text-secondary); }
+.passenger-picker { padding: 18px; background: var(--surface); }
+.passenger-option { border-radius: var(--radius-sm); }
+.summary-card { top: calc(var(--navbar-h) + 20px); border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
+.sum-img { height: 180px; }
+
+@media (max-width: 900px) {
+    .reserva-layout { display: flex; flex-direction: column; }
+    .reserva-form-col,
+    .reserva-summary-col { width: 100%; }
+    .reserva-summary-col { order: -1; }
+    .summary-card {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        column-gap: 18px;
+        align-items: start;
+    }
+    .summary-card h3 { grid-column: 1 / -1; }
+    .sum-img { grid-column: 1; grid-row: 2 / span 4; width: 112px; height: 112px; margin: 0; }
+    .summary-card h4,
+    .summary-card .sum-loc,
+    .summary-card .sum-divider,
+    .summary-card .sum-row,
+    .summary-card .sum-total-row,
+    .summary-card .sum-guarantee,
+    .summary-card .summary-note { grid-column: 2; }
+}
+
+@media (max-width: 560px) {
+    .checkout-steps { gap: 6px; padding: 8px; }
+    .checkout-steps span { padding: 9px 6px; font-size: .76rem; }
+    .checkout-panel { padding: 20px 16px; }
+    .form-section { padding: 16px 12px; }
+    .summary-card { padding: 18px; grid-template-columns: 88px minmax(0, 1fr); column-gap: 14px; }
+    .sum-img { width: 88px; height: 88px; }
+    .summary-card .sum-guarantee,
+    .summary-card .summary-note { grid-column: 1 / -1; }
+}

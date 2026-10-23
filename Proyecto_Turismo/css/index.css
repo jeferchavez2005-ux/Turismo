@@ -176,7 +176,7 @@
 
 .section-why {
     padding: 80px 0;
-    background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+    background: linear-gradient(135deg, var(--brand-surface-strong) 0%, var(--brand-surface) 100%);
     position: relative;
 }
 .section-why .section-tag { background: rgba(255,255,255,.12); color: rgba(255,255,255,.85); }
@@ -206,6 +206,16 @@
 }
 .why-card h3 { color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
 .why-card p  { color: rgba(255,255,255,.65); font-size: 0.875rem; line-height: 1.65; }
+
+/* V2 home hierarchy */
+.hero-content { max-width: 760px; }
+.hero-content p { max-width: 650px; }
+.hero-ctas .wp-btn { justify-content: center; }
+.section-destinations,
+.section-process { padding-block: clamp(72px, 8vw, 112px); }
+.section-why { padding-block: clamp(72px, 8vw, 104px); }
+.why-card { border-radius: var(--radius-md); }
+.why-card p { color: rgba(255,255,255,.78); }
 
 
 .section-process {
@@ -291,4 +301,7 @@
     .section-destinations,
     .section-process,
     .section-why { padding-block: 64px; }
+    .hero { min-height: 720px; }
+    .hero-content { padding-bottom: 152px; }
+    .hero-stats { bottom: 18px; width: calc(100% - 24px); }
 }
