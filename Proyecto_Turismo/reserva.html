@@ -29,53 +29,53 @@
 <main class="reserva-section">
     <div class="wp-container">
         <div class="checkout-steps" aria-label="Progreso de compra">
-            <span class="active"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Reserva</span>
-            <span><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Pago</span>
-            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> Compra</span>
+            <span class="active"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> <span data-i18n="booking.steps.booking">Reserva</span></span>
+            <span><i class="fa-solid fa-credit-card" aria-hidden="true"></i> <span data-i18n="booking.steps.payment">Pago</span></span>
+            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> <span data-i18n="booking.steps.purchase">Compra</span></span>
         </div>
         <div class="reserva-layout">
 
             <div class="reserva-form-col">
                 <div class="checkout-panel">
-                    <h2><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Detalles de la reserva</h2>
-                    <p class="checkout-sub">Completa la información para asegurar tu lugar en esta aventura.</p>
+                    <h2><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> <span data-i18n="booking.title">Detalles de la reserva</span></h2>
+                    <p class="checkout-sub" data-i18n="booking.subtitle">Completa la información para asegurar tu lugar en esta aventura.</p>
 
                     <form id="formReserva" class="checkout-form">
                         <div class="form-section">
-                            <h3>1. Tus datos</h3>
+                            <h3 data-i18n="booking.personal.title">1. Tus datos</h3>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label for="resNombres">Nombres</label>
+                                    <label for="resNombres" data-i18n="account.passengers.names">Nombres</label>
                                     <input type="text" class="wp-input" id="resNombres" required>
                                 </div>
                                 <div class="form-field">
-                                    <label for="resApellidos">Apellidos</label>
+                                    <label for="resApellidos" data-i18n="account.passengers.lastNames">Apellidos</label>
                                     <input type="text" class="wp-input" id="resApellidos" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label for="resEmail">Correo electrónico</label>
+                                    <label for="resEmail" data-i18n="auth.email">Correo electrónico</label>
                                     <input type="email" class="wp-input" id="resEmail" required>
                                 </div>
                                 <div class="form-field">
-                                    <label for="resTel">Teléfono</label>
+                                    <label for="resTel" data-i18n="booking.personal.phone">Teléfono</label>
                                     <input type="tel" class="wp-input" id="resTel" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-section">
-                            <h3>2. Detalles del viaje</h3>
+                            <h3 data-i18n="booking.trip.title">2. Detalles del viaje</h3>
                             <div class="wp-alert wp-alert-warning" id="destinoSelectorPanel" hidden>
-                                <strong>Selecciona un destino para continuar.</strong>
-                                <p>No se creará una reserva hasta que elijas una experiencia disponible.</p>
+                                <strong data-i18n="booking.destination.required">Selecciona un destino para continuar.</strong>
+                                <p data-i18n="booking.destination.help">No se creará una reserva hasta que elijas una experiencia disponible.</p>
                                 <label class="sr-only" for="selectorDestinoReserva">Destino</label>
                                 <select class="wp-select" id="selectorDestinoReserva"></select>
                             </div>
                             <div class="form-row">
                                 <div class="form-field">
-                                    <label for="resFecha">Fecha de inicio</label>
+                                    <label for="resFecha" data-i18n="booking.trip.startDate">Fecha de inicio</label>
                                     <input type="date" class="wp-input" id="resFecha" required>
                                 </div>
                                 <div class="form-field reservation-travelers-count">
@@ -93,13 +93,13 @@
                                 </a>
                             </fieldset>
                             <div class="form-field">
-                                <label for="resObservaciones">Requerimientos especiales (Opcional)</label>
-                                <textarea class="wp-textarea" id="resObservaciones" placeholder="Alergias, necesidades de movilidad..."></textarea>
+                                <label for="resObservaciones" data-i18n="booking.notes.label">Requerimientos especiales (Opcional)</label>
+                                <textarea class="wp-textarea" id="resObservaciones" placeholder="Alergias, necesidades de movilidad..." data-i18n-placeholder="booking.notes.placeholder"></textarea>
                             </div>
                         </div>
 
                         <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
-                            Continuar al pago <i class="fa-solid fa-arrow-right"></i>
+                            <span data-i18n="booking.continue">Continuar al pago</span> <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </form>
                 </div>
@@ -107,28 +107,28 @@
 
             <div class="reserva-summary-col">
                 <div class="summary-card" id="summaryCard">
-                    <h3>Resumen de reserva</h3>
+                    <h3 data-i18n="booking.summary.title">Resumen de reserva</h3>
                     <img id="sumImg" src="Img/machupichu.jpg" alt="" class="sum-img">
                     <h4 id="sumDestino">Machu Picchu</h4>
                     <p class="sum-loc"><i class="fa-solid fa-location-dot"></i> Perú</p>
                     <div class="sum-divider"></div>
                     <div class="sum-row">
-                        <span>Precio por persona</span>
+                        <span data-i18n="booking.summary.unitPrice">Precio por persona</span>
                         <span id="sumPrecioUnitario">S/ 0</span>
                     </div>
                     <div class="sum-row">
-                        <span>Viajeros</span>
+                        <span data-i18n="booking.summary.travelers">Viajeros</span>
                         <span id="sumPasajerosNum">0</span>
                     </div>
                     <div class="sum-divider"></div>
                     <div class="sum-total-row">
-                        <span>Total a pagar</span>
+                        <span data-i18n="booking.summary.total">Total a pagar</span>
                         <span id="sumTotal">S/ 0</span>
                     </div>
                     <div class="sum-guarantee">
-                        <i class="fa-solid fa-lock" aria-hidden="true"></i> Pago 100% seguro y encriptado
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i> <span data-i18n="booking.summary.secure">Pago 100% seguro y encriptado</span>
                     </div>
-                    <div class="summary-note">La reserva se confirma cuando el pago sea aprobado.</div>
+                    <div class="summary-note" data-i18n="booking.summary.note">La reserva se confirma cuando el pago sea aprobado.</div>
                 </div>
             </div>
 

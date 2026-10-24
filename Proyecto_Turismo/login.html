@@ -22,42 +22,42 @@
     <div class="left-panel">
         <div class="logo-login">Way<span class="orange">Path</span></div>
         <div class="overlay-content">
-            <h2>Bienvenido</h2>
-            <h1>de nuevo</h1>
-            <p>Inicia sesión y continúa planificando tu próxima aventura</p>
+            <h2 data-i18n="login.welcome">Bienvenido</h2>
+            <h1 data-i18n="login.again">de nuevo</h1>
+            <p data-i18n="login.intro">Inicia sesión y continúa planificando tu próxima aventura</p>
         </div>
     </div>
     
     <div class="right-panel">
         <div class="top-actions">
-            <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+            <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="common.back">Volver</span></a>
             <div class="register-link">
-                ¿No tienes una cuenta? <a id="registerFromLogin" href="registro.html">Regístrate</a>
+                <span data-i18n="login.noAccount">¿No tienes una cuenta?</span> <a id="registerFromLogin" href="registro.html" data-i18n="login.register">Regístrate</a>
             </div>
         </div>
         
-        <h1>Iniciar Sesión</h1>
+        <h1 data-i18n="login.title">Iniciar Sesión</h1>
         
         <form id="loginForm">
-            <label for="email">Correo electrónico</label>
+            <label for="email" data-i18n="auth.email">Correo electrónico</label>
 <input type="email" id="email" required maxlength="255" autocomplete="username">
             
-            <label for="password">Contraseña</label>
+            <label for="password" data-i18n="auth.password">Contraseña</label>
 <input type="password" id="password" required maxlength="128" autocomplete="current-password">
             
             <div class="forgot">
-                <a href="#">¿Olvidaste tu contraseña?</a>
+                <a href="#" data-i18n="login.forgot">¿Olvidaste tu contraseña?</a>
             </div>
             
             <p id="authMessage" role="status" aria-live="polite"></p>
-            <button type="submit">Iniciar sesión</button>
+            <button type="submit" data-i18n="login.submit">Iniciar sesión</button>
         </form>
         
         <div class="divider"></div>
         
         <div class="terms">
             <i class="fa-solid fa-shield-check shield"></i>
-            <p>Al iniciar sesión aceptas nuestros <a href="#">Términos y Condiciones</a> y nuestra <a href="#">Política de Privacidad</a></p>
+            <p data-i18n="login.terms">Al iniciar sesión aceptas nuestros Términos y Condiciones y nuestra Política de Privacidad.</p>
         </div>
     </div>
 </div>

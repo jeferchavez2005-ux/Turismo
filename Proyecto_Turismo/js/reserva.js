@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("selectorDestinoReserva")?.addEventListener("change", selectDestination);
     try {
         await validateAuthenticatedClient();
-        await ensureDestinationSelected();
-        await loadReservationContext();
+        const hasDestination = await ensureDestinationSelected();
+        if (hasDestination) await loadReservationContext();
         await loadProfile();
         await loadPassengers();
         updateTotal();
@@ -82,18 +82,19 @@ async function validateAuthenticatedClient() {
 }
 
 async function ensureDestinationSelected() {
-    if (state.destinoId) return;
+    if (state.destinoId) return true;
     const panel = document.getElementById("destinoSelectorPanel");
     const selector = document.getElementById("selectorDestinoReserva");
     const destinations = await api("/api/catalogo/destinos");
     if (panel) panel.hidden = false;
     if (selector) {
-        selector.innerHTML = `<option value="">Selecciona un destino</option>${destinations.map(destino => `<option value="${destino.destinoId}" data-name="${escapeHtml(destino.nombre)}" data-price="${destino.precioDesde ?? 0}" data-img="${escapeHtml(destino.imagenUrl || "")}">${escapeHtml(destino.nombre)} - ${escapeHtml(destino.ciudad)}</option>`).join("")}`;
+        selector.innerHTML = `<option value="">${escapeHtml(t("booking.destination.select", "Selecciona un destino"))}</option>${destinations.map(destino => `<option value="${destino.destinoId}" data-name="${escapeHtml(destino.nombre)}" data-price="${destino.precioDesde ?? 0}" data-img="${escapeHtml(destino.imagenUrl || "")}">${escapeHtml(destino.nombre)} - ${escapeHtml(destino.ciudad)}</option>`).join("")}`;
     }
-    throw new ApiError("Selecciona un destino antes de continuar con la reserva.", 400);
+    showMessage(t("booking.destination.required", "Selecciona un destino antes de continuar con la reserva."), true);
+    return false;
 }
 
-function selectDestination(event) {
+async function selectDestination(event) {
     const option = event.target.selectedOptions[0];
     if (!option?.value) return;
     state.destinoId = option.value;
@@ -106,7 +107,17 @@ function selectDestination(event) {
     localStorage.setItem("imgSeleccionada", state.imagen);
     document.getElementById("destinoSelectorPanel").hidden = true;
     bindSummary();
-    loadReservationContext().then(updateTotal).catch(error => showMessage(error.message, true));
+    clearMessage();
+    event.target.disabled = true;
+    try {
+        await loadReservationContext();
+        updateTotal();
+    } catch (error) {
+        showMessage(error.message || t("booking.context.loadError", "No se pudo cargar la disponibilidad del destino."), true);
+        document.getElementById("destinoSelectorPanel").hidden = false;
+    } finally {
+        event.target.disabled = false;
+    }
 }
 
 async function loadReservationContext() {
@@ -249,7 +260,7 @@ async function submitReservation(event) {
     }
     const button = event.submitter || document.querySelector("#formReserva button[type='submit']");
     button.disabled = true;
-    button.textContent = "Creando reserva...";
+    button.textContent = t("booking.create.loading", "Creando reserva...");
     try {
         const passengers = ensurePassengers();
         await ensureClientProfile();
@@ -274,10 +285,11 @@ async function submitReservation(event) {
             window.location.href = appUrl("login.html");
             return;
         }
-        showMessage(error instanceof ApiError ? error.message : "No se pudo crear la reserva.", true);
+        const fallback = t("booking.create.error", "No se pudo crear la reserva.");
+        showMessage(error instanceof ApiError ? error.message : fallback, true);
     } finally {
         button.disabled = false;
-        button.innerHTML = 'Continuar al pago <i class="fa-solid fa-arrow-right"></i>';
+        button.innerHTML = `<span data-i18n="booking.continue">${escapeHtml(t("booking.continue", "Continuar al pago"))}</span> <i class="fa-solid fa-arrow-right"></i>`;
     }
 }
 

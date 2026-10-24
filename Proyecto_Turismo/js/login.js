@@ -4,15 +4,19 @@ const message = document.getElementById("authMessage");
 const params = new URLSearchParams(location.search);
 const requestedReturn = safeReturnUrl(params.get("returnUrl") || localStorage.getItem("wp_auth_return_url"));
 const registerLink = document.getElementById("registerFromLogin");
+const t = (key, fallback) => {
+    const translated = window.WayPathI18n?.t(key);
+    return translated && translated !== key ? translated : fallback;
+};
 if (registerLink && requestedReturn) registerLink.href = `registro.html?returnUrl=${encodeURIComponent(requestedReturn)}`;
 if (params.get("registered") === "1")
-    message.textContent = "Cuenta creada. Inicia sesion para continuar.";
+    message.textContent = t("login.registered", "Cuenta creada. Inicia sesión para continuar.");
 form.addEventListener("submit", async event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    message.textContent = "Verificando...";
+    message.textContent = t("login.verifying", "Verificando...");
     try {
         await api("/api/auth/login", { method: "POST", body: {
             email: document.getElementById("email").value.trim(),
@@ -28,7 +32,7 @@ form.addEventListener("submit", async event => {
 });
 document.querySelector(".forgot a").addEventListener("click", event => {
     event.preventDefault();
-    message.textContent = "La recuperacion de cuentas por correo aun no esta disponible.";
+    message.textContent = t("login.recoveryUnavailable", "La recuperación de cuentas por correo aún no está disponible.");
 });
 
 function safeReturnUrl(value) {

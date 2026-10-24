@@ -18,7 +18,6 @@
     ];
     const clientLinks = [
         { href: "cuenta.html", key: "nav.account", icon: "fa-user" },
-        { href: "reserva.html", key: "nav.reservations", icon: "fa-calendar-check" },
         { href: "compras.html", key: "nav.purchases", icon: "fa-bag-shopping" },
         { href: "reseñas.html", key: "nav.reviews", icon: "fa-star" }
     ];

@@ -6,6 +6,10 @@ const confirmPassword = document.getElementById("confirmPassword");
 const strength = document.getElementById("passwordStrength");
 const params = new URLSearchParams(location.search);
 const requestedReturn = safeReturnUrl(params.get("returnUrl") || localStorage.getItem("wp_auth_return_url"));
+const t = (key, fallback) => {
+    const translated = window.WayPathI18n?.t(key);
+    return translated && translated !== key ? translated : fallback;
+};
 
 password?.addEventListener("input", renderPasswordStrength);
 confirmPassword?.addEventListener("input", validatePasswordMatch);
@@ -14,13 +18,13 @@ form.addEventListener("submit", async event => {
     event.preventDefault();
     validatePasswordMatch();
     if (!isStrongPassword(password.value)) {
-        message.textContent = "La contraseña debe tener mínimo 12 caracteres y al menos 4 caracteres especiales.";
+        message.textContent = t("register.passwordError", "La contraseña debe tener mínimo 12 caracteres y al menos 4 caracteres especiales.");
         return;
     }
     if (!form.reportValidity()) return;
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    message.textContent = "Creando cuenta...";
+    message.textContent = t("register.creating", "Creando cuenta...");
     try {
         await api("/api/auth/register", { method: "POST", body: {
             nombre: document.getElementById("name").value.trim(),
@@ -39,16 +43,20 @@ function renderPasswordStrength() {
     strength?.classList.toggle("strong", score === 3);
     strength?.classList.toggle("medium", score === 2);
     strength?.classList.toggle("weak", score < 2);
-    const label = score === 3 ? "Contraseña segura" : score === 2 ? "Contraseña aceptable" : "Contraseña débil";
+    const label = score === 3
+        ? t("register.strength.strong", "Contraseña segura")
+        : score === 2
+            ? t("register.strength.medium", "Contraseña aceptable")
+            : t("register.strength.weak", "Contraseña débil");
     const bar = strength?.querySelector("span");
     const text = strength?.querySelector("small");
     if (bar) bar.style.width = `${Math.max(25, score * 33)}%`;
-    if (text) text.textContent = `${label}. Usa mínimo 12 caracteres y 4 especiales.`;
+    if (text) text.textContent = `${label}. ${t("register.passwordRule", "Usa mínimo 12 caracteres y 4 especiales.")}`;
 }
 
 function validatePasswordMatch() {
     if (!confirmPassword) return;
-    confirmPassword.setCustomValidity(password.value === confirmPassword.value ? "" : "Las contraseñas no coinciden.");
+    confirmPassword.setCustomValidity(password.value === confirmPassword.value ? "" : t("register.passwordMismatch", "Las contraseñas no coinciden."));
 }
 
 function passwordScore(value) {

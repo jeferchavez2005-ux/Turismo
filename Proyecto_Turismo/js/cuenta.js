@@ -9,7 +9,16 @@ const t = (key, fallback) => {
     return translated && translated !== key ? translated : fallback;
 };
 
-window.addEventListener("waypath:languagechange", () => renderPassengers());
+window.addEventListener("waypath:languagechange", () => {
+    renderPassengers();
+    renderDocuments();
+    renderAddresses();
+});
+
+document.querySelectorAll(".account-progress a").forEach(link => link.addEventListener("click", () => {
+    document.querySelectorAll(".account-progress a").forEach(item => item.removeAttribute("aria-current"));
+    link.setAttribute("aria-current", "location");
+}));
 
 function showMessage(text) { message.textContent = text || ""; }
 function showError(error) {
@@ -20,7 +29,7 @@ function value(id) { return document.getElementById(id).value.trim(); }
 function nullable(id) { const data = value(id); return data.length ? data : null; }
 function checked(id) { return document.getElementById(id).checked; }
 function setValue(id, data) { document.getElementById(id).value = data ?? ""; }
-function optionLabel(text, flag) { return flag ? `${text} - Principal` : text; }
+function optionLabel(text, flag) { return flag ? `${text} - ${t("account.common.primary", "Principal")}` : text; }
 function asIntOrNull(id) {
     const data = value(id);
     return data.length ? Number(data) : null;
@@ -170,16 +179,16 @@ function renderDocuments() {
     if (!state.documentos.length) {
         const empty = document.createElement("p");
         empty.className = "account-empty";
-        empty.textContent = "Aun no registras documentos.";
+        empty.textContent = t("account.documents.empty", "Aún no registras documentos.");
         box.append(empty);
         return;
     }
     state.documentos.forEach(doc => item(box,
         optionLabel(`${doc.tipoDocumento}: ${doc.numeroDocumento}`, doc.esPrincipal),
-        doc.paisEmision ? `Emitido en ${doc.paisEmision}` : "Pais de emision no indicado",
+        doc.paisEmision ? `${t("account.documents.issuedIn", "Emitido en")} ${doc.paisEmision}` : t("account.documents.noCountry", "País de emisión no indicado"),
         [
-            actionButton("Editar", "fa-pen", () => editDocument(doc)),
-            actionButton("Eliminar", "fa-trash", () => deleteDocument(doc.documentoClienteId))
+            actionButton(t("account.common.edit", "Editar"), "fa-pen", () => editDocument(doc)),
+            actionButton(t("account.common.delete", "Eliminar"), "fa-trash", () => deleteDocument(doc.documentoClienteId))
         ]));
 }
 function editDocument(doc) {
@@ -191,7 +200,7 @@ function editDocument(doc) {
     document.getElementById("documentMain").checked = doc.esPrincipal;
 }
 async function deleteDocument(id) {
-    if (!confirm("Eliminar este documento?")) return;
+    if (!confirm(t("account.documents.deleteConfirm", "¿Eliminar este documento?"))) return;
     try {
         await api(`/api/clientes/me/documentos/${id}`, { method: "DELETE" });
         state.documentos = await api("/api/clientes/me/documentos");
@@ -206,7 +215,7 @@ function renderAddresses() {
     if (!state.direcciones.length) {
         const empty = document.createElement("p");
         empty.className = "account-empty";
-        empty.textContent = "Aun no registras direcciones.";
+        empty.textContent = t("account.addresses.empty", "Aún no registras direcciones.");
         box.append(empty);
         return;
     }
@@ -214,8 +223,8 @@ function renderAddresses() {
         optionLabel(dir.lineaDireccion, dir.esPrincipal),
         `${dir.ciudad}, ${dir.region}, ${dir.pais}`,
         [
-            actionButton("Editar", "fa-pen", () => editAddress(dir)),
-            actionButton("Eliminar", "fa-trash", () => deleteAddress(dir.direccionClienteId))
+            actionButton(t("account.common.edit", "Editar"), "fa-pen", () => editAddress(dir)),
+            actionButton(t("account.common.delete", "Eliminar"), "fa-trash", () => deleteAddress(dir.direccionClienteId))
         ]));
 }
 function editAddress(dir) {
@@ -226,7 +235,7 @@ function editAddress(dir) {
     document.getElementById("addressMain").checked = dir.esPrincipal;
 }
 async function deleteAddress(id) {
-    if (!confirm("Eliminar esta direccion?")) return;
+    if (!confirm(t("account.addresses.deleteConfirm", "¿Eliminar esta dirección?"))) return;
     try {
         await api(`/api/clientes/me/direcciones/${id}`, { method: "DELETE" });
         state.direcciones = await api("/api/clientes/me/direcciones");

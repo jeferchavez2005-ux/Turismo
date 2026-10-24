@@ -1,5 +1,10 @@
 export class ApiError extends Error {
-    constructor(message, status) { super(message); this.status = status; }
+    constructor(message, status, details = {}) {
+        super(message);
+        this.status = status;
+        this.path = details.path || "";
+        this.traceId = details.traceId || "";
+    }
 }
 
 const APP_ROOT_URL = new URL("../", import.meta.url);
@@ -44,7 +49,9 @@ async function request(path, options = {}) {
             : response.status === 401 ? (path === "/api/auth/login" ? "Correo o clave incorrectos." : "Tu sesión expiró. Inicia sesión nuevamente.")
             : response.status === 403 ? "No tienes permiso para realizar esta operacion."
             : body?.title || "No se pudo completar la solicitud. Revisa los datos e intenta nuevamente.";
-        throw new ApiError(message, response.status);
+        const details = { path, status: response.status, traceId: body?.traceId || "" };
+        console.error("WayPath API request failed", details);
+        throw new ApiError(message, response.status, details);
     }
     if (!body) throw new ApiError("La API de WayPath no esta disponible en este servidor.", 0);
     return body;

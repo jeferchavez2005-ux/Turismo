@@ -73,6 +73,14 @@
     background: var(--bg-100);
 }
 
+.account-progress a[aria-current="location"] {
+    border-color: var(--orange-500);
+    color: var(--text-primary);
+    background: rgba(249,115,22,.1);
+}
+
+.account-section { scroll-margin-top: calc(var(--navbar-h) + 20px); }
+
 .account-progress i {
     color: var(--orange-500);
 }

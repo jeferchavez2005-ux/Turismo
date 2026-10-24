@@ -32,45 +32,45 @@
     <section class="account-hero" id="main-content">
         <div>
             <span class="section-tag"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Area cliente</span>
-            <h1>Mi cuenta</h1>
-            <p>Gestiona tu perfil, documentos, direcciones y preferencias para reservar con menos friccion.</p>
+            <h1 data-i18n="account.title">Mi cuenta</h1>
+            <p data-i18n="account.subtitle">Gestiona tu perfil, documentos, direcciones y preferencias para reservar con menos fricción.</p>
         </div>
         <button id="logout" type="button" class="wp-btn wp-btn-outline account-logout" disabled>
-            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Cerrar sesion
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> <span data-i18n="account.logout">Cerrar sesión</span>
         </button>
     </section>
-    <div class="account-progress" aria-label="Modulos de cuenta">
-        <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Perfil</span>
+    <nav class="account-progress" aria-label="Modulos de cuenta">
+        <a href="#profileSection"><i class="fa-solid fa-id-card" aria-hidden="true"></i> <span data-i18n="account.profile.tab">Perfil</span></a>
         <a href="#passengersSection" data-i18n="account.passengers.tab"><i class="fa-solid fa-users" aria-hidden="true"></i> Pasajeros</a>
-        <span><i class="fa-solid fa-file-shield" aria-hidden="true"></i> Documentos</span>
-        <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Direcciones</span>
-        <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> Preferencias</span>
-    </div>
+        <a href="#documentsSection"><i class="fa-solid fa-file-shield" aria-hidden="true"></i> <span data-i18n="account.documents.tab">Documentos</span></a>
+        <a href="#addressesSection"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span data-i18n="account.addresses.tab">Direcciones</span></a>
+        <a href="#preferencesSection"><i class="fa-solid fa-sliders" aria-hidden="true"></i> <span data-i18n="account.preferences.tab">Preferencias</span></a>
+    </nav>
     <p id="accountMessage" class="auth-message" role="status" aria-live="polite">Cargando cuenta...</p>
     <div id="accountContent" hidden>
-        <section class="account-section">
-            <h2>Usuario</h2>
+        <section class="account-section account-section-wide" id="profileSection">
+            <h2 data-i18n="account.user.title">Usuario</h2>
             <p id="accountEmail" class="account-email"></p>
             <form id="profileForm">
-                <label for="name">Nombre</label>
+                <label for="name" data-i18n="account.user.name">Nombre</label>
                 <input id="name" class="wp-input" required maxlength="100" autocomplete="name">
                 <button type="submit" class="wp-btn wp-btn-primary">
-                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Guardar
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> <span data-i18n="common.save">Guardar</span>
                 </button>
             </form>
         </section>
-        <section class="account-section">
-            <h2>Perfil de cliente</h2>
+        <section class="account-section account-section-wide" id="clientProfileSection">
+            <h2 data-i18n="account.profile.title">Perfil de cliente</h2>
             <form id="clientProfileForm" class="account-grid">
-                <label for="clientNames">Nombres</label>
+                <label for="clientNames" data-i18n="account.passengers.names">Nombres</label>
                 <input id="clientNames" class="wp-input" required maxlength="120" autocomplete="given-name">
-                <label for="clientLastNames">Apellidos</label>
+                <label for="clientLastNames" data-i18n="account.passengers.lastNames">Apellidos</label>
                 <input id="clientLastNames" class="wp-input" required maxlength="120" autocomplete="family-name">
-                <label for="clientPhone">Telefono</label>
+                <label for="clientPhone" data-i18n="booking.personal.phone">Teléfono</label>
                 <input id="clientPhone" class="wp-input" maxlength="30" autocomplete="tel">
-                <label for="clientBirthDate">Fecha de nacimiento</label>
+                <label for="clientBirthDate" data-i18n="account.passengers.birthDate">Fecha de nacimiento</label>
                 <input id="clientBirthDate" class="wp-input" type="date" autocomplete="bday">
-                <label for="clientGender">Genero</label>
+                <label for="clientGender" data-i18n="account.profile.gender">Género</label>
                 <select id="clientGender" class="wp-input">
                     <option value="">Prefiero no indicar</option>
                     <option value="MASCULINO">Masculino</option>
@@ -79,7 +79,7 @@
                     <option value="NO_DECLARA">No declara</option>
                 </select>
                 <button type="submit" class="wp-btn wp-btn-primary">
-                    <i class="fa-solid fa-id-card" aria-hidden="true"></i> Guardar cliente
+                    <i class="fa-solid fa-id-card" aria-hidden="true"></i> <span data-i18n="account.profile.save">Guardar perfil</span>
                 </button>
             </form>
         </section>
@@ -108,8 +108,8 @@
                 </button>
             </form>
         </section>
-        <section class="account-section">
-            <h2>Documentos</h2>
+        <section class="account-section" id="documentsSection">
+            <h2 data-i18n="account.documents.title">Documentos</h2>
             <div id="documentsList" class="account-list"></div>
             <form id="documentForm" class="account-grid">
                 <input id="documentId" type="hidden">
@@ -125,12 +125,12 @@
                     <input id="documentMain" type="checkbox"> Principal
                 </label>
                 <button type="submit" class="wp-btn wp-btn-primary">
-                    <i class="fa-solid fa-file-shield" aria-hidden="true"></i> Guardar documento
+                    <i class="fa-solid fa-file-shield" aria-hidden="true"></i> <span data-i18n="account.documents.save">Guardar documento</span>
                 </button>
             </form>
         </section>
-        <section class="account-section">
-            <h2>Direcciones</h2>
+        <section class="account-section" id="addressesSection">
+            <h2 data-i18n="account.addresses.title">Direcciones</h2>
             <div id="addressesList" class="account-list"></div>
             <form id="addressForm" class="account-grid">
                 <input id="addressId" type="hidden">
@@ -144,12 +144,12 @@
                     <input id="addressMain" type="checkbox"> Principal
                 </label>
                 <button type="submit" class="wp-btn wp-btn-primary">
-                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i> Guardar direccion
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span data-i18n="account.addresses.save">Guardar dirección</span>
                 </button>
             </form>
         </section>
-        <section class="account-section">
-            <h2>Preferencias</h2>
+        <section class="account-section account-section-wide" id="preferencesSection">
+            <h2 data-i18n="account.preferences.title">Preferencias</h2>
             <form id="preferencesForm" class="account-grid">
                 <label for="preferredLanguage">Idioma</label>
                 <input id="preferredLanguage" class="wp-input" required maxlength="10" value="es">
@@ -164,7 +164,7 @@
                 <label for="preferenceNotes">Observaciones</label>
                 <textarea id="preferenceNotes" class="wp-input" maxlength="500" rows="4"></textarea>
                 <button type="submit" class="wp-btn wp-btn-primary">
-                    <i class="fa-solid fa-sliders" aria-hidden="true"></i> Guardar preferencias
+                    <i class="fa-solid fa-sliders" aria-hidden="true"></i> <span data-i18n="account.preferences.save">Guardar preferencias</span>
                 </button>
             </form>
         </section>

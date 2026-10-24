@@ -15,6 +15,8 @@
 - Navegación pública y footer unificados; Contacto permanece en el menú generado. Los enlaces privados y administrativos conservan las comprobaciones de sesión y rol existentes.
 - Páginas secundarias refinadas: Contacto, Compras, Cuenta y Reseñas comparten ahora la densidad, superficies, radios, espaciado y comportamiento responsive del sistema V2. No se cambiaron sus llamadas API ni su JavaScript funcional.
 - Panel administrativo refinado para WhyPath V2: shell, navegación responsive, dashboard, tablas adaptativas, filtros, formularios, tarjetas y estados comparten ahora el sistema visual global sin cambiar permisos, APIs ni reglas de negocio.
+- Bloqueos frontend de Reserva y Mi cuenta corregidos: la reserva carga perfil y pasajeros aunque aún no exista un destino seleccionado, Cuenta ofrece navegación funcional entre módulos y la navbar pública ya no muestra el acceso directo «Reservas».
+- Traducciones ampliadas y sincronizadas en ES, EN, FR y PT para login, registro, reserva y las secciones principales de Cuenta; Home y Destinos conservaron sus claves completas existentes.
 
 ## Últimos commits confirmados
 
@@ -37,7 +39,9 @@
 - La ejecución completa de capturas de este bloque quedó limitada por un cierre de Chrome headless causado por el proceso GPU del entorno; las combinaciones no generadas no se consideran probadas visualmente.
 - No hay credenciales de prueba ni una sesión autenticada real disponible. Los estados de Cuenta, Compras y creación de Reseñas que dependen del backend siguen pendientes de validación integrada.
 - La fase administrativa se revisó a nivel estático y responsive; Chrome headless sólo confirmó visualmente el tema oscuro y el estado de acceso restringido. El tema claro, los datos reales y las operaciones autenticadas continúan pendientes por falta de una sesión administrativa de prueba y por limitaciones del navegador del entorno.
+- Las correcciones funcionales se comprobaron con API vacía controlada, sin consultar `WayPathDB`, en 2560×1440, 1920×1080, 1366×768 y 390×844: sin errores JavaScript ni overflow horizontal. No se creó ni confirmó ninguna reserva.
+- El mensaje «No se pudo completar la operación» corresponde al `POST /api/reservas` con HTTP 500 y una excepción no clasificada por `ApiExceptionHandler`. El cliente registra ahora ruta, estado y `traceId`; determinar la excepción interna sigue pendiente de logs de una sesión real y acceso autorizado a la infraestructura, sin consultar ni modificar SQL desde esta fase.
 
 ## Siguiente tarea prevista
 
-Completar la regresión integrada con una sesión administrativa autorizada, incluyendo carga real, permisos parciales y operaciones de gestión; no se consideran validadas sin credenciales de prueba.
+Reproducir el `POST /api/reservas` con una sesión de cliente autorizada y correlacionar su `traceId` con logs de aplicación; la causa de infraestructura/datos no se considera resuelta sin esa evidencia. Completar también la regresión administrativa autenticada.
