@@ -15,6 +15,7 @@ export const adminLinks = [
 
 export async function initAdminPage({ active, title }) {
     bindMenu();
+    enhanceAdminTables();
     const user = await requireAdminAccess();
     renderShell(user, active, title);
     return user;
@@ -55,9 +56,50 @@ export function escapeHtml(value) {
 }
 
 function bindMenu() {
-    document.getElementById("adminMenuToggle")?.addEventListener("click", () => {
-        document.getElementById("adminSidebar")?.classList.toggle("open");
+    const toggle = document.getElementById("adminMenuToggle");
+    const sidebar = document.getElementById("adminSidebar");
+    if (!toggle || !sidebar) return;
+
+    const closeMenu = () => {
+        sidebar.classList.remove("open");
+        document.body.classList.remove("admin-menu-open");
+        toggle.setAttribute("aria-expanded", "false");
+    };
+
+    toggle.setAttribute("aria-controls", "adminSidebar");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.addEventListener("click", () => {
+        const isOpen = sidebar.classList.toggle("open");
+        document.body.classList.toggle("admin-menu-open", isOpen);
+        toggle.setAttribute("aria-expanded", String(isOpen));
     });
+    sidebar.addEventListener("click", event => {
+        if (event.target.closest("a")) closeMenu();
+    });
+    document.addEventListener("click", event => {
+        if (sidebar.classList.contains("open") && !sidebar.contains(event.target) && !toggle.contains(event.target)) closeMenu();
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && sidebar.classList.contains("open")) {
+            closeMenu();
+            toggle.focus();
+        }
+    });
+}
+
+function enhanceAdminTables() {
+    const annotate = root => {
+        root.querySelectorAll?.(".wp-table").forEach(table => {
+            const labels = [...table.querySelectorAll("thead th")].map(cell => cell.textContent.trim());
+            table.querySelectorAll("tbody tr").forEach(row => {
+                [...row.children].forEach((cell, index) => cell.dataset.label = labels[index] || "Dato");
+            });
+        });
+    };
+    annotate(document);
+    new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) annotate(node);
+    }))).observe(document.querySelector(".admin-main") || document.body, { childList: true, subtree: true });
 }
 
 async function requireAdminAccess() {

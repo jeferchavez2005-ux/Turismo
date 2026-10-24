@@ -70,8 +70,28 @@ async function init() {
 }
 
 function bindLayout() {
-    document.getElementById("adminMenuToggle")?.addEventListener("click", () => {
-        document.getElementById("adminSidebar")?.classList.toggle("open");
+    const toggle = document.getElementById("adminMenuToggle");
+    const sidebar = document.getElementById("adminSidebar");
+    const closeMenu = () => {
+        sidebar?.classList.remove("open");
+        document.body.classList.remove("admin-menu-open");
+        toggle?.setAttribute("aria-expanded", "false");
+    };
+    toggle?.setAttribute("aria-controls", "adminSidebar");
+    toggle?.setAttribute("aria-expanded", "false");
+    toggle?.addEventListener("click", () => {
+        const isOpen = sidebar?.classList.toggle("open") || false;
+        document.body.classList.toggle("admin-menu-open", isOpen);
+        toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+    document.addEventListener("click", event => {
+        if (sidebar?.classList.contains("open") && !sidebar.contains(event.target) && !toggle?.contains(event.target)) closeMenu();
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && sidebar?.classList.contains("open")) {
+            closeMenu();
+            toggle?.focus();
+        }
     });
 
     document.querySelectorAll(".admin-nav a").forEach(link => {
@@ -80,7 +100,7 @@ function bindLayout() {
             if (!href.startsWith("#")) return;
             event.preventDefault();
             activateSection(href.replace("#", "") || "dashboard");
-            document.getElementById("adminSidebar")?.classList.remove("open");
+            closeMenu();
         });
     });
 

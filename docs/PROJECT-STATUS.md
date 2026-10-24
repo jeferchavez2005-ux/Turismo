@@ -1,6 +1,6 @@
 # WhyPath — Project Status
 
-Última actualización: 23 de octubre de 2026.
+Última actualización: 24 de octubre de 2026.
 
 ## Arquitectura
 
@@ -14,7 +14,7 @@
 - Controles globales de idioma, tema y accesibilidad adaptados para evitar superposiciones en pantallas pequeñas.
 - Navegación pública y footer unificados; Contacto permanece en el menú generado. Los enlaces privados y administrativos conservan las comprobaciones de sesión y rol existentes.
 - Páginas secundarias refinadas: Contacto, Compras, Cuenta y Reseñas comparten ahora la densidad, superficies, radios, espaciado y comportamiento responsive del sistema V2. No se cambiaron sus llamadas API ni su JavaScript funcional.
-- El panel administrativo no ha sido rediseñado.
+- Panel administrativo refinado para WhyPath V2: shell, navegación responsive, dashboard, tablas adaptativas, filtros, formularios, tarjetas y estados comparten ahora el sistema visual global sin cambiar permisos, APIs ni reglas de negocio.
 
 ## Últimos commits confirmados
 
@@ -36,7 +36,8 @@
 - Para este bloque se verificaron el servidor estático, el diff y las reglas responsive. Se obtuvo una captura móvil real de Contacto que confirmó el reflujo de tarjetas.
 - La ejecución completa de capturas de este bloque quedó limitada por un cierre de Chrome headless causado por el proceso GPU del entorno; las combinaciones no generadas no se consideran probadas visualmente.
 - No hay credenciales de prueba ni una sesión autenticada real disponible. Los estados de Cuenta, Compras y creación de Reseñas que dependen del backend siguen pendientes de validación integrada.
+- La fase administrativa se revisó a nivel estático y responsive; Chrome headless sólo confirmó visualmente el tema oscuro y el estado de acceso restringido. El tema claro, los datos reales y las operaciones autenticadas continúan pendientes por falta de una sesión administrativa de prueba y por limitaciones del navegador del entorno.
 
 ## Siguiente tarea prevista
 
-Completar la regresión visual de las cuatro páginas secundarias en ambos temas cuando el navegador sea estable y, después, abordar el panel administrativo como una fase separada. La validación autenticada requiere una sesión de prueba autorizada.
+Completar la regresión integrada con una sesión administrativa autorizada, incluyendo carga real, permisos parciales y operaciones de gestión; no se consideran validadas sin credenciales de prueba.
