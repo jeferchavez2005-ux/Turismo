@@ -13,7 +13,7 @@ const isStaticDevelopmentServer = ["127.0.0.1", "localhost"].includes(location.h
     && location.port === "5500";
 
 export const API_BASE_URL = new URL(
-    configuredApiBase || (isStaticDevelopmentServer ? "http://localhost:5187" : location.origin)
+    configuredApiBase || (isStaticDevelopmentServer ? `${location.protocol}//${location.hostname}:5187` : location.origin)
 );
 
 export function appUrl(path = "") {

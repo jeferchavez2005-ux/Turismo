@@ -1,8 +1,9 @@
-import { api, appUrl, broadcastAuthChange } from "./api.js";
+import { api, appPath, appUrl, broadcastAuthChange } from "./api.js";
 
 const message = document.getElementById("accountMessage");
 const logout = document.getElementById("logout");
 const state = { user: null, cliente: null, catalogos: null, documentos: [], direcciones: [], pasajeros: [] };
+const returnUrl = safeReturnUrl(new URLSearchParams(location.search).get("returnUrl"));
 
 const t = (key, fallback) => {
     const translated = window.WayPathI18n?.t(key);
@@ -19,6 +20,8 @@ document.querySelectorAll(".account-progress a").forEach(link => link.addEventLi
     document.querySelectorAll(".account-progress a").forEach(item => item.removeAttribute("aria-current"));
     link.setAttribute("aria-current", "location");
 }));
+const bookingLink = document.querySelector("#passengersSection a[href='reserva.html']");
+if (bookingLink && returnUrl) bookingLink.href = returnUrl;
 
 function showMessage(text) { message.textContent = text || ""; }
 function showError(error) {
@@ -28,6 +31,13 @@ function showError(error) {
 function value(id) { return document.getElementById(id).value.trim(); }
 function nullable(id) { const data = value(id); return data.length ? data : null; }
 function checked(id) { return document.getElementById(id).checked; }
+function safeReturnUrl(value) {
+    if (!value || !value.startsWith("/") || value.startsWith("//")) return "";
+    const candidate = new URL(value, location.origin);
+    const root = new URL(appUrl());
+    return candidate.origin === location.origin && candidate.pathname.startsWith(root.pathname)
+        ? `${candidate.pathname}${candidate.search}${candidate.hash}` : "";
+}
 function setValue(id, data) { document.getElementById(id).value = data ?? ""; }
 function optionLabel(text, flag) { return flag ? `${text} - ${t("account.common.primary", "Principal")}` : text; }
 function asIntOrNull(id) {

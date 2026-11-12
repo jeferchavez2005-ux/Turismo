@@ -284,7 +284,7 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
         join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
         join d in db.Destinos.AsNoTracking() on r.DestinoId equals d.DestinoId
         join e in db.Estados.AsNoTracking() on r.EstadoModeracionId equals e.EstadoId
-        select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos, d.Nombre,
+        select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos, Id(d.DestinoId), d.Nombre,
             r.ReservaId == null ? null : Id(r.ReservaId.Value), r.Calificacion,
             r.Titulo, r.Comentario, e.Codigo, r.CreadoEn);
 

@@ -61,6 +61,12 @@ builder.Services.AddControllers(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+if (allowedOrigins.Length > 0)
+{
+    builder.Services.AddCors(options => options.AddPolicy("WayPathFrontend", policy => policy
+        .WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+}
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
@@ -173,6 +179,7 @@ if (Directory.Exists(frontend))
     app.UseStaticFiles(new StaticFileOptions { FileProvider = provider });
 }
 app.UseRouting();
+if (allowedOrigins.Length > 0) app.UseCors("WayPathFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

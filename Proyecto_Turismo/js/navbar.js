@@ -200,9 +200,9 @@
     async function getUser() {
         try {
             const module = await import("./api.js");
-            return await module.api("/api/auth/me");
-        } catch {
-            return null;
+            return { resolved: true, user: await module.api("/api/auth/me") };
+        } catch (error) {
+            return { resolved: error?.status === 401, user: null };
         }
     }
 
@@ -210,7 +210,8 @@
         bindHamburger();
         renderFooter();
         renderNav(null);
-        currentUser = await getUser();
+        const authentication = await getUser();
+        if (authentication.resolved) currentUser = authentication.user;
         renderNav(currentUser);
     }
 
@@ -220,8 +221,9 @@
         renderNav(currentUser);
     });
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) getUser().then(user => {
-            currentUser = user;
+        if (!document.hidden) getUser().then(authentication => {
+            if (!authentication.resolved) return;
+            currentUser = authentication.user;
             renderNav(currentUser);
         });
     });

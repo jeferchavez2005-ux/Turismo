@@ -35,7 +35,7 @@ public sealed record TicketViajeDto(string TicketViajeId, string CodigoTicket, s
 public sealed record VoucherDto(string VoucherId, string CodigoVoucher, string CompraId,
     string ReservaId, string Estado, DateTime EmitidoEn, string? UrlDocumento);
 
-public sealed record ResenaDto(string ResenaId, string Cliente, string Destino,
+public sealed record ResenaDto(string ResenaId, string Cliente, string DestinoId, string Destino,
     string? ReservaId, byte Calificacion, string? Titulo, string Comentario,
     string EstadoModeracion, DateTime CreadoEn);
 
