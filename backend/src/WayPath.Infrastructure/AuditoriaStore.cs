@@ -12,8 +12,8 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
     public async Task<AuditoriaCambioPage> Changes(long? userId, string? schema, string? table, string? operation,
         DateTime? from, DateTime? to, int page, int pageSize, CancellationToken ct)
     {
-        var query = ChangeQuery()
-            .Where(x => userId == null || x.UsuarioId == Id(userId.Value))
+        var query = db.AuditoriaCambios.AsNoTracking()
+            .Where(x => userId == null || x.UsuarioId == userId.Value)
             .Where(x => schema == null || x.EsquemaNombre == schema)
             .Where(x => table == null || x.TablaNombre == table)
             .Where(x => operation == null || x.Operacion == operation)
@@ -21,42 +21,54 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
             .Where(x => to == null || x.CreadoEn <= to);
         var total = await query.CountAsync(ct);
         var items = await query.OrderByDescending(x => x.CreadoEn).Skip((page - 1) * pageSize)
-            .Take(pageSize).ToArrayAsync(ct);
+            .Take(pageSize).Select(x => new AuditoriaCambioDto(Id(x.AuditoriaCambioId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.EsquemaNombre, x.TablaNombre, x.ClavePrimaria,
+                x.Operacion, x.DatosAntes, x.DatosDespues, x.Ip, x.CreadoEn)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
     public Task<AuditoriaCambioDto?> Change(long id, CancellationToken ct) =>
-        ChangeQuery().SingleOrDefaultAsync(x => x.AuditoriaCambioId == Id(id), ct);
+        db.AuditoriaCambios.AsNoTracking().Where(x => x.AuditoriaCambioId == id)
+            .Select(x => new AuditoriaCambioDto(Id(x.AuditoriaCambioId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.EsquemaNombre, x.TablaNombre, x.ClavePrimaria,
+                x.Operacion, x.DatosAntes, x.DatosDespues, x.Ip, x.CreadoEn)).SingleOrDefaultAsync(ct);
 
     public async Task<AuditoriaAccesoPage> Accesses(long? userId, string? result, DateTime? from, DateTime? to,
         int page, int pageSize, CancellationToken ct)
     {
-        var query = AccessQuery()
-            .Where(x => userId == null || x.UsuarioId == Id(userId.Value))
+        var query = db.AuditoriaAccesos.AsNoTracking()
+            .Where(x => userId == null || x.UsuarioId == userId.Value)
             .Where(x => result == null || x.Resultado == result)
             .Where(x => from == null || x.CreadoEn >= from)
             .Where(x => to == null || x.CreadoEn <= to);
         var total = await query.CountAsync(ct);
         var items = await query.OrderByDescending(x => x.CreadoEn).Skip((page - 1) * pageSize)
-            .Take(pageSize).ToArrayAsync(ct);
+            .Take(pageSize).Select(x => new AuditoriaAccesoDto(Id(x.AuditoriaAccesoId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.EmailIntentado, x.Resultado,
+                x.Ip, x.UserAgent, x.CreadoEn)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
     public async Task<ErrorAplicacionPage> Errors(string? level, DateTime? from, DateTime? to,
         int page, int pageSize, CancellationToken ct)
     {
-        var query = ErrorQuery()
+        var query = db.ErroresAplicacion.AsNoTracking()
             .Where(x => level == null || x.Nivel == level)
             .Where(x => from == null || x.CreadoEn >= from)
             .Where(x => to == null || x.CreadoEn <= to);
         var total = await query.CountAsync(ct);
         var items = await query.OrderByDescending(x => x.CreadoEn).Skip((page - 1) * pageSize)
-            .Take(pageSize).ToArrayAsync(ct);
+            .Take(pageSize).Select(x => new ErrorAplicacionDto(Id(x.ErrorAplicacionId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.Nivel, x.Origen, x.Mensaje,
+                x.StackTrace, x.DatosJson, x.CreadoEn)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
     public Task<ErrorAplicacionDto?> Error(long id, CancellationToken ct) =>
-        ErrorQuery().SingleOrDefaultAsync(x => x.ErrorAplicacionId == Id(id), ct);
+        db.ErroresAplicacion.AsNoTracking().Where(x => x.ErrorAplicacionId == id)
+            .Select(x => new ErrorAplicacionDto(Id(x.ErrorAplicacionId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.Nivel, x.Origen, x.Mensaje,
+                x.StackTrace, x.DatosJson, x.CreadoEn)).SingleOrDefaultAsync(ct);
 
     public async Task<AuditoriaResumenDto> Summary(CancellationToken ct)
     {
@@ -78,9 +90,18 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
     }
 
     public async Task<ActividadRecienteDto> RecentActivity(CancellationToken ct) =>
-        new(await ChangeQuery().OrderByDescending(x => x.CreadoEn).Take(10).ToArrayAsync(ct),
-            await AccessQuery().OrderByDescending(x => x.CreadoEn).Take(10).ToArrayAsync(ct),
-            await ErrorQuery().OrderByDescending(x => x.CreadoEn).Take(10).ToArrayAsync(ct));
+        new(await db.AuditoriaCambios.AsNoTracking().OrderByDescending(x => x.CreadoEn).Take(10)
+                .Select(x => new AuditoriaCambioDto(Id(x.AuditoriaCambioId),
+                    x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.EsquemaNombre, x.TablaNombre, x.ClavePrimaria,
+                    x.Operacion, x.DatosAntes, x.DatosDespues, x.Ip, x.CreadoEn)).ToArrayAsync(ct),
+            await db.AuditoriaAccesos.AsNoTracking().OrderByDescending(x => x.CreadoEn).Take(10)
+                .Select(x => new AuditoriaAccesoDto(Id(x.AuditoriaAccesoId),
+                    x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.EmailIntentado, x.Resultado,
+                    x.Ip, x.UserAgent, x.CreadoEn)).ToArrayAsync(ct),
+            await db.ErroresAplicacion.AsNoTracking().OrderByDescending(x => x.CreadoEn).Take(10)
+                .Select(x => new ErrorAplicacionDto(Id(x.ErrorAplicacionId),
+                    x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.Nivel, x.Origen, x.Mensaje,
+                    x.StackTrace, x.DatosJson, x.CreadoEn)).ToArrayAsync(ct));
 
     public async Task RegisterAccess(long? userId, string? email, string result, string? ip, string? userAgent, CancellationToken ct)
     {

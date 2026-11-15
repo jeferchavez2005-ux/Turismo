@@ -28,6 +28,7 @@
   "common.delete": "Eliminar",
   "common.back": "Volver",
   "common.reserve": "Reservar",
+  "destinations.view": "Ver destino",
   "common.pay": "Pagar",
   "common.search": "Buscar",
   "common.loading": "Cargando...",
@@ -355,6 +356,8 @@
   "purchases.tabs.all": "Todas", "purchases.tabs.upcoming": "Próximas", "purchases.tabs.completed": "Completadas", "purchases.tabs.cancelled": "Canceladas",
   "purchases.booking": "Reserva", "purchases.details": "Ver detalles", "purchases.destination": "Destino", "purchases.receipt": "Comprobante", "purchases.pending": "pendiente", "purchases.tickets": "Tickets emitidos", "purchases.detailError": "No se pudo cargar el detalle.", "purchases.datePending": "Fecha por definir",
   "contact.title": "Contáctanos", "contact.customerService": "Atención al cliente", "contact.email": "Correo electrónico", "contact.office": "Oficina principal", "contact.form.title": "Envíanos un mensaje", "contact.form.name": "Tu nombre", "contact.form.subject": "Selecciona un asunto", "contact.form.booking": "Modificar reserva", "contact.form.payment": "Dudas de pago", "contact.form.support": "Asistencia en viaje", "contact.form.other": "Otro", "contact.form.message": "Escribe tu mensaje aquí...", "contact.faq": "Preguntas frecuentes", "contact.additional": "Información adicional",
+  "payment.errors.loadTitle": "No se pudo cargar la reserva", "payment.errors.load": "No se pudo cargar el resumen de la reserva.", "payment.errors.noReservation": "No se encontró una reserva válida para pagar.", "payment.errors.invalidTitle": "Revisa los datos de pago", "payment.errors.processTitle": "No se pudo procesar el pago", "payment.errors.process": "Intenta nuevamente.", "payment.validation.cardNumber": "Ingresa un número de tarjeta válido.", "payment.validation.expiry": "Ingresa el vencimiento en formato MM/AA.", "payment.validation.cvv": "Ingresa un CVV válido.", "payment.validation.holder": "Ingresa el nombre del titular.",
+  "payment.secureCheckout": "Checkout seguro", "payment.method.title": "Método de pago", "payment.method.subtitle": "Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.", "payment.method.card": "Tarjeta de crédito / débito", "payment.card.number": "Número de tarjeta", "payment.card.expiry": "Vencimiento", "payment.card.holder": "Nombre del titular", "payment.card.holderPlaceholder": "Como aparece en la tarjeta", "payment.qr.help": "Escanea el código QR desde tu aplicación para realizar el pago.", "payment.qr.available": "Código disponible al iniciar el pago", "payment.confirm": "Confirmar y pagar", "payment.protected": "Tu compra está 100% protegida. WayPath garantiza los más altos estándares de seguridad en cada transacción.",
   "common.send": "Enviar",
   "common.cancel": "Cancelar"
 }

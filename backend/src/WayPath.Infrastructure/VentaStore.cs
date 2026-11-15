@@ -112,8 +112,18 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
     public async Task<CompraResumenDto[]> Mine(long usuarioId, CancellationToken ct)
     {
         var clienteId = await ClienteIdForUser(usuarioId, ct);
-        return await SummaryQuery(clienteId)
-            .OrderByDescending(x => x.FechaCompra).Select(x => x.Dto).ToArrayAsync(ct);
+        return await (from c in db.Compras.AsNoTracking()
+            join r in db.Reservas.AsNoTracking() on c.ReservaId equals r.ReservaId
+            join cl in db.Clientes.AsNoTracking() on c.ClienteId equals cl.ClienteId
+            join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on c.EstadoId equals e.EstadoId
+            where c.ClienteId == clienteId
+            orderby c.FechaCompra descending
+            select new CompraResumenDto(Id(c.CompraId), c.CodigoCompra, Id(c.ReservaId),
+                r.CodigoReserva, cl.Nombres + " " + cl.Apellidos, p.Nombre, d.Nombre,
+                s.FechaInicio, s.FechaFin, e.Codigo, c.FechaCompra, c.TotalPagado)).ToArrayAsync(ct);
     }
 
     public async Task<CompraDetalleDto?> DetailForUser(long usuarioId, long compraId, CancellationToken ct)
@@ -132,7 +142,7 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
             join c in db.Compras.AsNoTracking() on t.CompraId equals c.CompraId
             where t.TicketViajeId == ticketId && c.ClienteId == clienteId
             select t.TicketViajeId).AnyAsync(ct);
-        return belongs ? await TicketQuery().SingleOrDefaultAsync(x => x.TicketViajeId == Id(ticketId), ct) : null;
+        return belongs ? await TicketQuery(ticketId).SingleOrDefaultAsync(ct) : null;
     }
 
     public async Task<VoucherDto?> VoucherForUser(long usuarioId, long voucherId, CancellationToken ct)
@@ -142,16 +152,26 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
             join c in db.Compras.AsNoTracking() on v.CompraId equals c.CompraId
             where v.VoucherId == voucherId && c.ClienteId == clienteId
             select v.VoucherId).AnyAsync(ct);
-        return belongs ? await VoucherQuery().SingleOrDefaultAsync(x => x.VoucherId == Id(voucherId), ct) : null;
+        return belongs ? await VoucherQuery(voucherId).SingleOrDefaultAsync(ct) : null;
     }
 
     public async Task<CompraPage> List(int page, int pageSize, CancellationToken ct)
     {
-        var query = SummaryQuery();
-        var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.FechaCompra)
-            .Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(x => x.Dto).ToArrayAsync(ct);
+        var total = await db.Compras.AsNoTracking().CountAsync(ct);
+        var pageIds = db.Compras.AsNoTracking().OrderByDescending(c => c.FechaCompra)
+            .Skip((page - 1) * pageSize).Take(pageSize).Select(c => c.CompraId);
+        var items = await (from c in db.Compras.AsNoTracking()
+            join r in db.Reservas.AsNoTracking() on c.ReservaId equals r.ReservaId
+            join cl in db.Clientes.AsNoTracking() on c.ClienteId equals cl.ClienteId
+            join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on c.EstadoId equals e.EstadoId
+            where pageIds.Contains(c.CompraId)
+            orderby c.FechaCompra descending
+            select new CompraResumenDto(Id(c.CompraId), c.CodigoCompra, Id(c.ReservaId),
+                r.CodigoReserva, cl.Nombres + " " + cl.Apellidos, p.Nombre, d.Nombre,
+                s.FechaInicio, s.FechaFin, e.Codigo, c.FechaCompra, c.TotalPagado)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
@@ -216,15 +236,23 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
         };
         db.Resenas.Add(review);
         await SaveGuard(ct);
-        return await ReviewQuery().SingleAsync(x => x.ResenaId == Id(review.ResenaId), ct);
+        return await ReviewQueryFor(review.ResenaId).SingleAsync(ct);
     }
 
     public async Task<ResenaPage> ListReviews(int page, int pageSize, CancellationToken ct)
     {
-        var query = ReviewQuery();
-        var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.CreadoEn)
-            .Skip((page - 1) * pageSize).Take(pageSize).ToArrayAsync(ct);
+        var total = await db.Resenas.AsNoTracking().CountAsync(ct);
+        var pageIds = db.Resenas.AsNoTracking().OrderByDescending(r => r.CreadoEn)
+            .Skip((page - 1) * pageSize).Take(pageSize).Select(r => r.ResenaId);
+        var items = await (from r in db.Resenas.AsNoTracking()
+            join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
+            join d in db.Destinos.AsNoTracking() on r.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on r.EstadoModeracionId equals e.EstadoId
+            where pageIds.Contains(r.ResenaId)
+            orderby r.CreadoEn descending
+            select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos,
+                Id(d.DestinoId), d.Nombre, r.ReservaId == null ? null : Id(r.ReservaId.Value),
+                r.Calificacion, r.Titulo, r.Comentario, e.Codigo, r.CreadoEn)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
@@ -240,11 +268,23 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
 
     private async Task<CompraDetalleDto?> Detail(long compraId, CancellationToken ct)
     {
-        var header = await SummaryQuery().SingleOrDefaultAsync(x => x.CompraId == compraId, ct);
+        var header = await (from c in db.Compras.AsNoTracking()
+            join r in db.Reservas.AsNoTracking() on c.ReservaId equals r.ReservaId
+            join cl in db.Clientes.AsNoTracking() on c.ClienteId equals cl.ClienteId
+            join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on c.EstadoId equals e.EstadoId
+            where c.CompraId == compraId
+            select new CompraRow(c.CompraId, c.ClienteId, c.FechaCompra,
+                new CompraResumenDto(Id(c.CompraId), c.CodigoCompra, Id(c.ReservaId),
+                    r.CodigoReserva, cl.Nombres + " " + cl.Apellidos, p.Nombre, d.Nombre,
+                    s.FechaInicio, s.FechaFin, e.Codigo, c.FechaCompra, c.TotalPagado)))
+            .SingleOrDefaultAsync(ct);
         if (header is null) return null;
-        var comprobante = await ComprobanteQuery().SingleOrDefaultAsync(x => x.CompraId == Id(compraId), ct);
-        var tickets = await TicketQuery().Where(x => x.CompraId == Id(compraId)).ToArrayAsync(ct);
-        var voucher = await VoucherQuery().SingleOrDefaultAsync(x => x.CompraId == Id(compraId), ct);
+        var comprobante = await ComprobanteQueryForCompra(compraId).SingleOrDefaultAsync(ct);
+        var tickets = await TicketQueryForCompra(compraId).ToArrayAsync(ct);
+        var voucher = await VoucherQueryForCompra(compraId).SingleOrDefaultAsync(ct);
         return new(Id(header.CompraId), header.Dto.CodigoCompra, header.Dto.ReservaId,
             header.Dto.CodigoReserva, header.Dto.Cliente, header.Dto.Paquete, header.Dto.Destino,
             header.Dto.FechaInicio, header.Dto.FechaFin, header.Dto.Estado, header.Dto.FechaCompra,
@@ -275,10 +315,40 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
                 .Select(d => new ComprobanteLineaDto(Id(d.ComprobanteDetalleId), d.Descripcion,
                     d.Cantidad, d.PrecioUnitario, d.Importe)).ToArray());
 
+    private IQueryable<ComprobanteDto> ComprobanteQueryForCompra(long compraId) =>
+        from c in db.Comprobantes.AsNoTracking()
+        join e in db.Estados.AsNoTracking() on c.EstadoId equals e.EstadoId
+        where c.CompraId == compraId
+        select new ComprobanteDto(Id(c.ComprobanteId), Id(c.CompraId), c.TipoComprobante,
+            c.Serie, c.Numero, e.Codigo, c.FechaEmision, c.Subtotal, c.Impuestos, c.Total,
+            db.ComprobanteDetalle.AsNoTracking().Where(d => d.ComprobanteId == c.ComprobanteId)
+                .OrderBy(d => d.ComprobanteDetalleId)
+                .Select(d => new ComprobanteLineaDto(Id(d.ComprobanteDetalleId), d.Descripcion,
+                    d.Cantidad, d.PrecioUnitario, d.Importe)).ToArray());
+
     private IQueryable<TicketViajeDto> TicketQuery() =>
         from t in db.TicketsViaje.AsNoTracking()
         join p in db.Pasajeros.AsNoTracking() on t.PasajeroId equals p.PasajeroId
         join e in db.Estados.AsNoTracking() on t.EstadoId equals e.EstadoId
+        select new TicketViajeDto(Id(t.TicketViajeId), t.CodigoTicket, Id(t.CompraId),
+            Id(t.ReservaId), Id(t.PasajeroId), p.Nombres + " " + p.Apellidos,
+            e.Codigo, t.EmitidoEn, t.UrlDocumento);
+
+    private IQueryable<TicketViajeDto> TicketQuery(long ticketId) =>
+        from t in db.TicketsViaje.AsNoTracking()
+        join p in db.Pasajeros.AsNoTracking() on t.PasajeroId equals p.PasajeroId
+        join e in db.Estados.AsNoTracking() on t.EstadoId equals e.EstadoId
+        where t.TicketViajeId == ticketId
+        select new TicketViajeDto(Id(t.TicketViajeId), t.CodigoTicket, Id(t.CompraId),
+            Id(t.ReservaId), Id(t.PasajeroId), p.Nombres + " " + p.Apellidos,
+            e.Codigo, t.EmitidoEn, t.UrlDocumento);
+
+    private IQueryable<TicketViajeDto> TicketQueryForCompra(long compraId) =>
+        from t in db.TicketsViaje.AsNoTracking()
+        join p in db.Pasajeros.AsNoTracking() on t.PasajeroId equals p.PasajeroId
+        join e in db.Estados.AsNoTracking() on t.EstadoId equals e.EstadoId
+        where t.CompraId == compraId
+        orderby t.TicketViajeId
         select new TicketViajeDto(Id(t.TicketViajeId), t.CodigoTicket, Id(t.CompraId),
             Id(t.ReservaId), Id(t.PasajeroId), p.Nombres + " " + p.Apellidos,
             e.Codigo, t.EmitidoEn, t.UrlDocumento);
@@ -289,11 +359,35 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
         select new VoucherDto(Id(v.VoucherId), v.CodigoVoucher, Id(v.CompraId),
             Id(v.ReservaId), e.Codigo, v.EmitidoEn, v.UrlDocumento);
 
+    private IQueryable<VoucherDto> VoucherQuery(long voucherId) =>
+        from v in db.Vouchers.AsNoTracking()
+        join e in db.Estados.AsNoTracking() on v.EstadoId equals e.EstadoId
+        where v.VoucherId == voucherId
+        select new VoucherDto(Id(v.VoucherId), v.CodigoVoucher, Id(v.CompraId),
+            Id(v.ReservaId), e.Codigo, v.EmitidoEn, v.UrlDocumento);
+
+    private IQueryable<VoucherDto> VoucherQueryForCompra(long compraId) =>
+        from v in db.Vouchers.AsNoTracking()
+        join e in db.Estados.AsNoTracking() on v.EstadoId equals e.EstadoId
+        where v.CompraId == compraId
+        select new VoucherDto(Id(v.VoucherId), v.CodigoVoucher, Id(v.CompraId),
+            Id(v.ReservaId), e.Codigo, v.EmitidoEn, v.UrlDocumento);
+
     private IQueryable<ResenaDto> ReviewQuery() =>
         from r in db.Resenas.AsNoTracking()
         join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
         join d in db.Destinos.AsNoTracking() on r.DestinoId equals d.DestinoId
         join e in db.Estados.AsNoTracking() on r.EstadoModeracionId equals e.EstadoId
+        select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos, Id(d.DestinoId), d.Nombre,
+            r.ReservaId == null ? null : Id(r.ReservaId.Value), r.Calificacion,
+            r.Titulo, r.Comentario, e.Codigo, r.CreadoEn);
+
+    private IQueryable<ResenaDto> ReviewQueryFor(long resenaId) =>
+        from r in db.Resenas.AsNoTracking()
+        join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
+        join d in db.Destinos.AsNoTracking() on r.DestinoId equals d.DestinoId
+        join e in db.Estados.AsNoTracking() on r.EstadoModeracionId equals e.EstadoId
+        where r.ResenaId == resenaId
         select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos, Id(d.DestinoId), d.Nombre,
             r.ReservaId == null ? null : Id(r.ReservaId.Value), r.Calificacion,
             r.Titulo, r.Comentario, e.Codigo, r.CreadoEn);

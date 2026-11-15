@@ -118,19 +118,22 @@ public sealed class ReporteStore(WayPathDbContext db, IDashboardStore dashboard)
         };
         db.EventosAnalitica.Add(item);
         await SaveGuard(ct);
-        return await EventQuery().SingleAsync(x => x.EventoAnaliticaId == Id(item.EventoAnaliticaId), ct);
+        return await EventQuery(item.EventoAnaliticaId).SingleAsync(ct);
     }
 
     public async Task<EventoAnaliticaPage> Events(string? type, DateTime? from, DateTime? to,
         int page, int pageSize, CancellationToken ct)
     {
-        var query = EventQuery()
+        var query = db.EventosAnalitica.AsNoTracking()
             .Where(x => type == null || x.TipoEvento == type)
             .Where(x => from == null || x.CreadoEn >= from)
             .Where(x => to == null || x.CreadoEn <= to);
         var total = await query.CountAsync(ct);
         var items = await query.OrderByDescending(x => x.CreadoEn).Skip((page - 1) * pageSize)
-            .Take(pageSize).ToArrayAsync(ct);
+            .Take(pageSize).Select(x => new EventoAnaliticaDto(Id(x.EventoAnaliticaId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.ClienteId == null ? null : Id(x.ClienteId.Value),
+                x.SesionId, x.TipoEvento, x.Pagina, x.RecursoId, x.DatosJson, x.Ip, x.UserAgent, x.CreadoEn))
+            .ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
@@ -149,15 +152,19 @@ public sealed class ReporteStore(WayPathDbContext db, IDashboardStore dashboard)
 
     public async Task<DashboardSnapshotPage> Snapshots(string? dashboardCode, int page, int pageSize, CancellationToken ct)
     {
-        var query = SnapshotQuery().Where(x => dashboardCode == null || x.CodigoDashboard == dashboardCode);
+        var query = db.DashboardSnapshots.AsNoTracking()
+            .Where(x => dashboardCode == null || x.CodigoDashboard == dashboardCode);
         var total = await query.CountAsync(ct);
         var items = await query.OrderByDescending(x => x.GeneradoEn).Skip((page - 1) * pageSize)
-            .Take(pageSize).ToArrayAsync(ct);
+            .Take(pageSize).Select(x => new DashboardSnapshotDto(Id(x.DashboardSnapshotId),
+                x.CodigoDashboard, x.Titulo, x.DatosJson,
+                x.GeneradoPorUsuarioId == null ? null : Id(x.GeneradoPorUsuarioId.Value), x.GeneradoEn))
+            .ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
     public Task<DashboardSnapshotDto?> Snapshot(long id, CancellationToken ct) =>
-        SnapshotQuery().SingleOrDefaultAsync(x => x.DashboardSnapshotId == Id(id), ct);
+        SnapshotQuery(id).SingleOrDefaultAsync(ct);
 
     public async Task<DashboardSnapshotDto> CreateSnapshot(long userId, DashboardSnapshotRequest request, CancellationToken ct)
     {
@@ -180,10 +187,22 @@ public sealed class ReporteStore(WayPathDbContext db, IDashboardStore dashboard)
             x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.ClienteId == null ? null : Id(x.ClienteId.Value),
             x.SesionId, x.TipoEvento, x.Pagina, x.RecursoId, x.DatosJson, x.Ip, x.UserAgent, x.CreadoEn));
 
+    private IQueryable<EventoAnaliticaDto> EventQuery(long id) =>
+        db.EventosAnalitica.AsNoTracking().Where(x => x.EventoAnaliticaId == id)
+            .Select(x => new EventoAnaliticaDto(Id(x.EventoAnaliticaId),
+                x.UsuarioId == null ? null : Id(x.UsuarioId.Value), x.ClienteId == null ? null : Id(x.ClienteId.Value),
+                x.SesionId, x.TipoEvento, x.Pagina, x.RecursoId, x.DatosJson, x.Ip, x.UserAgent, x.CreadoEn));
+
     private IQueryable<DashboardSnapshotDto> SnapshotQuery() =>
         db.DashboardSnapshots.AsNoTracking().Select(x => new DashboardSnapshotDto(Id(x.DashboardSnapshotId),
             x.CodigoDashboard, x.Titulo, x.DatosJson,
             x.GeneradoPorUsuarioId == null ? null : Id(x.GeneradoPorUsuarioId.Value), x.GeneradoEn));
+
+    private IQueryable<DashboardSnapshotDto> SnapshotQuery(long id) =>
+        db.DashboardSnapshots.AsNoTracking().Where(x => x.DashboardSnapshotId == id)
+            .Select(x => new DashboardSnapshotDto(Id(x.DashboardSnapshotId),
+                x.CodigoDashboard, x.Titulo, x.DatosJson,
+                x.GeneradoPorUsuarioId == null ? null : Id(x.GeneradoPorUsuarioId.Value), x.GeneradoEn));
 
     private async Task<DashboardSerieDto[]> ClientsByState(CancellationToken ct) =>
         await (from c in db.Clientes.AsNoTracking()

@@ -28,6 +28,7 @@
   "common.delete": "Supprimer",
   "common.back": "Retour",
   "common.reserve": "Reserver",
+  "destinations.view": "Voir la destination",
   "common.pay": "Payer",
   "common.search": "Rechercher",
   "common.loading": "Chargement...",
@@ -348,6 +349,8 @@
   "purchases.title": "Mes achats", "purchases.loading": "Chargement de vos achats...", "purchases.authRequired": "Connectez-vous pour voir vos achats.", "purchases.loadError": "Impossible de charger vos achats.", "purchases.empty": "Vous n’avez encore aucun achat émis.", "purchases.emptyFiltered": "Aucun achat dans cet état.", "purchases.emptyHelp": "WayPath affichera ici les achats issus de paiements approuvés.",
   "purchases.tabs.all": "Tous", "purchases.tabs.upcoming": "À venir", "purchases.tabs.completed": "Terminés", "purchases.tabs.cancelled": "Annulés", "purchases.booking": "Réservation", "purchases.details": "Voir les détails", "purchases.destination": "Destination", "purchases.receipt": "Reçu", "purchases.pending": "en attente", "purchases.tickets": "Billets émis", "purchases.detailError": "Impossible de charger les détails.", "purchases.datePending": "Date à confirmer",
   "contact.title": "Contactez-nous", "contact.customerService": "Service client", "contact.email": "E-mail", "contact.office": "Bureau principal", "contact.form.title": "Envoyez-nous un message", "contact.form.name": "Votre nom", "contact.form.subject": "Sélectionnez un sujet", "contact.form.booking": "Modifier une réservation", "contact.form.payment": "Questions de paiement", "contact.form.support": "Assistance voyage", "contact.form.other": "Autre", "contact.form.message": "Écrivez votre message ici...", "contact.faq": "Questions fréquentes", "contact.additional": "Informations supplémentaires",
+  "payment.errors.loadTitle": "Impossible de charger la réservation", "payment.errors.load": "Impossible de charger le récapitulatif de la réservation.", "payment.errors.noReservation": "Aucune réservation valide à payer n’a été trouvée.", "payment.errors.invalidTitle": "Vérifiez les informations de paiement", "payment.errors.processTitle": "Impossible de traiter le paiement", "payment.errors.process": "Réessayez.", "payment.validation.cardNumber": "Saisissez un numéro de carte valide.", "payment.validation.expiry": "Saisissez l’expiration au format MM/AA.", "payment.validation.cvv": "Saisissez un CVV valide.", "payment.validation.holder": "Saisissez le nom du titulaire.",
+  "payment.secureCheckout": "Paiement sécurisé", "payment.method.title": "Mode de paiement", "payment.method.subtitle": "Choisissez comment payer votre réservation. Toutes les transactions sont sécurisées.", "payment.method.card": "Carte de crédit / débit", "payment.card.number": "Numéro de carte", "payment.card.expiry": "Expiration", "payment.card.holder": "Nom du titulaire", "payment.card.holderPlaceholder": "Tel qu’il figure sur la carte", "payment.qr.help": "Scannez le code QR depuis votre application pour payer.", "payment.qr.available": "Code disponible au début du paiement", "payment.confirm": "Confirmer et payer", "payment.protected": "Votre achat est entièrement protégé. WayPath applique des normes de sécurité élevées à chaque transaction.",
   "common.send": "Envoyer",
   "common.cancel": "Annuler"
 }

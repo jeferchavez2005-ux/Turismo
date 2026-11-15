@@ -1,20 +1,28 @@
 import { ApiError, api, appPath, appUrl } from "./api.js";
 import { errorMessageWithTrace, t } from "./frontend-utils.js";
 
+const params = new URLSearchParams(location.search);
+const storedContext = readBookingContext();
 const state = {
-    destinoId: localStorage.getItem("destinoIdSeleccionado"),
-    destino: localStorage.getItem("destinoSeleccionado") || "Selecciona un destino",
-    imagen: localStorage.getItem("imgSeleccionada") || "",
+    destinoId: params.get("destinoId") || storedContext.destinoId || localStorage.getItem("destinoIdSeleccionado"),
+    destino: storedContext.destino || localStorage.getItem("destinoSeleccionado") || "Selecciona un destino",
+    imagen: storedContext.imagen || localStorage.getItem("imgSeleccionada") || "",
+    paqueteId: params.get("paqueteId") || storedContext.paqueteId || null,
     paquete: null,
     salidas: [],
     salida: null,
     tarifa: null,
-    precio: Number.parseFloat(localStorage.getItem("precioSeleccionado") || "0") || 0,
+    precio: Number(storedContext.precio ?? localStorage.getItem("precioSeleccionado") ?? 0) || 0,
     user: null,
     client: null,
     pasajeros: []
 };
 const draftKey = "wp_reservation_draft";
+
+function readBookingContext() {
+    try { return JSON.parse(sessionStorage.getItem("wp_booking_context") || "{}"); }
+    catch { return {}; }
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     const addPassengerLink = document.querySelector(".passenger-add-link");
@@ -91,15 +99,26 @@ async function validateAuthenticatedClient() {
 }
 
 async function ensureDestinationSelected() {
-    if (state.destinoId) return true;
-    setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
     const panel = document.getElementById("destinoSelectorPanel");
     const selector = document.getElementById("selectorDestinoReserva");
     const destinations = await api("/api/catalogo/destinos");
     if (panel) panel.hidden = false;
     if (selector) {
         selector.innerHTML = `<option value="">${escapeHtml(t("booking.destination.select", "Selecciona un destino"))}</option>${destinations.map(destino => `<option value="${destino.destinoId}" data-name="${escapeHtml(destino.nombre)}" data-price="${destino.precioDesde ?? 0}" data-img="${escapeHtml(destino.imagenUrl || "")}">${escapeHtml(destino.nombre)} - ${escapeHtml(destino.ciudad)}</option>`).join("")}`;
+        selector.value = state.destinoId ? String(state.destinoId) : "";
     }
+    const selected = destinations.find(item => String(item.destinoId) === String(state.destinoId));
+    if (selected) {
+        state.destino = selected.nombre;
+        state.precio = Number(selected.precioDesde ?? state.precio);
+        state.imagen = selected.imagenUrl || state.imagen;
+        persistBookingContext();
+        document.getElementById("destinoSelectorTitle").hidden = true;
+        document.getElementById("destinoSelectorHelp").hidden = true;
+        bindSummary();
+        return true;
+    }
+    setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
     showMessage(t("booking.destination.required", "Selecciona un destino antes de continuar con la reserva."), true);
     return false;
 }
@@ -111,11 +130,10 @@ async function selectDestination(event) {
     state.destino = option.dataset.name || option.textContent;
     state.precio = Number(option.dataset.price || 0);
     state.imagen = option.dataset.img || "Img/machupichu.jpg";
-    localStorage.setItem("destinoIdSeleccionado", state.destinoId);
-    localStorage.setItem("destinoSeleccionado", state.destino);
-    localStorage.setItem("precioSeleccionado", String(state.precio));
-    localStorage.setItem("imgSeleccionada", state.imagen);
-    document.getElementById("destinoSelectorPanel").hidden = true;
+    state.paqueteId = null;
+    persistBookingContext();
+    document.getElementById("destinoSelectorTitle").hidden = true;
+    document.getElementById("destinoSelectorHelp").hidden = true;
     bindSummary();
     clearMessage();
     event.target.disabled = true;
@@ -145,7 +163,7 @@ async function loadReservationContext() {
         setDepartureState(t("booking.trip.loadError", "No se pudo cargar la disponibilidad. Intente nuevamente."));
         throw error;
     }
-    state.paquete = packages[0];
+    state.paquete = packages.find(item => String(item.paqueteId) === String(state.paqueteId)) || packages[0];
     if (!state.paquete) {
         setDepartureState(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."));
         throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 404);
@@ -154,6 +172,8 @@ async function loadReservationContext() {
     state.tarifa = detail.tarifas?.[0];
     if (!state.tarifa) throw new ApiError("El paquete seleccionado no tiene tarifas activas.", 404);
     state.precio = Number(state.tarifa.precioBase);
+    state.paqueteId = String(state.paquete.paqueteId);
+    persistBookingContext();
     let availability;
     try {
         availability = await api(`/api/operacion/disponibilidad?paqueteId=${encodeURIComponent(state.paquete.paqueteId)}`);
@@ -168,6 +188,16 @@ async function loadReservationContext() {
     }
     renderDepartures();
     text("sumPrecioUnitario", money(state.precio));
+}
+
+function persistBookingContext() {
+    const context = { destinoId: String(state.destinoId || ""), destino: state.destino,
+        paqueteId: state.paqueteId ? String(state.paqueteId) : null, precio: state.precio, imagen: state.imagen };
+    sessionStorage.setItem("wp_booking_context", JSON.stringify(context));
+    localStorage.setItem("destinoIdSeleccionado", context.destinoId);
+    localStorage.setItem("destinoSeleccionado", context.destino);
+    localStorage.setItem("precioSeleccionado", String(context.precio));
+    localStorage.setItem("imgSeleccionada", context.imagen || "");
 }
 
 function renderDepartures() {

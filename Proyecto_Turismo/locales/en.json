@@ -28,6 +28,7 @@
   "common.delete": "Delete",
   "common.back": "Back",
   "common.reserve": "Book",
+  "destinations.view": "View destination",
   "common.pay": "Pay",
   "common.search": "Search",
   "common.loading": "Loading...",
@@ -348,6 +349,8 @@
   "purchases.title": "My purchases", "purchases.loading": "Loading your purchases...", "purchases.authRequired": "Sign in to view your purchases.", "purchases.loadError": "Your purchases could not be loaded.", "purchases.empty": "You do not have any issued purchases yet.", "purchases.emptyFiltered": "There are no purchases in this status.", "purchases.emptyHelp": "WayPath will show purchases generated from approved payments here.",
   "purchases.tabs.all": "All", "purchases.tabs.upcoming": "Upcoming", "purchases.tabs.completed": "Completed", "purchases.tabs.cancelled": "Cancelled", "purchases.booking": "Booking", "purchases.details": "View details", "purchases.destination": "Destination", "purchases.receipt": "Receipt", "purchases.pending": "pending", "purchases.tickets": "Tickets issued", "purchases.detailError": "The details could not be loaded.", "purchases.datePending": "Date to be confirmed",
   "contact.title": "Contact us", "contact.customerService": "Customer service", "contact.email": "Email", "contact.office": "Main office", "contact.form.title": "Send us a message", "contact.form.name": "Your name", "contact.form.subject": "Select a subject", "contact.form.booking": "Change a booking", "contact.form.payment": "Payment questions", "contact.form.support": "Travel assistance", "contact.form.other": "Other", "contact.form.message": "Write your message here...", "contact.faq": "Frequently asked questions", "contact.additional": "Additional information",
+  "payment.errors.loadTitle": "The booking could not be loaded", "payment.errors.load": "The booking summary could not be loaded.", "payment.errors.noReservation": "No valid booking was found for payment.", "payment.errors.invalidTitle": "Check the payment details", "payment.errors.processTitle": "The payment could not be processed", "payment.errors.process": "Try again.", "payment.validation.cardNumber": "Enter a valid card number.", "payment.validation.expiry": "Enter the expiry date in MM/YY format.", "payment.validation.cvv": "Enter a valid CVV.", "payment.validation.holder": "Enter the cardholder name.",
+  "payment.secureCheckout": "Secure checkout", "payment.method.title": "Payment method", "payment.method.subtitle": "Choose how to pay for your booking. All transactions are secure.", "payment.method.card": "Credit / debit card", "payment.card.number": "Card number", "payment.card.expiry": "Expiry", "payment.card.holder": "Cardholder name", "payment.card.holderPlaceholder": "As shown on the card", "payment.qr.help": "Scan the QR code from your app to make the payment.", "payment.qr.available": "Code available when payment begins", "payment.confirm": "Confirm and pay", "payment.protected": "Your purchase is fully protected. WayPath applies high security standards to every transaction.",
   "common.send": "Send",
   "common.cancel": "Cancel"
 }

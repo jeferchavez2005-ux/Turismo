@@ -67,7 +67,7 @@ function card(destino) {
     priceInfo.append(from, amount);
 
     const reserve = document.createElement("a");
-    reserve.href = appUrl("reserva.html");
+    reserve.href = `${appUrl("reserva.html")}?destinoId=${encodeURIComponent(destino.destinoId)}`;
     reserve.className = "wp-btn wp-btn-primary btn-reserva";
     reserve.dataset.destinoId = destino.destinoId;
     reserve.dataset.nombre = destino.nombre;
@@ -98,7 +98,7 @@ async function handleReserveClick(event, destino) {
             await goTo("Completa tu perfil", "Antes de reservar necesitamos tus nombres, apellidos y teléfono.", `${appUrl("cuenta.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`);
             return;
         }
-        window.location.href = appUrl("reserva.html");
+        window.location.href = reserveUrl(destino);
     } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
             await authPrompt();
@@ -109,11 +109,18 @@ async function handleReserveClick(event, destino) {
 }
 
 function saveReservationIntent(destino) {
+    const context = { destinoId: String(destino.destinoId), destino: destino.nombre,
+        precio: Number(destino.precioDesde ?? 0), imagen: fallbackImage(destino.imagenUrl) };
+    sessionStorage.setItem("wp_booking_context", JSON.stringify(context));
     localStorage.setItem("destinoIdSeleccionado", destino.destinoId);
     localStorage.setItem("destinoSeleccionado", destino.nombre);
     localStorage.setItem("precioSeleccionado", destino.precioDesde ?? "0");
     localStorage.setItem("imgSeleccionada", fallbackImage(destino.imagenUrl));
     localStorage.setItem("wp_auth_return_url", appPath("reserva.html"));
+}
+
+function reserveUrl(destino) {
+    return `${appUrl("reserva.html")}?destinoId=${encodeURIComponent(destino.destinoId)}`;
 }
 
 function isProfileComplete(profile) {

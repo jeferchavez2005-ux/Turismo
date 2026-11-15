@@ -92,9 +92,23 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
     public async Task<ReservaResumenDto[]> Mine(long usuarioId, CancellationToken ct)
     {
         var clienteId = await ClienteIdForUser(usuarioId, ct);
-        return await SummaryQuery(clienteId)
-            .OrderByDescending(x => x.FechaReserva).ToArrayAsync(ct);
+        return await ReservationsForClient(clienteId).ToArrayAsync(ct);
     }
+
+    private IQueryable<ReservaResumenDto> ReservationsForClient(long clienteId) =>
+        from r in db.Reservas.AsNoTracking()
+            join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
+            join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on r.EstadoId equals e.EstadoId
+            join m in db.Monedas.AsNoTracking() on r.MonedaId equals m.MonedaId
+            where r.ClienteId == clienteId
+            orderby r.FechaReserva descending
+            select new ReservaResumenDto(Id(r.ReservaId), r.CodigoReserva, Id(r.ClienteId),
+                c.Nombres + " " + c.Apellidos, Id(r.SalidaId), p.Nombre, d.Nombre,
+                s.FechaInicio, s.FechaFin, e.Codigo, r.FechaReserva, r.FechaExpiracion,
+                r.Total, m.CodigoIso, db.ReservaPasajeros.Count(rp => rp.ReservaId == r.ReservaId));
 
     public async Task<ReservaDetalleDto?> DetailForUser(long usuarioId, long reservaId, CancellationToken ct)
     {
@@ -150,15 +164,31 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
 
     public async Task<ReservaPage> List(ReservaFiltroRequest filtro, int page, int pageSize, CancellationToken ct)
     {
-        var query = SummaryQuery()
-            .Where(x => filtro.ClienteId == null || x.ClienteId == Id(filtro.ClienteId.Value))
-            .Where(x => filtro.SalidaId == null || x.SalidaId == Id(filtro.SalidaId.Value))
-            .Where(x => filtro.EstadoId == null || db.Reservas.Any(r => r.ReservaId.ToString() == x.ReservaId && r.EstadoId == filtro.EstadoId))
-            .Where(x => filtro.Desde == null || DateOnly.FromDateTime(x.FechaReserva) >= filtro.Desde)
-            .Where(x => filtro.Hasta == null || DateOnly.FromDateTime(x.FechaReserva) <= filtro.Hasta);
-        var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.FechaReserva)
-            .Skip((page - 1) * pageSize).Take(pageSize).ToArrayAsync(ct);
+        var start = filtro.Desde?.ToDateTime(TimeOnly.MinValue);
+        var endExclusive = filtro.Hasta?.AddDays(1).ToDateTime(TimeOnly.MinValue);
+        var filtered = db.Reservas.AsNoTracking()
+            .Where(r => filtro.ClienteId == null || r.ClienteId == filtro.ClienteId)
+            .Where(r => filtro.SalidaId == null || r.SalidaId == filtro.SalidaId)
+            .Where(r => filtro.EstadoId == null || r.EstadoId == filtro.EstadoId)
+            .Where(r => start == null || r.FechaReserva >= start)
+            .Where(r => endExclusive == null || r.FechaReserva < endExclusive);
+        var total = await filtered.CountAsync(ct);
+        var pageIds = filtered.OrderByDescending(r => r.FechaReserva)
+            .Skip((page - 1) * pageSize).Take(pageSize).Select(r => r.ReservaId);
+        var items = await (from r in db.Reservas.AsNoTracking()
+            join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
+            join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on r.EstadoId equals e.EstadoId
+            join m in db.Monedas.AsNoTracking() on r.MonedaId equals m.MonedaId
+            where pageIds.Contains(r.ReservaId)
+            orderby r.FechaReserva descending
+            select new ReservaResumenDto(Id(r.ReservaId), r.CodigoReserva, Id(r.ClienteId),
+                c.Nombres + " " + c.Apellidos, Id(r.SalidaId), p.Nombre, d.Nombre,
+                s.FechaInicio, s.FechaFin, e.Codigo, r.FechaReserva, r.FechaExpiracion,
+                r.Total, m.CodigoIso, db.ReservaPasajeros.Count(rp => rp.ReservaId == r.ReservaId)))
+            .ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
@@ -264,21 +294,6 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
             header.r.Impuestos, header.r.Descuento, header.r.Total, header.Moneda,
             header.Simbolo, header.r.Observaciones, details, passengers, history);
     }
-
-    private IQueryable<ReservaResumenDto> SummaryQuery(long? clienteId = null) =>
-        from r in db.Reservas.AsNoTracking()
-        join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
-        join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
-        join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
-        join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
-        join e in db.Estados.AsNoTracking() on r.EstadoId equals e.EstadoId
-        join m in db.Monedas.AsNoTracking() on r.MonedaId equals m.MonedaId
-        where clienteId == null || r.ClienteId == clienteId
-        let passengerCount = db.ReservaPasajeros.Count(rp => rp.ReservaId == r.ReservaId)
-        select new ReservaResumenDto(Id(r.ReservaId), r.CodigoReserva, Id(r.ClienteId),
-            c.Nombres + " " + c.Apellidos, Id(r.SalidaId), p.Nombre, d.Nombre,
-            s.FechaInicio, s.FechaFin, e.Codigo, r.FechaReserva, r.FechaExpiracion,
-            r.Total, m.CodigoIso, passengerCount);
 
     private IQueryable<ReservaHistorialDto> HistoryQuery(long reservaId) =>
         from h in db.ReservaHistorialEstados.AsNoTracking()

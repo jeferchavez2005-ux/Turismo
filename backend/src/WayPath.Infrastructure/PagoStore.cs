@@ -139,34 +139,56 @@ public sealed class PagoStore(WayPathDbContext db, IVentaStore ventas) : IPagoSt
         var reserva = await ReservaForUser(usuarioId, reservaId, tracking: false, ct)
             ?? throw new SecurityFault(404, "Reserva no encontrada.");
         var reserveState = await StateCode(reserva.EstadoId, ct);
-        var order = await OrderQuery().Where(x => x.ReservaId == Id(reserva.ReservaId))
-            .OrderByDescending(x => x.FechaCreacion).FirstOrDefaultAsync(ct);
-        var payment = await PaymentQuery().Where(x => x.ReservaId == Id(reserva.ReservaId))
-            .OrderByDescending(x => x.CreadoEn).FirstOrDefaultAsync(ct);
-        var attempts = order is null ? [] : await AttemptQuery(order.OrdenPagoId).ToArrayAsync(ct);
+        var order = await OrderQueryForReservation(reserva.ReservaId).FirstOrDefaultAsync(ct);
+        var payment = await PaymentQueryForReservation(reserva.ReservaId).FirstOrDefaultAsync(ct);
+        var attempts = order is null ? [] : await AttemptQuery(long.Parse(order.OrdenPagoId)).ToArrayAsync(ct);
         return new(Id(reserva.ReservaId), reserva.CodigoReserva, reserveState, order, payment, attempts);
     }
 
     public async Task<PagoDto[]> Mine(long usuarioId, CancellationToken ct)
     {
         var clienteId = await ClienteIdForUser(usuarioId, ct);
-        return await PaymentQuery().Where(x => db.Reservas.Any(r => r.ReservaId.ToString() == x.ReservaId && r.ClienteId == clienteId))
-            .OrderByDescending(x => x.CreadoEn).ToArrayAsync(ct);
+        return await (from p in db.Pagos.AsNoTracking()
+            join r in db.Reservas.AsNoTracking() on p.ReservaId equals r.ReservaId
+            join metodo in db.MetodosPago.AsNoTracking() on p.MetodoPagoId equals metodo.MetodoPagoId
+            join estado in db.Estados.AsNoTracking() on p.EstadoId equals estado.EstadoId
+            join moneda in db.Monedas.AsNoTracking() on p.MonedaId equals moneda.MonedaId
+            where r.ClienteId == clienteId
+            orderby p.CreadoEn descending
+            select new PagoDto(Id(p.PagoId), Id(p.OrdenPagoId), Id(p.ReservaId), metodo.Codigo,
+                estado.Codigo, p.Monto, moneda.CodigoIso, p.CodigoTransaccion, p.ReferenciaPasarela,
+                p.FechaPago, p.CreadoEn, p.Observaciones)).ToArrayAsync(ct);
     }
 
     public async Task<PagoPage> ListPayments(int page, int pageSize, CancellationToken ct)
     {
-        var query = PaymentQuery();
-        var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.CreadoEn).Skip((page - 1) * pageSize).Take(pageSize).ToArrayAsync(ct);
+        var total = await db.Pagos.AsNoTracking().CountAsync(ct);
+        var pageIds = db.Pagos.AsNoTracking().OrderByDescending(p => p.CreadoEn)
+            .Skip((page - 1) * pageSize).Take(pageSize).Select(p => p.PagoId);
+        var items = await (from p in db.Pagos.AsNoTracking()
+            join metodo in db.MetodosPago.AsNoTracking() on p.MetodoPagoId equals metodo.MetodoPagoId
+            join estado in db.Estados.AsNoTracking() on p.EstadoId equals estado.EstadoId
+            join moneda in db.Monedas.AsNoTracking() on p.MonedaId equals moneda.MonedaId
+            where pageIds.Contains(p.PagoId)
+            orderby p.CreadoEn descending
+            select new PagoDto(Id(p.PagoId), Id(p.OrdenPagoId), Id(p.ReservaId), metodo.Codigo,
+                estado.Codigo, p.Monto, moneda.CodigoIso, p.CodigoTransaccion, p.ReferenciaPasarela,
+                p.FechaPago, p.CreadoEn, p.Observaciones)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
     public async Task<OrdenPagoPage> ListOrders(int page, int pageSize, CancellationToken ct)
     {
-        var query = OrderQuery();
-        var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.FechaCreacion).Skip((page - 1) * pageSize).Take(pageSize).ToArrayAsync(ct);
+        var total = await db.OrdenesPago.AsNoTracking().CountAsync(ct);
+        var pageIds = db.OrdenesPago.AsNoTracking().OrderByDescending(o => o.FechaCreacion)
+            .Skip((page - 1) * pageSize).Take(pageSize).Select(o => o.OrdenPagoId);
+        var items = await (from o in db.OrdenesPago.AsNoTracking()
+            join m in db.Monedas.AsNoTracking() on o.MonedaId equals m.MonedaId
+            join e in db.Estados.AsNoTracking() on o.EstadoId equals e.EstadoId
+            where pageIds.Contains(o.OrdenPagoId)
+            orderby o.FechaCreacion descending
+            select new OrdenPagoDto(Id(o.OrdenPagoId), Id(o.ReservaId), o.CodigoOrden,
+                o.MontoTotal, m.CodigoIso, e.Codigo, o.FechaCreacion, o.FechaExpiracion)).ToArrayAsync(ct);
         return new(items, page, pageSize, total);
     }
 
@@ -219,19 +241,51 @@ public sealed class PagoStore(WayPathDbContext db, IVentaStore ventas) : IPagoSt
             estado.Codigo, p.Monto, moneda.CodigoIso, p.CodigoTransaccion, p.ReferenciaPasarela,
             p.FechaPago, p.CreadoEn, p.Observaciones);
 
-    private IQueryable<PagoIntentoDto> AttemptQuery(string orderId) =>
+    private IQueryable<OrdenPagoDto> OrderQueryForReservation(long reservaId) =>
+        from o in db.OrdenesPago.AsNoTracking()
+        join m in db.Monedas.AsNoTracking() on o.MonedaId equals m.MonedaId
+        join e in db.Estados.AsNoTracking() on o.EstadoId equals e.EstadoId
+        where o.ReservaId == reservaId
+        orderby o.FechaCreacion descending
+        select new OrdenPagoDto(Id(o.OrdenPagoId), Id(o.ReservaId), o.CodigoOrden,
+            o.MontoTotal, m.CodigoIso, e.Codigo, o.FechaCreacion, o.FechaExpiracion);
+
+    private IQueryable<PagoDto> PaymentQueryForReservation(long reservaId) =>
+        from p in db.Pagos.AsNoTracking()
+        join metodo in db.MetodosPago.AsNoTracking() on p.MetodoPagoId equals metodo.MetodoPagoId
+        join estado in db.Estados.AsNoTracking() on p.EstadoId equals estado.EstadoId
+        join moneda in db.Monedas.AsNoTracking() on p.MonedaId equals moneda.MonedaId
+        where p.ReservaId == reservaId
+        orderby p.CreadoEn descending
+        select new PagoDto(Id(p.PagoId), Id(p.OrdenPagoId), Id(p.ReservaId), metodo.Codigo,
+            estado.Codigo, p.Monto, moneda.CodigoIso, p.CodigoTransaccion, p.ReferenciaPasarela,
+            p.FechaPago, p.CreadoEn, p.Observaciones);
+
+    private IQueryable<PagoIntentoDto> AttemptQuery(long orderId) =>
         from i in db.PagoIntentos.AsNoTracking()
         join m in db.MetodosPago.AsNoTracking() on i.MetodoPagoId equals m.MetodoPagoId
-        where i.OrdenPagoId.ToString() == orderId
+        where i.OrdenPagoId == orderId
         orderby i.CreadoEn descending
         select new PagoIntentoDto(Id(i.PagoIntentoId), Id(i.OrdenPagoId),
             i.PagoId == null ? null : Id(i.PagoId.Value), m.Codigo, i.Resultado, i.Mensaje, i.CreadoEn);
 
     private async Task<OrdenPagoDto> FindOrder(long orderId, CancellationToken ct) =>
-        await OrderQuery().SingleAsync(x => x.OrdenPagoId == Id(orderId), ct);
+        await (from o in db.OrdenesPago.AsNoTracking()
+            join m in db.Monedas.AsNoTracking() on o.MonedaId equals m.MonedaId
+            join e in db.Estados.AsNoTracking() on o.EstadoId equals e.EstadoId
+            where o.OrdenPagoId == orderId
+            select new OrdenPagoDto(Id(o.OrdenPagoId), Id(o.ReservaId), o.CodigoOrden,
+                o.MontoTotal, m.CodigoIso, e.Codigo, o.FechaCreacion, o.FechaExpiracion)).SingleAsync(ct);
 
     private async Task<PagoDto> FindPayment(long pagoId, CancellationToken ct) =>
-        await PaymentQuery().SingleAsync(x => x.PagoId == Id(pagoId), ct);
+        await (from p in db.Pagos.AsNoTracking()
+            join metodo in db.MetodosPago.AsNoTracking() on p.MetodoPagoId equals metodo.MetodoPagoId
+            join estado in db.Estados.AsNoTracking() on p.EstadoId equals estado.EstadoId
+            join moneda in db.Monedas.AsNoTracking() on p.MonedaId equals moneda.MonedaId
+            where p.PagoId == pagoId
+            select new PagoDto(Id(p.PagoId), Id(p.OrdenPagoId), Id(p.ReservaId), metodo.Codigo,
+                estado.Codigo, p.Monto, moneda.CodigoIso, p.CodigoTransaccion, p.ReferenciaPasarela,
+                p.FechaPago, p.CreadoEn, p.Observaciones)).SingleAsync(ct);
 
     private PagoIntento NewAttempt(OrdenPago order, int methodId, long? paymentId, string result, string? message) =>
         new()

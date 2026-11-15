@@ -26,7 +26,7 @@ public sealed class QueryTranslationTests
     public void My_reservations_filter_client_in_sql()
     {
         using var db = Context();
-        var sql = Query(new ReservaStore(db), "SummaryQuery", (long?)17).ToQueryString();
+        var sql = Query(new ReservaStore(db), "ReservationsForClient", 17L).ToQueryString();
 
         Assert.Contains("ClienteId", sql);
         Assert.Contains("WHERE", sql);
@@ -63,6 +63,38 @@ public sealed class QueryTranslationTests
         Assert.Contains("COUNT(*)", sql);
         Assert.Contains("MAX(", sql);
         Assert.Contains("ORDER BY", sql);
+    }
+
+    [Fact]
+    public void Payment_order_lookup_filters_entity_id_in_sql()
+    {
+        using var db = Context();
+        var sql = Query(new PagoStore(db, new VentaStore(db)), "OrderQueryForReservation", 23L).ToQueryString();
+
+        Assert.Contains("ReservaId", sql);
+        Assert.Contains("ORDER BY", sql);
+        Assert.Contains("WHERE", sql);
+    }
+
+    [Fact]
+    public void Payment_lookup_filters_entity_id_in_sql()
+    {
+        using var db = Context();
+        var sql = Query(new PagoStore(db, new VentaStore(db)), "PaymentQueryForReservation", 23L).ToQueryString();
+
+        Assert.Contains("ReservaId", sql);
+        Assert.Contains("ORDER BY", sql);
+        Assert.Contains("WHERE", sql);
+    }
+
+    [Fact]
+    public void Review_lookup_filters_entity_id_in_sql()
+    {
+        using var db = Context();
+        var sql = Query(new VentaStore(db), "ReviewQueryFor", 9L).ToQueryString();
+
+        Assert.Contains("ResenaId", sql);
+        Assert.Contains("WHERE", sql);
     }
 
     private static WayPathDbContext Context() => new(new DbContextOptionsBuilder<WayPathDbContext>()

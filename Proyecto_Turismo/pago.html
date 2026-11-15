@@ -21,23 +21,23 @@
 <header class="wp-navbar">
     <div class="nav-inner">
         <a href="index.html" class="wp-logo">Way<span class="accent">Path</span></a>
-        <div style="font-weight:600;color:var(--text-500);"><i class="fa-solid fa-lock"></i> Checkout Seguro</div>
+        <div style="font-weight:600;color:var(--text-500);"><i class="fa-solid fa-lock"></i> <span data-i18n="payment.secureCheckout">Checkout Seguro</span></div>
     </div>
 </header>
 
 <main class="reserva-section">
     <div class="wp-container">
         <div class="checkout-steps" aria-label="Progreso de compra">
-            <span><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Reserva</span>
-            <span class="active"><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Pago</span>
-            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> Compra</span>
+            <span><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> <span data-i18n="booking.steps.booking">Reserva</span></span>
+            <span class="active"><i class="fa-solid fa-credit-card" aria-hidden="true"></i> <span data-i18n="booking.steps.payment">Pago</span></span>
+            <span><i class="fa-solid fa-ticket" aria-hidden="true"></i> <span data-i18n="booking.steps.purchase">Compra</span></span>
         </div>
         <div class="reserva-layout">
 
             <div class="reserva-form-col">
                 <div class="checkout-panel">
-                    <h2><i class="fa-solid fa-credit-card" aria-hidden="true"></i> Método de pago</h2>
-                    <p class="checkout-sub">Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.</p>
+                    <h2><i class="fa-solid fa-credit-card" aria-hidden="true"></i> <span data-i18n="payment.method.title">Método de pago</span></h2>
+                    <p class="checkout-sub" data-i18n="payment.method.subtitle">Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.</p>
 
                     <form id="formPago" class="checkout-form">
 
@@ -46,7 +46,7 @@
                                 <input type="radio" name="metodo" id="metodo-tarjeta" value="tarjeta" class="sr-only" checked>
                                 <label for="metodo-tarjeta" class="metodo-label">
                                     <div class="metodo-info">
-                                        <i class="fa-regular fa-credit-card" aria-hidden="true"></i> Tarjeta de Crédito / Débito
+                                        <i class="fa-regular fa-credit-card" aria-hidden="true"></i> <span data-i18n="payment.method.card">Tarjeta de Crédito / Débito</span>
                                     </div>
                                     <div class="metodo-icons">
                                         <i class="fa-brands fa-cc-visa" aria-hidden="true"></i>
@@ -56,12 +56,12 @@
                                 </label>
                                 <div class="pago-details tarjeta-info">
                                     <div class="form-field" style="margin-bottom:12px;">
-                                        <label for="cardNumber">Número de Tarjeta</label>
+                                        <label for="cardNumber" data-i18n="payment.card.number">Número de Tarjeta</label>
                                         <input id="cardNumber" type="text" class="wp-input" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-field">
-                                            <label for="cardExpiry">Vencimiento</label>
+                                            <label for="cardExpiry" data-i18n="payment.card.expiry">Vencimiento</label>
                                             <input id="cardExpiry" type="text" class="wp-input" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
                                         </div>
                                         <div class="form-field">
@@ -70,8 +70,8 @@
                                         </div>
                                     </div>
                                     <div class="form-field" style="margin-top:12px;">
-                                        <label for="cardHolder">Nombre del Titular</label>
-                                        <input id="cardHolder" type="text" class="wp-input" placeholder="Como aparece en la tarjeta" autocomplete="cc-name">
+                                        <label for="cardHolder" data-i18n="payment.card.holder">Nombre del Titular</label>
+                                        <input id="cardHolder" type="text" class="wp-input" placeholder="Como aparece en la tarjeta" data-i18n-placeholder="payment.card.holderPlaceholder" autocomplete="cc-name">
                                     </div>
                                 </div>
                             </div>
@@ -87,10 +87,10 @@
                                     </div>
                                 </label>
                                 <div class="pago-details yape-info">
-                                    <p style="font-size:.85rem;color:var(--text-500);margin-bottom:12px;">Escanea el código QR desde tu aplicación para realizar el pago.</p>
+                                    <p style="font-size:.85rem;color:var(--text-500);margin-bottom:12px;" data-i18n="payment.qr.help">Escanea el código QR desde tu aplicación para realizar el pago.</p>
                                     <div class="payment-code-placeholder" role="img" aria-label="Código de pago disponible al iniciar la operación">
                                         <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
-                                        <span>Código disponible al iniciar el pago</span>
+                                        <span data-i18n="payment.qr.available">Código disponible al iniciar el pago</span>
                                     </div>
                                     <p style="font-size:.9rem;font-weight:700;color:var(--blue-900);">Número: 987 654 321</p>
                                 </div>
@@ -98,7 +98,7 @@
                         </div>
 
                         <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
-                            Confirmar y pagar <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                            <span data-i18n="payment.confirm">Confirmar y pagar</span> <i class="fa-solid fa-lock" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>
@@ -106,17 +106,17 @@
 
             <div class="reserva-summary-col">
                 <div class="summary-card">
-                    <h3>Resumen de reserva</h3>
+                    <h3 data-i18n="booking.summary.title">Resumen de reserva</h3>
                     <img id="sumImg" src="Img/machupichu.jpg" alt="" class="sum-img">
                     <h4 id="sumDestino">Machu Picchu</h4>
                     <p class="sum-loc" style="margin-bottom:12px;"><i class="fa-regular fa-calendar"></i> <span id="sumFecha">--</span></p>
                     <div class="sum-divider"></div>
                     <div class="sum-total-row">
-                        <span>Total a pagar</span>
+                        <span data-i18n="booking.summary.total">Total a pagar</span>
                         <span id="sumTotal" style="color:var(--orange-500);">S/ 0</span>
                     </div>
                     <div class="sum-guarantee">
-                        <i class="fa-solid fa-shield-check"></i> Tu compra está 100% protegida. WayPath garantiza los más altos estándares de seguridad en cada transacción.
+                        <i class="fa-solid fa-shield-check"></i> <span data-i18n="payment.protected">Tu compra está 100% protegida. WayPath garantiza los más altos estándares de seguridad en cada transacción.</span>
                     </div>
                 </div>
             </div>
@@ -126,6 +126,7 @@
 </main>
 
 <script src="js/accesibilidad.js"></script>
+<script type="module" src="js/i18n.js"></script>
 <script type="module" src="js/pago.js"></script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>

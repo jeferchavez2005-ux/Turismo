@@ -39,18 +39,22 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
                 s.FechaInicio, s.FechaFin, s.CupoTotal, s.CupoReservado, s.PuntoEncuentro, e.Codigo);
 
     public async Task<SalidaDto[]> ListSalidas(SalidasFiltroRequest filtro, CancellationToken ct) =>
-        await BaseSalidas()
-            .Where(x => filtro.PaqueteId == null || x.PaqueteId == filtro.PaqueteId)
-            .Where(x => filtro.EstadoId == null || x.EstadoId == filtro.EstadoId)
-            .Where(x => filtro.Desde == null || x.FechaInicio >= filtro.Desde)
-            .Where(x => filtro.Hasta == null || x.FechaInicio <= filtro.Hasta)
-            .OrderByDescending(x => x.FechaInicio)
-            .Select(x => ToSalidaDto(x))
+        await (from s in db.Salidas.AsNoTracking()
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join e in db.Estados.AsNoTracking() on s.EstadoId equals e.EstadoId
+            where (filtro.PaqueteId == null || s.PaqueteId == filtro.PaqueteId)
+                && (filtro.EstadoId == null || s.EstadoId == filtro.EstadoId)
+                && (filtro.Desde == null || s.FechaInicio >= filtro.Desde)
+                && (filtro.Hasta == null || s.FechaInicio <= filtro.Hasta)
+            orderby s.FechaInicio descending
+            select new SalidaDto(Id(s.SalidaId), Id(s.PaqueteId), p.Nombre,
+                s.FechaInicio, s.FechaFin, s.CupoTotal, s.CupoReservado,
+                s.CupoTotal - s.CupoReservado, s.PuntoEncuentro, e.Codigo))
             .ToArrayAsync(ct);
 
     public async Task<SalidaDto?> GetSalida(long salidaId, CancellationToken ct)
     {
-        var row = await BaseSalidas().SingleOrDefaultAsync(x => x.SalidaId == salidaId, ct);
+        var row = await BaseSalidasFor(salidaId).SingleOrDefaultAsync(ct);
         return row is null ? null : ToSalidaDto(row);
     }
 
@@ -122,9 +126,13 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
     }
 
     public async Task<ProveedorDto[]> ListProveedores(CancellationToken ct) =>
-        await BaseProveedores().OrderBy(x => x.RazonSocial)
-            .Select(x => new ProveedorDto(Id(x.ProveedorId), x.RazonSocial,
-                x.NombreComercial, x.Email, x.Telefono, x.Ciudad, x.Estado)).ToArrayAsync(ct);
+        await (from p in db.Proveedores.AsNoTracking()
+            join e in db.Estados.AsNoTracking() on p.EstadoId equals e.EstadoId
+            join c0 in db.Ciudades.AsNoTracking() on p.CiudadId equals c0.CiudadId into cities
+            from c in cities.DefaultIfEmpty()
+            orderby p.RazonSocial
+            select new ProveedorDto(Id(p.ProveedorId), p.RazonSocial, p.NombreComercial,
+                p.Email, p.Telefono, c == null ? null : c.Nombre, e.Codigo)).ToArrayAsync(ct);
 
     public async Task<ProveedorDto> CreateProveedor(ProveedorRequest request, CancellationToken ct)
     {
@@ -172,9 +180,15 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
 
     public async Task<ProveedorServicioDto[]> ListProveedorServicios(long? proveedorId, CancellationToken ct)
     {
-        var query = BaseServicios();
-        if (proveedorId is not null) query = query.Where(x => x.ProveedorId == Id(proveedorId.Value));
-        return await query.OrderBy(x => x.Proveedor).ThenBy(x => x.Nombre).ToArrayAsync(ct);
+        return await (from s in db.ProveedorServicios.AsNoTracking()
+            join p in db.Proveedores.AsNoTracking() on s.ProveedorId equals p.ProveedorId
+            join m in db.Monedas.AsNoTracking() on s.MonedaId equals m.MonedaId
+            join e in db.Estados.AsNoTracking() on s.EstadoId equals e.EstadoId
+            where proveedorId == null || s.ProveedorId == proveedorId
+            orderby p.NombreComercial ?? p.RazonSocial, s.Nombre
+            select new ProveedorServicioDto(Id(s.ProveedorServicioId), Id(s.ProveedorId),
+                p.NombreComercial ?? p.RazonSocial, s.TipoServicio, s.Nombre, s.Descripcion,
+                s.CostoBase, m.CodigoIso, e.Codigo)).ToArrayAsync(ct);
     }
 
     public async Task<ProveedorServicioDto> CreateProveedorServicio(ProveedorServicioRequest request, CancellationToken ct)
@@ -235,7 +249,7 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
     public async Task<AsignacionOperacionDto[]> ListAsignaciones(long salidaId, CancellationToken ct)
     {
         await EnsureSalida(salidaId, ct);
-        return await AssignmentRows().Where(x => x.SalidaId == Id(salidaId)).OrderByDescending(x => x.FechaAsignacion).ToArrayAsync(ct);
+        return await AssignmentRowsForSalida(salidaId).ToArrayAsync(ct);
     }
 
     public async Task<AsignacionOperacionDto> CreateAsignacion(AsignacionOperacionRequest request, CancellationToken ct)
@@ -254,7 +268,7 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
         };
         db.AsignacionesOperacion.Add(entity);
         await SaveGuard(ct);
-        return await AssignmentRows().SingleAsync(x => x.AsignacionOperacionId == Id(entity.AsignacionOperacionId), ct);
+        return await AssignmentRowsFor(entity.AsignacionOperacionId).SingleAsync(ct);
     }
 
     public async Task<BloqueoDisponibilidadDto[]> ListBloqueos(long? paqueteId, long? salidaId, CancellationToken ct) =>
@@ -333,6 +347,15 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
         select new SalidaRow(s.SalidaId, s.PaqueteId, s.EstadoId, p.Nombre, d.Nombre,
             s.FechaInicio, s.FechaFin, s.CupoTotal, s.CupoReservado, s.PuntoEncuentro, e.Codigo);
 
+    private IQueryable<SalidaRow> BaseSalidasFor(long salidaId) =>
+        from s in db.Salidas.AsNoTracking()
+        join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+        join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+        join e in db.Estados.AsNoTracking() on s.EstadoId equals e.EstadoId
+        where s.SalidaId == salidaId
+        select new SalidaRow(s.SalidaId, s.PaqueteId, s.EstadoId, p.Nombre, d.Nombre,
+            s.FechaInicio, s.FechaFin, s.CupoTotal, s.CupoReservado, s.PuntoEncuentro, e.Codigo);
+
     private IQueryable<ProveedorRow> BaseProveedores() =>
         from p in db.Proveedores.AsNoTracking()
         join e in db.Estados.AsNoTracking() on p.EstadoId equals e.EstadoId
@@ -367,6 +390,46 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
             t == null ? null : t.TipoTransporte + " " + t.Placa, h == null ? null : h.Nombre,
             hb == null ? null : hb.TipoHabitacion, a.FechaAsignacion, a.Observaciones);
 
+    private IQueryable<AsignacionOperacionDto> AssignmentRowsForSalida(long salidaId) =>
+        from a in db.AsignacionesOperacion.AsNoTracking()
+        join ps0 in db.ProveedorServicios.AsNoTracking() on a.ProveedorServicioId equals ps0.ProveedorServicioId into servicios
+        from ps in servicios.DefaultIfEmpty()
+        join g0 in db.Guias.AsNoTracking() on a.GuiaId equals g0.GuiaId into guias
+        from g in guias.DefaultIfEmpty()
+        join t0 in db.Transportes.AsNoTracking() on a.TransporteId equals t0.TransporteId into transportes
+        from t in transportes.DefaultIfEmpty()
+        join h0 in db.Hoteles.AsNoTracking() on a.HotelId equals h0.HotelId into hoteles
+        from h in hoteles.DefaultIfEmpty()
+        join hb0 in db.Habitaciones.AsNoTracking() on a.HabitacionId equals hb0.HabitacionId into habitaciones
+        from hb in habitaciones.DefaultIfEmpty()
+        where a.SalidaId == salidaId
+        orderby a.FechaAsignacion descending
+        select new AsignacionOperacionDto(Id(a.AsignacionOperacionId), Id(a.SalidaId),
+            ps == null ? null : ps.Nombre, g == null ? null : g.Nombres + " " + g.Apellidos,
+            t == null ? null : t.TipoTransporte + " " + t.Placa, h == null ? null : h.Nombre,
+            hb == null ? null : hb.TipoHabitacion, a.FechaAsignacion, a.Observaciones);
+
+    private IQueryable<AsignacionOperacionDto> AssignmentRowsFor(long assignmentId) =>
+        AssignmentRowsForEntity(assignmentId);
+
+    private IQueryable<AsignacionOperacionDto> AssignmentRowsForEntity(long assignmentId) =>
+        from a in db.AsignacionesOperacion.AsNoTracking()
+        join ps0 in db.ProveedorServicios.AsNoTracking() on a.ProveedorServicioId equals ps0.ProveedorServicioId into servicios
+        from ps in servicios.DefaultIfEmpty()
+        join g0 in db.Guias.AsNoTracking() on a.GuiaId equals g0.GuiaId into guias
+        from g in guias.DefaultIfEmpty()
+        join t0 in db.Transportes.AsNoTracking() on a.TransporteId equals t0.TransporteId into transportes
+        from t in transportes.DefaultIfEmpty()
+        join h0 in db.Hoteles.AsNoTracking() on a.HotelId equals h0.HotelId into hoteles
+        from h in hoteles.DefaultIfEmpty()
+        join hb0 in db.Habitaciones.AsNoTracking() on a.HabitacionId equals hb0.HabitacionId into habitaciones
+        from hb in habitaciones.DefaultIfEmpty()
+        where a.AsignacionOperacionId == assignmentId
+        select new AsignacionOperacionDto(Id(a.AsignacionOperacionId), Id(a.SalidaId),
+            ps == null ? null : ps.Nombre, g == null ? null : g.Nombres + " " + g.Apellidos,
+            t == null ? null : t.TipoTransporte + " " + t.Placa, h == null ? null : h.Nombre,
+            hb == null ? null : hb.TipoHabitacion, a.FechaAsignacion, a.Observaciones);
+
     private async Task<Dictionary<long, CupoSalidaDto[]>> CuposFor(long[] salidaIds, CancellationToken ct)
     {
         var rows = await db.CuposSalida.AsNoTracking().Where(x => salidaIds.Contains(x.SalidaId))
@@ -391,12 +454,23 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
     }
 
     private async Task<ProveedorDto> FindProveedor(long id, CancellationToken ct) =>
-        await BaseProveedores().Where(x => x.ProveedorId == id)
-            .Select(x => new ProveedorDto(Id(x.ProveedorId), x.RazonSocial,
-                x.NombreComercial, x.Email, x.Telefono, x.Ciudad, x.Estado)).SingleAsync(ct);
+        await (from p in db.Proveedores.AsNoTracking()
+            join e in db.Estados.AsNoTracking() on p.EstadoId equals e.EstadoId
+            join c0 in db.Ciudades.AsNoTracking() on p.CiudadId equals c0.CiudadId into cities
+            from c in cities.DefaultIfEmpty()
+            where p.ProveedorId == id
+            select new ProveedorDto(Id(p.ProveedorId), p.RazonSocial, p.NombreComercial,
+                p.Email, p.Telefono, c == null ? null : c.Nombre, e.Codigo)).SingleAsync(ct);
 
     private async Task<ProveedorServicioDto> FindServicio(long id, CancellationToken ct) =>
-        await BaseServicios().SingleAsync(x => x.ProveedorServicioId == Id(id), ct);
+        await (from s in db.ProveedorServicios.AsNoTracking()
+            join p in db.Proveedores.AsNoTracking() on s.ProveedorId equals p.ProveedorId
+            join m in db.Monedas.AsNoTracking() on s.MonedaId equals m.MonedaId
+            join e in db.Estados.AsNoTracking() on s.EstadoId equals e.EstadoId
+            where s.ProveedorServicioId == id
+            select new ProveedorServicioDto(Id(s.ProveedorServicioId), Id(s.ProveedorId),
+                p.NombreComercial ?? p.RazonSocial, s.TipoServicio, s.Nombre, s.Descripcion,
+                s.CostoBase, m.CodigoIso, e.Codigo)).SingleAsync(ct);
 
     private async Task ValidatePackage(long paqueteId, CancellationToken ct)
     {
