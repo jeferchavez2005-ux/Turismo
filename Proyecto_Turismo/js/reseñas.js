@@ -1,7 +1,9 @@
 import { api, ApiError } from "./api.js";
 import { errorMessageWithTrace, t } from "./frontend-utils.js";
+import { getDestinationImage } from "./destination-images.js";
 
 let requestVersion = 0;
+let destinationCatalog = [];
 document.addEventListener("DOMContentLoaded", async () => {
     const reviewsList = document.getElementById("reviewsList");
     reviewsList?.replaceChildren();
@@ -17,6 +19,7 @@ async function loadDestinations() {
     const select = document.getElementById("filtroDestino");
     if (!select) return;
     const destinations = await api("/api/catalogo/destinos");
+    destinationCatalog = destinations;
     const current = select.value;
     select.innerHTML = `<option value="">${escapeHtml(t("reviews.filters.allDestinations", "Todos los destinos"))}</option>` +
         destinations.map(item => `<option value="${escapeHtml(item.destinoId)}">${escapeHtml(item.nombre)}</option>`).join("");
@@ -105,7 +108,7 @@ async function writeReview() {
 
 function reviewHtml(item) {
     return `<article class="review-card" data-destino-id="${escapeHtml(item.destinoId)}" data-stars="${item.calificacion}">
-        <img src="${imageFor(item.destino)}" alt="${escapeHtml(item.destino)}" class="review-img" loading="lazy"><div class="review-body">
+        <img src="${getDestinationImage({ destino: item.destino, destinoId: item.destinoId }, destinationCatalog)}" alt="${escapeHtml(item.destino)}" class="review-img" loading="lazy"><div class="review-body">
         <div class="review-header"><div class="reviewer-info"><div class="avatar">${initials(item.cliente)}</div><div><h4>${escapeHtml(item.cliente)}</h4>
         <span class="reviewer-loc"><i class="fa-solid fa-circle-check"></i> ${escapeHtml(t("reviews.verified", "Cliente verificado"))}</span></div></div>
         <div class="review-stars">${stars(item.calificacion)}</div></div><h5 class="review-title">${escapeHtml(item.titulo || item.destino)}</h5>
@@ -114,7 +117,6 @@ function reviewHtml(item) {
 }
 function stars(score) { return Array.from({ length: 5 }, (_, i) => `<i class="${i < score ? "fa-solid" : "fa-regular"} fa-star"></i>`).join(""); }
 function initials(name) { return (name || "WP").split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase(); }
-function imageFor(name) { const value = (name || "").toLowerCase(); if (value.includes("titicaca")) return "Img/LAGOTITICACA.webp"; if (value.includes("mancora") || value.includes("máncora")) return "Img/MANCORA.jpg"; if (value.includes("huacachina")) return "Img/OASISDEHUACACHINA.jpg"; return "Img/machupichu.jpg"; }
 function formatDate(value) { return new Intl.DateTimeFormat(document.documentElement.lang || "es", { month: "short", year: "numeric" }).format(new Date(value)); }
 function empty(title, detail = "") { return `<div class="wp-empty-state"><i class="fa-solid fa-star" aria-hidden="true"></i><strong>${escapeHtml(title)}</strong>${detail ? `<p>${escapeHtml(detail)}</p>` : ""}</div>`; }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" })[c]); }

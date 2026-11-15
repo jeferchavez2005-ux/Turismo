@@ -58,7 +58,6 @@
 </nav>
 
 <section class="wp-page-hero" id="main-content">
-    <span class="section-tag"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Tu historial</span>
     <h1 data-i18n="purchases.title">Mis compras</h1>
     <p>Consulta tus compras emitidas, comprobantes, tickets y vouchers digitales.</p>
 </section>
@@ -81,102 +80,7 @@
             <button class="tab-btn" data-filter="cancelado" role="tab" aria-selected="false" data-i18n="purchases.tabs.cancelled">Canceladas</button>
         </div>
 
-        <div class="purchases-list" id="contenedor-compras">
-
-            <article class="purchase-card" data-status="proxima">
-                <div class="pc-img">
-                    <img src="Img/machupichu.jpg" alt="Machu Picchu" loading="lazy">
-                </div>
-                <div class="pc-info">
-                    <div class="pc-top">
-                        <h3>Aventura en Machu Picchu</h3>
-                        <span class="wp-badge wp-badge-blue"><i class="fa-solid fa-clock"></i> Próximo</span>
-                    </div>
-                    <div class="pc-meta">
-                        <span><i class="fa-solid fa-location-dot"></i> Cusco, Perú</span>
-                        <span><i class="fa-regular fa-calendar"></i> 12–16 Ago, 2026</span>
-                        <span><i class="fa-regular fa-user"></i> 2 personas</span>
-                    </div>
-                    <div class="pc-code">Código: <strong>WP-2026-0891</strong></div>
-                </div>
-                <div class="pc-aside">
-                    <div class="pc-price-wrap">
-                        <span class="pc-price-label">Total pagado</span>
-                        <span class="pc-price">S/ 1,250</span>
-                    </div>
-                    <button class="wp-btn wp-btn-outline pc-detail-btn"
-                            data-titulo="Aventura en Machu Picchu"
-                            data-imagen="Img/machupichu.jpg"
-                            data-detalles="Viaje de 5 días y 4 noches en Cusco. Incluye transporte, guía y entrada al Santuario Histórico."
-                            data-precio="S/ 1,250">
-                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </article>
-
-            <article class="purchase-card" data-status="completado">
-                <div class="pc-img">
-                    <img src="Img/huaraz.jpg" alt="Huaraz" loading="lazy">
-                </div>
-                <div class="pc-info">
-                    <div class="pc-top">
-                        <h3>Expedición Laguna 69</h3>
-                        <span class="wp-badge wp-badge-green"><i class="fa-solid fa-check"></i> Completado</span>
-                    </div>
-                    <div class="pc-meta">
-                        <span><i class="fa-solid fa-location-dot"></i> Huaraz, Perú</span>
-                        <span><i class="fa-regular fa-calendar"></i> 05–08 Jun, 2026</span>
-                        <span><i class="fa-regular fa-user"></i> 1 persona</span>
-                    </div>
-                    <div class="pc-code">Código: <strong>WP-2026-0542</strong></div>
-                </div>
-                <div class="pc-aside">
-                    <div class="pc-price-wrap">
-                        <span class="pc-price-label">Total pagado</span>
-                        <span class="pc-price">S/ 450</span>
-                    </div>
-                    <button class="wp-btn wp-btn-outline pc-detail-btn"
-                            data-titulo="Expedición Laguna 69"
-                            data-imagen="Img/huaraz.jpg"
-                            data-detalles="Trekking y aventura en la Cordillera Blanca. 3 noches con guía especializado."
-                            data-precio="S/ 450">
-                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </article>
-
-            <article class="purchase-card" data-status="cancelado">
-                <div class="pc-img">
-                    <img src="Img/iquitos.jpg" alt="Iquitos" loading="lazy">
-                </div>
-                <div class="pc-info">
-                    <div class="pc-top">
-                        <h3>Selva Mágica en Iquitos</h3>
-                        <span class="wp-badge wp-badge-red"><i class="fa-solid fa-xmark"></i> Cancelado</span>
-                    </div>
-                    <div class="pc-meta">
-                        <span><i class="fa-solid fa-location-dot"></i> Iquitos, Perú</span>
-                        <span><i class="fa-regular fa-calendar"></i> 20–24 Abr, 2026</span>
-                        <span><i class="fa-regular fa-user"></i> 2 personas</span>
-                    </div>
-                    <div class="pc-code">Código: <strong>WP-2026-0765</strong></div>
-                </div>
-                <div class="pc-aside">
-                    <div class="pc-price-wrap">
-                        <span class="pc-price-label">Reembolsado</span>
-                        <span class="pc-price">S/ 629</span>
-                    </div>
-                    <button class="wp-btn wp-btn-outline pc-detail-btn"
-                            data-titulo="Selva Mágica en Iquitos"
-                            data-imagen="Img/iquitos.jpg"
-                            data-detalles="Experiencia amazónica con recorridos fluviales. Cancelado por el usuario."
-                            data-precio="S/ 629 (reembolsado)">
-                        Ver detalles <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </article>
-
-        </div>
+        <div class="purchases-list" id="contenedor-compras" aria-live="polite"></div>
     </div>
 </section>
 
@@ -184,9 +88,9 @@
     <div class="wp-modal-backdrop"></div>
     <div class="wp-modal-box">
         <button class="wp-modal-close" id="modalClose" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-        <img id="modalImg" src="" alt="" class="wp-modal-img">
+        <img id="modalImg" src="Img/waypath-placeholder.svg" alt="WayPath" class="wp-modal-img">
         <div class="wp-modal-body">
-            <h3 id="modalTitle"></h3>
+            <h2 id="modalTitle"></h2>
             <p id="modalDetalles"></p>
             <div class="wp-modal-price">
                 <span class="price-from">Total</span>

@@ -34,7 +34,7 @@ export function stateBadge(value) {
             : ["BLOQUEADO", "INACTIVO", "CANCELADA", "RECHAZADO", "RECHAZADA", "ANULADA"].includes(normalized)
                 ? "danger"
                 : "muted";
-    return `<span class="wp-status wp-status-${type}">${escapeHtml(value || "Sin estado")}</span>`;
+    return `<span class="wp-status wp-status-${type}">${escapeHtml(translateState(value))}</span>`;
 }
 
 export function adminLoading(message = "Cargando datos...") {
@@ -140,8 +140,10 @@ function renderShell(user, active, title) {
     }
     const publicLink = document.querySelector(".admin-public-link");
     if (publicLink) {
+        publicLink.classList.remove("admin-public-link");
+        publicLink.classList.add("admin-logout");
         publicLink.href = "#";
-        publicLink.innerHTML = '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> <span>Cerrar sesión</span>';
+        publicLink.innerHTML = `<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> <span data-i18n="account.logout">${escapeHtml(tr("account.logout", "Cerrar sesión"))}</span>`;
         publicLink.addEventListener("click", async event => {
             event.preventDefault();
             publicLink.setAttribute("aria-disabled", "true");
@@ -155,6 +157,16 @@ function renderShell(user, active, title) {
             }
         }, { once: true });
     }
+}
+
+function tr(key, fallback) {
+    const translated = window.WayPathI18n?.t(key);
+    return translated && translated !== key ? translated : fallback;
+}
+
+function translateState(value) {
+    const fallback = String(value || tr("states.unknown", "Sin estado")).replaceAll("_", " ");
+    return tr(`states.${String(value || "unknown").toLowerCase()}`, fallback);
 }
 
 function primaryRole(user) {

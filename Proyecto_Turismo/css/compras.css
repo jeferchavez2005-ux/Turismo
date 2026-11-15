@@ -282,3 +282,19 @@
     .wp-modal { padding: 12px; }
     .wp-modal-body { padding: 22px 20px; }
 }
+
+.purchase-receipt { color: var(--text-primary); }
+.receipt-brand { display: block; margin-bottom: 14px; color: var(--blue-900); font-size: 1.35rem; letter-spacing: .08em; }
+.purchase-receipt dl { display: grid; gap: 10px; margin: 0; }
+.purchase-receipt dl > div { display: grid; grid-template-columns: minmax(120px, .7fr) 1fr; gap: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.purchase-receipt dt { color: var(--text-muted); font-weight: 700; }
+.purchase-receipt dd { margin: 0; color: var(--text-primary); font-weight: 800; overflow-wrap: anywhere; }
+.receipt-disclaimer { margin-top: 18px; font-size: .78rem !important; }
+.receipt-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+@media print {
+    body > *:not(.wp-modal), .wp-modal-backdrop, .wp-modal-close, .wp-modal-img, .receipt-actions { display: none !important; }
+    .wp-modal { position: static; display: block !important; padding: 0; }
+    .wp-modal-box { max-width: none; box-shadow: none; }
+    .wp-modal-body { padding: 18mm; }
+}

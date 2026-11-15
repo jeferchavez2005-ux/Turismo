@@ -1,9 +1,9 @@
 const supportedLanguages = ["es", "en", "pt", "fr"];
 const languageNames = {
-    es: "Espanol",
+    es: "Español",
     en: "English",
-    pt: "Portugues",
-    fr: "Francais"
+    pt: "Português",
+    fr: "Français"
 };
 const storageKey = "wp_language";
 let dictionary = {};

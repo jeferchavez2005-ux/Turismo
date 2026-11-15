@@ -698,3 +698,5 @@
 @media (prefers-reduced-motion: reduce) {
     .admin-sidebar, .admin-body::before { transition: none; }
 }
+.admin-public-link { display: none !important; }
+.admin-logout { display: inline-flex; }

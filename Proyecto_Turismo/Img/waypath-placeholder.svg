@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">WayPath</title>
+  <desc id="desc">Imagen neutra para destinos sin fotografía disponible</desc>
+  <rect width="1200" height="675" fill="#eef4f7"/>
+  <path d="M0 520 220 350l170 120 230-240 190 180 180-120 210 190v195H0Z" fill="#cbdde4"/>
+  <path d="M0 585 250 430l165 105 220-225 170 165 190-105 205 165v140H0Z" fill="#9ebdc8"/>
+  <circle cx="945" cy="150" r="62" fill="#f4a261"/>
+  <text x="600" y="610" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#173b4d">WayPath</text>
+</svg>

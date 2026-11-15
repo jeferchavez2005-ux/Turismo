@@ -112,6 +112,7 @@
 
         if (languageWidget && languageWidget.parentNode !== utilityBar) utilityBar.append(languageWidget);
         if (accessibilityWidget && accessibilityWidget.parentNode !== utilityBar) utilityBar.append(accessibilityWidget);
+        utilityBar.classList.add("wp-preferences-panel");
     }
 
     function init() {
@@ -122,6 +123,7 @@
         ensureUtilityBar();
         ensureAccessibilityControls();
         setButtonState(theme, scale);
+        window.addEventListener("waypath:languagechange", () => setButtonState(root.dataset.theme || "light", root.dataset.fontScale || "normal"));
 
         document.getElementById("btn-alto-contraste")?.addEventListener("click", () => {
             const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";

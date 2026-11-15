@@ -91,6 +91,21 @@
 .passenger-holder { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: .82rem; font-weight: 700; }
 .passenger-option:not(.is-selected) .passenger-option-controls { opacity: .6; }
 .passenger-add-link { margin-top: 14px; }
+.principal-traveler { display: grid; gap: 10px; }
+.traveler-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.traveler-heading h3, .traveler-heading h4 { margin: 0; padding: 0; border: 0; }
+.principal-badge { display: inline-flex; align-items: center; gap: 7px; color: var(--success); font-weight: 800; }
+.principal-traveler > span { color: var(--text-secondary); overflow-wrap: anywhere; }
+.principal-traveler .wp-select { max-width: 240px; }
+.companion-list { display: grid; gap: 14px; margin-block: 14px; }
+.companion-card { min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-raised); }
+.companion-card label { display: grid; gap: 6px; min-width: 0; color: var(--text-secondary); font-size: .86rem; font-weight: 700; }
+.remove-companion { min-height: 44px; border: 0; background: transparent; color: var(--danger); font-weight: 800; }
+.payment-unavailable { display: grid; justify-items: start; gap: 18px; }
+.payment-unavailable > i { font-size: 2rem; color: var(--orange-500); }
+.payment-unavailable h2 { margin: 0; }
+.payment-method-preview { display: flex; flex-wrap: wrap; gap: 10px; }
+.payment-method-preview > span { display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); }
 
 
 .summary-card {
@@ -155,6 +170,7 @@ input[type="radio"]:checked + .metodo-label { border-color: var(--orange-500); b
     .checkout-panel { padding: 24px; }
     .passenger-option { grid-template-columns: auto minmax(0, 1fr); }
     .passenger-option-controls { grid-column: 1 / -1; }
+    .traveler-heading { display: grid; }
 }
 
 /* WayPath V2 reservation flow */

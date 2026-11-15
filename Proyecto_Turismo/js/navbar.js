@@ -35,7 +35,7 @@
         "nav.account": "Mi cuenta",
         "nav.reservations": "Reservas",
         "nav.purchases": "Mis compras",
-        "nav.reviews": "Resenas",
+        "nav.reviews": "Reseñas",
         "nav.dashboard": "Dashboard",
         "nav.reports": "Reportes",
         "nav.landings": "Landing Pages",

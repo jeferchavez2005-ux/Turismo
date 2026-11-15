@@ -1,4 +1,5 @@
 import { ApiError, api, appPath, appUrl } from "./api.js";
+import { getDestinationImage } from "./destination-images.js";
 
 const grid = document.getElementById("destinosGrid");
 const emptyState = document.getElementById("emptyState");
@@ -19,9 +20,6 @@ function money(value, currency) {
     const prefix = currency === "USD" ? "$" : "S/";
     return `${prefix} ${Number(value).toLocaleString("es-PE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
-function fallbackImage(url) {
-    return url && url.length ? url : "Img/machupichu.jpg";
-}
 function card(destino) {
     const article = document.createElement("article");
     article.className = "dest-card";
@@ -31,7 +29,7 @@ function card(destino) {
     const imgWrap = document.createElement("div");
     imgWrap.className = "dest-img-wrap";
     const img = document.createElement("img");
-    img.src = fallbackImage(destino.imagenUrl);
+    img.src = getDestinationImage(destino, destinos);
     img.alt = destino.imagenAlt || destino.nombre;
     img.loading = "lazy";
     const badge = document.createElement("span");

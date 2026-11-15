@@ -36,87 +36,33 @@
 
             <div class="reserva-form-col">
                 <div class="checkout-panel">
-                    <h2><i class="fa-solid fa-credit-card" aria-hidden="true"></i> <span data-i18n="payment.method.title">Método de pago</span></h2>
-                    <p class="checkout-sub" data-i18n="payment.method.subtitle">Elige cómo deseas pagar tu reserva. Todas las transacciones son seguras.</p>
-
-                    <form id="formPago" class="checkout-form">
-
-                        <div class="metodos-pago">
-                            <div class="metodo-item">
-                                <input type="radio" name="metodo" id="metodo-tarjeta" value="tarjeta" class="sr-only" checked>
-                                <label for="metodo-tarjeta" class="metodo-label">
-                                    <div class="metodo-info">
-                                        <i class="fa-regular fa-credit-card" aria-hidden="true"></i> <span data-i18n="payment.method.card">Tarjeta de Crédito / Débito</span>
-                                    </div>
-                                    <div class="metodo-icons">
-                                        <i class="fa-brands fa-cc-visa" aria-hidden="true"></i>
-                                        <i class="fa-brands fa-cc-mastercard" aria-hidden="true"></i>
-                                        <i class="fa-brands fa-cc-amex" aria-hidden="true"></i>
-                                    </div>
-                                </label>
-                                <div class="pago-details tarjeta-info">
-                                    <div class="form-field" style="margin-bottom:12px;">
-                                        <label for="cardNumber" data-i18n="payment.card.number">Número de Tarjeta</label>
-                                        <input id="cardNumber" type="text" class="wp-input" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-field">
-                                            <label for="cardExpiry" data-i18n="payment.card.expiry">Vencimiento</label>
-                                            <input id="cardExpiry" type="text" class="wp-input" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
-                                        </div>
-                                        <div class="form-field">
-                                            <label for="cardCvv">CVV</label>
-                                            <input id="cardCvv" type="text" class="wp-input" placeholder="123" maxlength="4" autocomplete="cc-csc">
-                                        </div>
-                                    </div>
-                                    <div class="form-field" style="margin-top:12px;">
-                                        <label for="cardHolder" data-i18n="payment.card.holder">Nombre del Titular</label>
-                                        <input id="cardHolder" type="text" class="wp-input" placeholder="Como aparece en la tarjeta" data-i18n-placeholder="payment.card.holderPlaceholder" autocomplete="cc-name">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="metodo-item" style="margin-top:16px;">
-                                <input type="radio" name="metodo" id="metodo-yape" value="yape" class="sr-only">
-                                <label for="metodo-yape" class="metodo-label">
-                                    <div class="metodo-info">
-                                        <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Yape / Plin
-                                    </div>
-                                    <div class="metodo-icons">
-                                        <span style="font-size:.8rem;font-weight:700;color:#7c3aed;">YAPE</span>
-                                    </div>
-                                </label>
-                                <div class="pago-details yape-info">
-                                    <p style="font-size:.85rem;color:var(--text-500);margin-bottom:12px;" data-i18n="payment.qr.help">Escanea el código QR desde tu aplicación para realizar el pago.</p>
-                                    <div class="payment-code-placeholder" role="img" aria-label="Código de pago disponible al iniciar la operación">
-                                        <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
-                                        <span data-i18n="payment.qr.available">Código disponible al iniciar el pago</span>
-                                    </div>
-                                    <p style="font-size:.9rem;font-weight:700;color:var(--blue-900);">Número: 987 654 321</p>
-                                </div>
-                            </div>
+                    <div class="payment-unavailable" role="status">
+                        <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                        <h2 data-i18n="payment.unavailable.title">Pago en línea temporalmente no disponible</h2>
+                        <p data-i18n="payment.unavailable.description">La integración con la pasarela de pago se encuentra en desarrollo. Tu reserva ha sido registrada y permanece pendiente de pago.</p>
+                        <div class="payment-method-preview" aria-label="Métodos de pago en preparación">
+                            <span><i class="fa-regular fa-credit-card" aria-hidden="true"></i> <span data-i18n="payment.future.card">Tarjeta</span></span>
+                            <span><i class="fa-solid fa-building-columns" aria-hidden="true"></i> <span data-i18n="payment.future.transfer">Transferencia</span></span>
+                            <span><i class="fa-solid fa-qrcode" aria-hidden="true"></i> <span data-i18n="payment.future.qr">QR</span></span>
                         </div>
-
-                        <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
-                            <span data-i18n="payment.confirm">Confirmar y pagar</span> <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                        </button>
-                    </form>
+                        <a class="wp-btn wp-btn-primary" href="cuenta.html#reservationsSection" data-i18n="payment.unavailable.back">Volver a mis reservas</a>
+                    </div>
                 </div>
             </div>
 
             <div class="reserva-summary-col">
                 <div class="summary-card">
                     <h3 data-i18n="booking.summary.title">Resumen de reserva</h3>
-                    <img id="sumImg" src="Img/machupichu.jpg" alt="" class="sum-img">
-                    <h4 id="sumDestino">Machu Picchu</h4>
+                    <img id="sumImg" src="Img/waypath-placeholder.svg" alt="" class="sum-img">
+                    <h4 id="sumDestino">—</h4>
                     <p class="sum-loc" style="margin-bottom:12px;"><i class="fa-regular fa-calendar"></i> <span id="sumFecha">--</span></p>
                     <div class="sum-divider"></div>
                     <div class="sum-total-row">
-                        <span data-i18n="booking.summary.total">Total a pagar</span>
+                        <span data-i18n="booking.summary.total">Total pendiente</span>
                         <span id="sumTotal" style="color:var(--orange-500);">S/ 0</span>
                     </div>
                     <div class="sum-guarantee">
-                        <i class="fa-solid fa-shield-check"></i> <span data-i18n="payment.protected">Tu compra está 100% protegida. WayPath garantiza los más altos estándares de seguridad en cada transacción.</span>
+                        <i class="fa-solid fa-circle-info"></i> <span data-i18n="payment.unavailable.status">Estado: pendiente de pago. No se ha creado una compra.</span>
                     </div>
                 </div>
             </div>

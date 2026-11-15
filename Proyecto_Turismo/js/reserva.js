@@ -1,525 +1,169 @@
 import { ApiError, api, appPath, appUrl } from "./api.js";
 import { errorMessageWithTrace, t } from "./frontend-utils.js";
+import { getDestinationImage } from "./destination-images.js";
 
 const params = new URLSearchParams(location.search);
-const storedContext = readBookingContext();
-const state = {
-    destinoId: params.get("destinoId") || storedContext.destinoId || localStorage.getItem("destinoIdSeleccionado"),
-    destino: storedContext.destino || localStorage.getItem("destinoSeleccionado") || "Selecciona un destino",
-    imagen: storedContext.imagen || localStorage.getItem("imgSeleccionada") || "",
-    paqueteId: params.get("paqueteId") || storedContext.paqueteId || null,
-    paquete: null,
-    salidas: [],
-    salida: null,
-    tarifa: null,
-    precio: Number(storedContext.precio ?? localStorage.getItem("precioSeleccionado") ?? 0) || 0,
-    user: null,
-    client: null,
-    pasajeros: []
-};
+const context = readJson(sessionStorage, "wp_booking_context");
 const draftKey = "wp_reservation_draft";
+const state = { destinoId: params.get("destinoId") || context.destinoId || localStorage.getItem("destinoIdSeleccionado"), paqueteId: params.get("paqueteId") || context.paqueteId || null, destino: context.destino || localStorage.getItem("destinoSeleccionado") || "", imagen: context.imagen || localStorage.getItem("imgSeleccionada") || "", precio: Number(context.precio ?? localStorage.getItem("precioSeleccionado") ?? 0), user: null, profile: null, paquete: null, tarifa: null, salida: null, salidas: [], pasajeros: [], companions: [] };
 
-function readBookingContext() {
-    try { return JSON.parse(sessionStorage.getItem("wp_booking_context") || "{}"); }
-    catch { return {}; }
-}
+document.addEventListener("DOMContentLoaded", init);
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const addPassengerLink = document.querySelector(".passenger-add-link");
-    if (addPassengerLink) {
-        addPassengerLink.href = `${appUrl("cuenta.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}#passengersSection`;
-    }
+async function init() {
     bindSummary();
     document.getElementById("formReserva")?.addEventListener("submit", submitReservation);
     document.getElementById("selectorDestinoReserva")?.addEventListener("change", selectDestination);
     document.getElementById("resFecha")?.addEventListener("change", selectDeparture);
-    document.getElementById("formReserva")?.addEventListener("input", saveDraft);
-    document.getElementById("formReserva")?.addEventListener("change", saveDraft);
-    document.getElementById("formReserva")?.addEventListener("input", updateContinueState);
-    document.getElementById("formReserva")?.addEventListener("change", updateContinueState);
-    try { await validateAuthenticatedClient(); }
-    catch (error) { handleInitialError(error); return; }
-
-    const hasDestination = await ensureDestinationSelected().catch(error => {
-        handleInitialError(error);
-        return false;
-    });
-    await Promise.allSettled([
-        hasDestination ? loadReservationContext().catch(handleInitialError) : Promise.resolve(),
-        loadProfile().catch(handleInitialError),
-        loadPassengers()
-    ]);
-    restoreDraft();
+    document.getElementById("addCompanion")?.addEventListener("click", addCompanion);
+    document.getElementById("principalCategory")?.addEventListener("change", updateTotal);
+    document.getElementById("resObservaciones")?.addEventListener("input", saveDraft);
+    try {
+        await validateAuthenticatedClient();
+        await Promise.all([loadProfile(), loadPassengers(), loadDestinations()]);
+        restoreDraft();
+        if (state.destinoId) await loadReservationContext();
+        else showMessage(t("booking.destination.required", "Selecciona un destino antes de continuar."), true);
+    } catch (error) { handleError(error); }
     updateTotal();
-    updateContinueState();
-});
-
-function bindSummary() {
-    text("sumDestino", state.destino);
-    const image = document.getElementById("sumImg");
-    if (image) {
-        image.src = state.imagen || "Img/machupichu.jpg";
-        image.alt = state.destino;
-    }
-    text("sumPrecioUnitario", money(state.precio));
-    updateTotal();
-}
-
-function handleInitialError(error) {
-    const message = error instanceof ApiError ? error.message : "No se pudo cargar la informacion de reserva.";
-    showMessage(message, true);
-    if (error instanceof ApiError && error.status === 401) {
-        const form = document.getElementById("formReserva");
-        const login = document.createElement("a");
-        login.className = "wp-btn wp-btn-primary";
-        login.href = `${appUrl("login.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`;
-        login.textContent = "Iniciar sesión";
-        const register = document.createElement("a");
-        register.className = "wp-btn wp-btn-outline";
-        register.href = `${appUrl("registro.html")}?returnUrl=${encodeURIComponent(appPath("reserva.html"))}`;
-        register.textContent = "Registrarse";
-        const actions = document.createElement("div");
-        actions.className = "checkout-actions";
-        actions.append(login, register);
-        form?.prepend(actions);
-    }
 }
 
 async function validateAuthenticatedClient() {
-    try {
-        state.user = await api("/api/auth/me");
-    } catch (error) {
-        if (!(error instanceof ApiError) || error.status !== 401) throw error;
-        localStorage.setItem("wp_auth_return_url", appPath("reserva.html"));
-        throw new ApiError(t("booking.auth.required", "Debes iniciar sesión para realizar una reserva."), 401);
+    try { state.user = await api("/api/auth/me"); }
+    catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+            const returnUrl = appPath("reserva.html") + location.search;
+            localStorage.setItem("wp_auth_return_url", returnUrl);
+            location.replace(`${appUrl("login.html")}?returnUrl=${encodeURIComponent(returnUrl)}`);
+        }
+        throw error;
     }
-    if (!(state.user.roles || []).includes("CLIENTE")) {
-        throw new ApiError("Solo una cuenta Cliente puede realizar reservas desde este flujo.", 403);
-    }
+    if (!(state.user.roles || []).includes("CLIENTE")) throw new ApiError(t("booking.auth.clientOnly", "Solo una cuenta de cliente puede reservar."), 403);
 }
 
-async function ensureDestinationSelected() {
-    const panel = document.getElementById("destinoSelectorPanel");
-    const selector = document.getElementById("selectorDestinoReserva");
+async function loadProfile() {
+    const response = await api("/api/clientes/me");
+    state.profile = response?.perfil || null;
+    if (!state.profile) throw new ApiError(t("booking.travelers.profileRequired", "Completa tu perfil en Mi cuenta antes de reservar."), 409);
+    text("principalName", `${state.profile.nombres} ${state.profile.apellidos}`);
+    text("principalEmail", state.profile.email || state.user.email || "—");
+    text("principalPhone", state.profile.telefono || "—");
+}
+
+async function loadPassengers() { state.pasajeros = await api("/api/reservas/me/pasajeros"); }
+
+async function loadDestinations() {
     const destinations = await api("/api/catalogo/destinos");
-    if (panel) panel.hidden = false;
-    if (selector) {
-        selector.innerHTML = `<option value="">${escapeHtml(t("booking.destination.select", "Selecciona un destino"))}</option>${destinations.map(destino => `<option value="${destino.destinoId}" data-name="${escapeHtml(destino.nombre)}" data-price="${destino.precioDesde ?? 0}" data-img="${escapeHtml(destino.imagenUrl || "")}">${escapeHtml(destino.nombre)} - ${escapeHtml(destino.ciudad)}</option>`).join("")}`;
-        selector.value = state.destinoId ? String(state.destinoId) : "";
-    }
+    const select = document.getElementById("selectorDestinoReserva");
+    select.innerHTML = `<option value="">${escapeHtml(t("booking.destination.select", "Selecciona un destino"))}</option>` + destinations.map(item => `<option value="${item.destinoId}" data-name="${escapeHtml(item.nombre)}" data-price="${item.precioDesde || 0}" data-img="${escapeHtml(item.imagenUrl || "")}">${escapeHtml(item.nombre)} · ${escapeHtml(item.ciudad)}</option>`).join("");
+    select.value = state.destinoId || "";
     const selected = destinations.find(item => String(item.destinoId) === String(state.destinoId));
     if (selected) {
-        state.destino = selected.nombre;
-        state.precio = Number(selected.precioDesde ?? state.precio);
-        state.imagen = selected.imagenUrl || state.imagen;
-        persistBookingContext();
+        state.destino = selected.nombre; state.imagen = getDestinationImage(selected, destinations);
         document.getElementById("destinoSelectorTitle").hidden = true;
         document.getElementById("destinoSelectorHelp").hidden = true;
-        bindSummary();
-        return true;
     }
-    setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
-    showMessage(t("booking.destination.required", "Selecciona un destino antes de continuar con la reserva."), true);
-    return false;
+    document.getElementById("destinoSelectorPanel").hidden = false;
+    persistContext(); bindSummary();
 }
 
 async function selectDestination(event) {
     const option = event.target.selectedOptions[0];
     if (!option?.value) return;
-    state.destinoId = option.value;
-    state.destino = option.dataset.name || option.textContent;
-    state.precio = Number(option.dataset.price || 0);
-    state.imagen = option.dataset.img || "Img/machupichu.jpg";
-    state.paqueteId = null;
-    persistBookingContext();
-    document.getElementById("destinoSelectorTitle").hidden = true;
-    document.getElementById("destinoSelectorHelp").hidden = true;
-    bindSummary();
-    clearMessage();
-    event.target.disabled = true;
-    try {
-        await loadReservationContext();
-        updateTotal();
-    } catch (error) {
-        showMessage(error.message || t("booking.context.loadError", "No se pudo cargar la disponibilidad del destino."), true);
-        document.getElementById("destinoSelectorPanel").hidden = false;
-    } finally {
-        event.target.disabled = false;
-    }
+    state.destinoId = option.value; state.destino = option.dataset.name; state.precio = Number(option.dataset.price || 0);
+    state.imagen = getDestinationImage({ destino: state.destino, imagenUrl: option.dataset.img }); state.paqueteId = null;
+    document.getElementById("destinoSelectorTitle").hidden = true; document.getElementById("destinoSelectorHelp").hidden = true;
+    persistContext(); bindSummary();
+    try { await loadReservationContext(); } catch (error) { handleError(error); }
 }
 
 async function loadReservationContext() {
-    state.salida = null;
-    state.salidas = [];
-    updateContinueState();
-    if (!state.destinoId) {
-        setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
-        throw new ApiError(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."), 400);
-    }
-    let packages;
-    try {
-        packages = await api(`/api/catalogo/paquetes?destinoId=${encodeURIComponent(state.destinoId)}`);
-    } catch (error) {
-        setDepartureState(t("booking.trip.loadError", "No se pudo cargar la disponibilidad. Intente nuevamente."));
-        throw error;
-    }
+    state.salida = null; updateContinueState();
+    const packages = await api(`/api/catalogo/paquetes?destinoId=${encodeURIComponent(state.destinoId)}`);
     state.paquete = packages.find(item => String(item.paqueteId) === String(state.paqueteId)) || packages[0];
-    if (!state.paquete) {
-        setDepartureState(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."));
-        throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 404);
-    }
+    if (!state.paquete) throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 404);
     const detail = await api(`/api/catalogo/paquetes/${encodeURIComponent(state.paquete.paqueteId)}`);
     state.tarifa = detail.tarifas?.[0];
-    if (!state.tarifa) throw new ApiError("El paquete seleccionado no tiene tarifas activas.", 404);
-    state.precio = Number(state.tarifa.precioBase);
-    state.paqueteId = String(state.paquete.paqueteId);
-    persistBookingContext();
-    let availability;
-    try {
-        availability = await api(`/api/operacion/disponibilidad?paqueteId=${encodeURIComponent(state.paquete.paqueteId)}`);
-    } catch (error) {
-        setDepartureState(t("booking.trip.loadError", "No se pudo cargar la disponibilidad. Intente nuevamente."));
-        throw error;
-    }
-    state.salidas = availability.filter(item => !item.estaBloqueada && Number(item.cupoDisponible) > 0);
-    if (!state.salidas.length) {
-        setDepartureState(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."));
-        throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 409);
-    }
-    renderDepartures();
-    text("sumPrecioUnitario", money(state.precio));
-}
-
-function persistBookingContext() {
-    const context = { destinoId: String(state.destinoId || ""), destino: state.destino,
-        paqueteId: state.paqueteId ? String(state.paqueteId) : null, precio: state.precio, imagen: state.imagen };
-    sessionStorage.setItem("wp_booking_context", JSON.stringify(context));
-    localStorage.setItem("destinoIdSeleccionado", context.destinoId);
-    localStorage.setItem("destinoSeleccionado", context.destino);
-    localStorage.setItem("precioSeleccionado", String(context.precio));
-    localStorage.setItem("imgSeleccionada", context.imagen || "");
+    if (!state.tarifa) throw new ApiError(t("booking.trip.noFare", "La experiencia no tiene una tarifa activa."), 404);
+    state.paqueteId = String(state.paquete.paqueteId); state.precio = Number(state.tarifa.precioBase);
+    state.salidas = (await api(`/api/operacion/disponibilidad?paqueteId=${encodeURIComponent(state.paqueteId)}`)).filter(item => !item.estaBloqueada && Number(item.cupoDisponible) > 0);
+    renderDepartures(); text("sumPaquete", state.paquete.nombre); text("sumPrecioUnitario", money(state.precio)); persistContext(); updateTotal();
 }
 
 function renderDepartures() {
-    const select = document.getElementById("resFecha");
-    select.disabled = false;
-    select.innerHTML = `<option value="">${escapeHtml(t("booking.trip.selectDeparture", "Seleccione una salida disponible."))}</option>` +
-        state.salidas.map(item => `<option value="${escapeHtml(item.salidaId)}">${escapeHtml(formatDeparture(item))}</option>`).join("");
-    if (state.salidas.length === 1) {
-        select.value = String(state.salidas[0].salidaId);
-        selectDeparture({ target: select });
-    }
+    const select = document.getElementById("resFecha"); select.disabled = !state.salidas.length;
+    select.innerHTML = state.salidas.length ? `<option value="">${escapeHtml(t("booking.trip.selectDeparture", "Selecciona una salida"))}</option>${state.salidas.map(item => `<option value="${item.salidaId}">${escapeHtml(formatDeparture(item))}</option>`).join("")}` : `<option value="">${escapeHtml(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."))}</option>`;
 }
 
-function setDepartureState(message) {
-    const select = document.getElementById("resFecha");
-    select.disabled = true;
-    select.innerHTML = `<option value="">${escapeHtml(message)}</option>`;
+function selectDeparture(event) { state.salida = state.salidas.find(item => String(item.salidaId) === event.target.value) || null; updateContinueState(); }
+function formatDeparture(item) { const date = new Intl.DateTimeFormat(document.documentElement.lang || "es", { dateStyle: "long" }).format(new Date(`${item.fechaInicio}T00:00:00`)); return `${date} · ${item.cupoDisponible} ${t("booking.trip.seats", "cupos disponibles")}`; }
+
+function addCompanion() {
+    if (state.companions.length >= 19) return showMessage(t("booking.passengers.maximum", "Puedes registrar hasta 19 acompañantes."), true);
+    state.companions.push({ id: crypto.randomUUID?.() || `${Date.now()}-${state.companions.length}` }); renderCompanions();
 }
 
-function selectDeparture(event) {
-    state.salida = state.salidas.find(item => String(item.salidaId) === event.target.value) || null;
-    updateContinueState();
-    saveDraft();
+function renderCompanions() {
+    const list = document.getElementById("companionList"); list.innerHTML = state.companions.map(companionHtml).join("");
+    list.querySelectorAll(".remove-companion").forEach(button => button.addEventListener("click", () => { state.companions = state.companions.filter(item => item.id !== button.dataset.id); renderCompanions(); saveDraft(); }));
+    list.querySelectorAll("input, select, textarea").forEach(control => control.addEventListener("input", () => { updateTotal(); saveDraft(); })); updateTotal();
 }
 
-function formatDeparture(item) {
-    const date = new Intl.DateTimeFormat(document.documentElement.lang || "es", { dateStyle: "long" })
-        .format(new Date(`${item.fechaInicio}T00:00:00`));
-    return `${date} · ${item.cupoDisponible} ${t("booking.trip.seats", "cupos disponibles")}`;
+function companionHtml(item, index) {
+    return `<section class="companion-card" data-id="${escapeHtml(item.id)}"><div class="traveler-heading"><h4>${escapeHtml(t("booking.travelers.companion", "Acompañante"))} ${index + 1}</h4><button type="button" class="remove-companion" data-id="${escapeHtml(item.id)}">${escapeHtml(t("booking.travelers.remove", "Eliminar acompañante"))}</button></div><div class="form-row"><label>${escapeHtml(t("account.passengers.names", "Nombres"))}<input class="wp-input companion-names" value="${escapeHtml(item.nombres || "")}" maxlength="120" required></label><label>${escapeHtml(t("account.passengers.lastNames", "Apellidos"))}<input class="wp-input companion-lastnames" value="${escapeHtml(item.apellidos || "")}" maxlength="120" required></label></div><div class="form-row"><label>${escapeHtml(t("account.passengers.birthDate", "Fecha de nacimiento"))}<input type="date" class="wp-input companion-birth" value="${escapeHtml(item.fechaNacimiento || "")}" max="${previousDateIso()}" required></label><label>${escapeHtml(t("booking.passengers.category", "Categoría"))}<select class="wp-select companion-category">${categoryOptions(item.tipoPasajero)}</select></label></div><label>${escapeHtml(t("booking.notes.label", "Requerimientos especiales (opcional)"))}<textarea class="wp-textarea companion-requirements" maxlength="500">${escapeHtml(item.requerimientosEspeciales || "")}</textarea></label></section>`;
 }
 
-async function loadProfile() {
-    const client = await api("/api/clientes/me");
-    state.client = client;
-    document.getElementById("resEmail").value = state.user.email || "";
-    if (client?.existe && client.perfil) {
-        document.getElementById("resNombres").value = client.perfil.nombres || "";
-        document.getElementById("resApellidos").value = client.perfil.apellidos || "";
-        document.getElementById("resTel").value = client.perfil.telefono || "";
-    } else {
-        showMessage("Completa tus datos personales antes de continuar con la reserva.", true);
-    }
-}
-
-async function loadPassengers() {
-    const status = document.getElementById("passengerPickerStatus");
-    status.textContent = t("booking.passengers.loading", "Cargando pasajeros...");
-    status.classList.remove("is-error");
-    try {
-        state.pasajeros = await api("/api/reservas/me/pasajeros");
-        renderPassengerPicker(readDraftSelection());
-        status.textContent = state.pasajeros.length ? "" : t("booking.passengers.empty", "No tienes pasajeros registrados. Agrégalos en Mi cuenta antes de continuar.");
-    } catch (error) {
-        status.textContent = error.message || t("booking.passengers.loadError", "No pudimos cargar tus pasajeros.");
-        status.classList.add("is-error");
-    }
-}
-
-function renderPassengerPicker(selection = new Map()) {
-    const list = document.getElementById("passengerPickerList");
-    list.replaceChildren();
-    state.pasajeros.forEach(passenger => {
-        const row = document.createElement("div");
-        row.className = "passenger-option";
-        row.dataset.passengerId = passenger.pasajeroId;
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "passenger-select";
-        checkbox.id = `passenger-${passenger.pasajeroId}`;
-        checkbox.setAttribute("aria-label", `${t("booking.passengers.select", "Seleccionar a")} ${passenger.nombres} ${passenger.apellidos}`);
-
-        const main = document.createElement("label");
-        main.className = "passenger-option-main";
-        main.htmlFor = checkbox.id;
-        const name = document.createElement("strong");
-        name.className = "passenger-option-name";
-        name.textContent = `${passenger.nombres} ${passenger.apellidos}`;
-        const meta = document.createElement("span");
-        meta.className = "passenger-option-meta";
-        meta.textContent = passenger.fechaNacimiento || t("booking.passengers.noBirthDate", "Sin fecha de nacimiento");
-        main.append(name, meta);
-
-        const controls = document.createElement("div");
-        controls.className = "passenger-option-controls";
-        const type = document.createElement("select");
-        type.className = "wp-select passenger-type";
-        type.disabled = true;
-        type.setAttribute("aria-label", `${t("booking.passengers.typeFor", "Categoría de")} ${passenger.nombres}`);
-        [
-            ["ADULTO", t("booking.passengers.adult", "Adulto")],
-            ["NINO", t("booking.passengers.child", "Niño")],
-            ["INFANTE", t("booking.passengers.infant", "Infante")],
-            ["ADULTO_MAYOR", t("booking.passengers.senior", "Adulto mayor")]
-        ].forEach(([value, label]) => type.add(new Option(label, value)));
-
-        const holderLabel = document.createElement("label");
-        holderLabel.className = "passenger-holder";
-        const holder = document.createElement("input");
-        holder.type = "radio";
-        holder.name = "passengerHolder";
-        holder.className = "passenger-holder-input";
-        holder.disabled = true;
-        holderLabel.append(holder, document.createTextNode(t("booking.passengers.holder", "Titular de la reserva")));
-        const saved = selection.get(String(passenger.pasajeroId));
-        if (saved) {
-            checkbox.checked = true;
-            row.classList.add("is-selected");
-            type.disabled = false;
-            type.value = saved.tipoPasajero;
-            holder.disabled = false;
-            holder.checked = saved.esTitular;
-        }
-        controls.append(type, holderLabel);
-        row.append(checkbox, main, controls);
-        list.append(row);
-
-        checkbox.addEventListener("change", () => {
-            row.classList.toggle("is-selected", checkbox.checked);
-            type.disabled = !checkbox.checked;
-            holder.disabled = !checkbox.checked;
-            if (!checkbox.checked) holder.checked = false;
-            updateTotal();
-        });
-        type.addEventListener("change", updateTotal);
-    });
-}
-
-function currentPassengerSelection() {
-    return new Map([...document.querySelectorAll(".passenger-option")]
-        .filter(row => row.querySelector(".passenger-select")?.checked)
-        .map(row => [String(row.dataset.passengerId), {
-            tipoPasajero: row.querySelector(".passenger-type").value,
-            esTitular: row.querySelector(".passenger-holder-input").checked
-        }]));
-}
-
-function saveDraft() {
-    const selection = Object.fromEntries(currentPassengerSelection());
-    sessionStorage.setItem(draftKey, JSON.stringify({
-        destinoId: state.destinoId,
-        nombres: value("resNombres"),
-        apellidos: value("resApellidos"),
-        telefono: value("resTel"),
-        observaciones: value("resObservaciones"),
-        selection
-    }));
-}
-
-function readDraft() {
-    try { return JSON.parse(sessionStorage.getItem(draftKey) || "null") || {}; }
-    catch { return {}; }
-}
-
-function readDraftSelection() {
-    const draft = readDraft();
-    if (draft.destinoId && String(draft.destinoId) !== String(state.destinoId)) return new Map();
-    return new Map(Object.entries(draft.selection || {}));
-}
-
-function restoreDraft() {
-    const draft = readDraft();
-    if (draft.destinoId && String(draft.destinoId) !== String(state.destinoId)) return;
-    [["resNombres", draft.nombres], ["resApellidos", draft.apellidos],
-        ["resTel", draft.telefono], ["resObservaciones", draft.observaciones]].forEach(([id, saved]) => {
-        const field = document.getElementById(id);
-        if (field && saved && !field.value) field.value = saved;
-    });
-}
+function categoryOptions(selected = "ADULTO") { return [["ADULTO","adult"],["NINO","child"],["INFANTE","infant"],["ADULTO_MAYOR","senior"]].map(([value,key]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHtml(t(`booking.passengers.${key}`, value))}</option>`).join(""); }
+function readCompanionForms() { return [...document.querySelectorAll(".companion-card")].map(card => ({ id: card.dataset.id, nombres: card.querySelector(".companion-names").value.trim(), apellidos: card.querySelector(".companion-lastnames").value.trim(), fechaNacimiento: card.querySelector(".companion-birth").value, tipoPasajero: card.querySelector(".companion-category").value, requerimientosEspeciales: card.querySelector(".companion-requirements").value.trim() })); }
 
 async function submitReservation(event) {
-    event.preventDefault();
-    clearMessage();
-    if (!state.salida || !state.tarifa) {
-        showMessage("No hay una salida disponible para reservar.", true);
-        return;
-    }
-    if (!isProfileComplete()) {
-        showMessage("Completa nombres, apellidos y teléfono antes de reservar.", true);
-        return;
-    }
-    const button = event.submitter || document.querySelector("#formReserva button[type='submit']");
-    button.disabled = true;
-    button.textContent = t("booking.create.loading", "Creando reserva...");
+    event.preventDefault(); clearMessage();
+    if (!state.salida || !state.tarifa) return showMessage(t("booking.trip.selectDeparture", "Selecciona una salida disponible."), true);
+    if (!state.profile?.telefono) return showMessage(t("booking.travelers.profileRequired", "Completa tu teléfono en Mi cuenta antes de reservar."), true);
+    const button = event.submitter; button.disabled = true;
     try {
-        const passengers = ensurePassengers();
-        await ensureClientProfile();
-        const reserva = await api("/api/reservas", {
-            method: "POST",
-            body: {
-                salidaId: Number(state.salida.salidaId),
-                tarifaId: Number(state.tarifa.tarifaId),
-                pasajeros: passengers,
-                observaciones: value("resObservaciones")
-            }
-        });
-        localStorage.setItem("wp_reserva_id", reserva.reservaId);
-        localStorage.setItem("wp_codigo_reserva", reserva.codigoReserva);
-        localStorage.setItem("wp_total_pagar", money(reserva.total));
-        localStorage.setItem("wp_detalle_pasajeros", `${passengers.length} ${t("booking.passengers.travelers", "pasajeros")}`);
-        localStorage.setItem("totalReserva", String(reserva.total));
-        localStorage.setItem("fechaReserva", state.salida.fechaInicio);
-        sessionStorage.removeItem(draftKey);
-        window.location.href = appUrl("pago.html");
-    } catch (error) {
-        if (error instanceof ApiError && error.status === 401) {
-            window.location.href = appUrl("login.html");
-            return;
-        }
-        const fallback = t("booking.create.error", "No se pudo crear la reserva.");
-        showMessage(errorMessageWithTrace(error, fallback), true);
-    } finally {
-        button.disabled = false;
-        button.innerHTML = `<span data-i18n="booking.continue">${escapeHtml(t("booking.continue", "Continuar al pago"))}</span> <i class="fa-solid fa-arrow-right"></i>`;
-    }
+        const passengers = await resolvePassengers();
+        const reserva = await api("/api/reservas", { method: "POST", body: { salidaId: Number(state.salida.salidaId), tarifaId: Number(state.tarifa.tarifaId), pasajeros: passengers, observaciones: value("resObservaciones") || null } });
+        localStorage.setItem("wp_reserva_id", reserva.reservaId); localStorage.setItem("wp_codigo_reserva", reserva.codigoReserva); localStorage.setItem("wp_total_pagar", money(reserva.total)); localStorage.setItem("totalReserva", String(reserva.total)); localStorage.setItem("fechaReserva", state.salida.fechaInicio);
+        sessionStorage.removeItem(draftKey); location.href = appUrl("pago.html");
+    } catch (error) { showMessage(errorMessageWithTrace(error, t("booking.create.error", "No se pudo crear la reserva.")), true); }
+    finally { button.disabled = false; button.innerHTML = `<span data-i18n="booking.continue">${escapeHtml(t("booking.continue", "Registrar reserva"))}</span> <i class="fa-solid fa-arrow-right"></i>`; }
 }
 
-async function ensureClientProfile() {
-    await api("/api/clientes/me", {
-        method: "PUT",
-        body: {
-            nombres: value("resNombres"),
-            apellidos: value("resApellidos"),
-            telefono: value("resTel"),
-            fechaNacimiento: null,
-            genero: null
-        }
-    });
+async function resolvePassengers() {
+    const companions = readCompanionForms();
+    for (const companion of companions) if (!companion.nombres || !companion.apellidos || !isValidPastDate(companion.fechaNacimiento)) throw new ApiError(t("booking.travelers.invalidCompanion", "Completa los datos y una fecha válida para cada acompañante."), 400);
+    const principal = await findOrCreatePassenger({ nombres: state.profile.nombres, apellidos: state.profile.apellidos, fechaNacimiento: state.profile.fechaNacimiento, requerimientosEspeciales: null });
+    const result = [{ pasajeroId: Number(principal.pasajeroId), tipoPasajero: document.getElementById("principalCategory").value, esTitular: true }];
+    for (const companion of companions) { const saved = await findOrCreatePassenger(companion); result.push({ pasajeroId: Number(saved.pasajeroId), tipoPasajero: companion.tipoPasajero, esTitular: false }); }
+    return result;
 }
 
-function ensurePassengers() {
-    const selected = [...document.querySelectorAll(".passenger-option")]
-        .filter(row => row.querySelector(".passenger-select")?.checked)
-        .map(row => ({
-            pasajeroId: Number(row.dataset.passengerId),
-            tipoPasajero: row.querySelector(".passenger-type").value,
-            esTitular: row.querySelector(".passenger-holder-input").checked
-        }));
-    if (!selected.length) {
-        throw new ApiError(t("booking.passengers.required", "Selecciona al menos un pasajero para continuar."), 400);
-    }
-    if (selected.length > 20) {
-        throw new ApiError(t("booking.passengers.maximum", "Puedes seleccionar hasta 20 pasajeros."), 400);
-    }
-    if (selected.filter(passenger => passenger.esTitular).length !== 1) {
-        throw new ApiError(t("booking.passengers.holderRequired", "Elige exactamente un titular de la reserva."), 400);
-    }
-    return selected;
-}
-
-function isProfileComplete() {
-    return Boolean(value("resNombres") && value("resApellidos") && value("resTel"));
+async function findOrCreatePassenger(person) {
+    const match = state.pasajeros.find(item => normalize(item.nombres) === normalize(person.nombres) && normalize(item.apellidos) === normalize(person.apellidos) && String(item.fechaNacimiento || "") === String(person.fechaNacimiento || ""));
+    if (match) return match;
+    const created = await api("/api/reservas/me/pasajeros", { method: "POST", body: { nombres: person.nombres, apellidos: person.apellidos, fechaNacimiento: person.fechaNacimiento || null, requerimientosEspeciales: person.requerimientosEspeciales || null } }); state.pasajeros.push(created); return created;
 }
 
 function updateTotal() {
-    const selectedRows = [...document.querySelectorAll(".passenger-option")]
-        .filter(row => row.querySelector(".passenger-select")?.checked);
-    const count = selectedRows.length;
-    const childPrice = Number(state.tarifa?.precioNino ?? state.precio);
-    const estimatedTotal = selectedRows.reduce((total, row) => {
-        const type = row.querySelector(".passenger-type").value;
-        return total + (type === "NINO" || type === "INFANTE" ? childPrice : state.precio);
-    }, 0);
-    text("resPasajerosCount", String(count));
-    text("sumPasajerosNum", String(count));
-    text("sumTotal", money(estimatedTotal));
-    updateContinueState();
+    const companions = readCompanionForms(); const count = 1 + companions.length; const childPrice = Number(state.tarifa?.precioNino ?? state.precio); const types = [document.getElementById("principalCategory")?.value || "ADULTO", ...companions.map(item => item.tipoPasajero)];
+    const total = types.reduce((sum, type) => sum + (["NINO","INFANTE"].includes(type) ? childPrice : state.precio), 0);
+    text("resPasajerosCount", String(count)); text("sumPasajerosNum", String(count)); text("sumTotal", money(total)); text("travelerCountLabel", `${count} ${t(count === 1 ? "booking.travelers.one" : "booking.travelers.many", count === 1 ? "viajero" : "viajeros")}`); updateContinueState();
 }
 
-function updateContinueState() {
-    const button = document.getElementById("continueToPayment");
-    if (!button) return;
-    const selected = document.querySelectorAll(".passenger-select:checked").length;
-    const ready = Boolean(state.salida && state.tarifa && selected > 0 && isProfileComplete());
-    button.disabled = !ready;
-    button.title = !state.salida ? t("booking.trip.selectDeparture", "Seleccione una salida disponible.")
-        : !selected ? t("booking.passengers.required", "Seleccione al menos un pasajero.")
-        : !isProfileComplete() ? t("booking.form.incomplete", "Complete los datos requeridos antes de continuar.") : "";
-}
-
-window.addEventListener("waypath:languagechange", () => {
-    if (state.salidas.length) renderDepartures();
-    if (!state.pasajeros.length) return;
-    const selection = currentPassengerSelection();
-    renderPassengerPicker(selection);
-    updateTotal();
-});
-
-function showMessage(message, isError = false) {
-    let box = document.getElementById("reservaMensaje");
-    if (!box) {
-        box = document.createElement("p");
-        box.id = "reservaMensaje";
-        box.className = "wp-alert";
-        box.setAttribute("role", "status");
-        box.setAttribute("aria-live", "polite");
-        document.getElementById("formReserva")?.prepend(box);
-    }
-    box.textContent = message;
-    box.className = `wp-alert ${isError ? "wp-alert-danger" : "wp-alert-success"}`;
-}
-
-function clearMessage() {
-    const box = document.getElementById("reservaMensaje");
-    if (box) box.textContent = "";
-}
-
-function value(id) {
-    return document.getElementById(id)?.value.trim() || "";
-}
-
-function text(id, content) {
-    const node = document.getElementById(id);
-    if (node) node.textContent = content;
-}
-
-function money(value) {
-    return `S/ ${Number(value || 0).toFixed(2)}`;
-}
-
-function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
-    })[char]);
-}
+function updateContinueState() { document.getElementById("continueToPayment").disabled = !(state.salida && state.tarifa && state.profile?.telefono); }
+function bindSummary() { text("sumDestino", state.destino || "—"); const image = document.getElementById("sumImg"); image.src = getDestinationImage({ destino: state.destino, imagenUrl: state.imagen }); image.alt = state.destino || "WayPath"; text("sumPrecioUnitario", money(state.precio)); }
+function persistContext() { sessionStorage.setItem("wp_booking_context", JSON.stringify({ destinoId: state.destinoId, destino: state.destino, paqueteId: state.paqueteId, precio: state.precio, imagen: state.imagen })); }
+function saveDraft() { sessionStorage.setItem(draftKey, JSON.stringify({ destinoId: state.destinoId, observaciones: value("resObservaciones"), companions: readCompanionForms() })); }
+function restoreDraft() { const draft = readJson(sessionStorage, draftKey); if (draft.destinoId && String(draft.destinoId) !== String(state.destinoId)) return; state.companions = draft.companions || []; if (draft.observaciones) document.getElementById("resObservaciones").value = draft.observaciones; renderCompanions(); }
+function handleError(error) { showMessage(errorMessageWithTrace(error, t("booking.context.loadError", "No se pudo cargar la reserva.")), true); }
+function showMessage(message, error = false) { let box = document.getElementById("reservaMensaje"); if (!box) { box = document.createElement("div"); box.id = "reservaMensaje"; document.getElementById("formReserva")?.prepend(box); } box.className = `wp-alert ${error ? "wp-alert-danger" : "wp-alert-success"}`; box.textContent = message; }
+function clearMessage() { document.getElementById("reservaMensaje")?.remove(); }
+function readJson(storage, key) { try { return JSON.parse(storage.getItem(key) || "{}") || {}; } catch { return {}; } }
+function isValidPastDate(value) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false; const date = new Date(`${value}T00:00:00`); const today = new Date(); today.setHours(0,0,0,0); return !Number.isNaN(date.getTime()) && date < today && date.toISOString().slice(0,10) === value; }
+function previousDateIso() { const date = new Date(); date.setDate(date.getDate() - 1); return date.toISOString().slice(0,10); }
+function normalize(value) { return String(value || "").trim().toLocaleLowerCase("es"); }
+function value(id) { return document.getElementById(id)?.value?.trim() || ""; }
+function text(id, content) { const node = document.getElementById(id); if (node) node.textContent = content; }
+function money(value) { return Number(value || 0).toLocaleString(document.documentElement.lang || "es-PE", { style: "currency", currency: "PEN" }); }
+function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[char]); }
+window.addEventListener("waypath:languagechange", () => { renderCompanions(); if (state.salidas.length) renderDepartures(); updateTotal(); });
