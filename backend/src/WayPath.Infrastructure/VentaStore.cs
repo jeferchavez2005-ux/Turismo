@@ -112,7 +112,7 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
     public async Task<CompraResumenDto[]> Mine(long usuarioId, CancellationToken ct)
     {
         var clienteId = await ClienteIdForUser(usuarioId, ct);
-        return await SummaryQuery().Where(x => x.ClienteId == clienteId)
+        return await SummaryQuery(clienteId)
             .OrderByDescending(x => x.FechaCompra).Select(x => x.Dto).ToArrayAsync(ct);
     }
 
@@ -173,12 +173,21 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
 
     public async Task<ResenaDto[]> PublicReviews(long? destinoId, byte? calificacion, CancellationToken ct)
     {
-        var approved = await StateId("RESENA", "APROBADA", ct);
-        return await ReviewQuery().Where(x => x.EstadoModeracion == "APROBADA")
-            .Where(x => destinoId == null || db.Resenas.Any(r => r.ResenaId.ToString() == x.ResenaId && r.DestinoId == destinoId))
-            .Where(x => calificacion == null || x.Calificacion == calificacion)
-            .OrderByDescending(x => x.CreadoEn).ToArrayAsync(ct);
+        return await PublicReviewQuery(destinoId, calificacion).ToArrayAsync(ct);
     }
+
+    private IQueryable<ResenaDto> PublicReviewQuery(long? destinoId, byte? calificacion) =>
+        from r in db.Resenas.AsNoTracking()
+            join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
+            join d in db.Destinos.AsNoTracking() on r.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on r.EstadoModeracionId equals e.EstadoId
+            where e.Codigo == "APROBADA"
+                && (destinoId == null || r.DestinoId == destinoId)
+                && (calificacion == null || r.Calificacion == calificacion)
+            orderby r.CreadoEn descending
+            select new ResenaDto(Id(r.ResenaId), c.Nombres + " " + c.Apellidos,
+                Id(d.DestinoId), d.Nombre, r.ReservaId == null ? null : Id(r.ReservaId.Value),
+                r.Calificacion, r.Titulo, r.Comentario, e.Codigo, r.CreadoEn);
 
     public async Task<ResenaDto> CreateReview(long usuarioId, CrearResenaRequest request, CancellationToken ct)
     {
@@ -242,7 +251,7 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
             header.Dto.TotalPagado, comprobante, tickets, voucher);
     }
 
-    private IQueryable<CompraRow> SummaryQuery() =>
+    private IQueryable<CompraRow> SummaryQuery(long? clienteId = null) =>
         from c in db.Compras.AsNoTracking()
         join r in db.Reservas.AsNoTracking() on c.ReservaId equals r.ReservaId
         join cl in db.Clientes.AsNoTracking() on c.ClienteId equals cl.ClienteId
@@ -250,6 +259,7 @@ public sealed class VentaStore(WayPathDbContext db) : IVentaStore
         join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
         join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
         join e in db.Estados.AsNoTracking() on c.EstadoId equals e.EstadoId
+        where clienteId == null || c.ClienteId == clienteId
         select new CompraRow(c.CompraId, c.ClienteId, c.FechaCompra,
             new CompraResumenDto(Id(c.CompraId), c.CodigoCompra, Id(c.ReservaId),
                 r.CodigoReserva, cl.Nombres + " " + cl.Apellidos, p.Nombre, d.Nombre,

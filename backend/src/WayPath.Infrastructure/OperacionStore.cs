@@ -11,13 +11,7 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
     public async Task<DisponibilidadDto[]> Disponibilidad(DisponibilidadFiltroRequest filtro, CancellationToken ct)
     {
         var activeSalida = await StateId("SALIDA", "PROGRAMADA", ct);
-        var rows = await BaseSalidas()
-            .Where(x => x.EstadoId == activeSalida)
-            .Where(x => filtro.PaqueteId == null || x.PaqueteId == filtro.PaqueteId)
-            .Where(x => filtro.Desde == null || x.FechaInicio >= filtro.Desde)
-            .Where(x => filtro.Hasta == null || x.FechaInicio <= filtro.Hasta)
-            .OrderBy(x => x.FechaInicio)
-            .ToArrayAsync(ct);
+        var rows = await AvailabilityQuery(activeSalida, filtro).ToArrayAsync(ct);
         var salidaIds = rows.Select(x => x.SalidaId).ToArray();
         var cupos = await CuposFor(salidaIds, ct);
         var blocked = await BlockedSalidaIds(salidaIds, ct);
@@ -30,6 +24,19 @@ public sealed class OperacionStore(WayPathDbContext db) : IOperacionStore
                 salidaCupos ?? []);
         }).ToArray();
     }
+
+    private IQueryable<SalidaRow> AvailabilityQuery(int activeSalida, DisponibilidadFiltroRequest filtro) =>
+        from s in db.Salidas.AsNoTracking()
+            join p in db.Paquetes.AsNoTracking() on s.PaqueteId equals p.PaqueteId
+            join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
+            join e in db.Estados.AsNoTracking() on s.EstadoId equals e.EstadoId
+            where s.EstadoId == activeSalida
+                && (filtro.PaqueteId == null || s.PaqueteId == filtro.PaqueteId)
+                && (filtro.Desde == null || s.FechaInicio >= filtro.Desde)
+                && (filtro.Hasta == null || s.FechaInicio <= filtro.Hasta)
+            orderby s.FechaInicio
+            select new SalidaRow(s.SalidaId, s.PaqueteId, s.EstadoId, p.Nombre, d.Nombre,
+                s.FechaInicio, s.FechaFin, s.CupoTotal, s.CupoReservado, s.PuntoEncuentro, e.Codigo);
 
     public async Task<SalidaDto[]> ListSalidas(SalidasFiltroRequest filtro, CancellationToken ct) =>
         await BaseSalidas()

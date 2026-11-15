@@ -19,9 +19,11 @@ form.addEventListener("submit", async event => {
             email: document.getElementById("email").value.trim(),
             password: document.getElementById("password").value
         } });
+        const user = await api("/api/auth/me");
         form.reset();
         broadcastAuthChange();
-        const next = requestedReturn || appPath("index.html");
+        const isAdministrator = (user.roles || []).some(role => String(role).toUpperCase() === "ADMINISTRADOR");
+        const next = isAdministrator ? appPath("admin/index.html") : requestedReturn || appPath("index.html");
         localStorage.removeItem("wp_auth_return_url");
         location.assign(next);
     } catch (error) { message.textContent = error.message; }

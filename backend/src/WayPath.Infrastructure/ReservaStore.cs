@@ -92,7 +92,7 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
     public async Task<ReservaResumenDto[]> Mine(long usuarioId, CancellationToken ct)
     {
         var clienteId = await ClienteIdForUser(usuarioId, ct);
-        return await SummaryQuery().Where(x => x.ClienteId == Id(clienteId))
+        return await SummaryQuery(clienteId)
             .OrderByDescending(x => x.FechaReserva).ToArrayAsync(ct);
     }
 
@@ -265,7 +265,7 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
             header.Simbolo, header.r.Observaciones, details, passengers, history);
     }
 
-    private IQueryable<ReservaResumenDto> SummaryQuery() =>
+    private IQueryable<ReservaResumenDto> SummaryQuery(long? clienteId = null) =>
         from r in db.Reservas.AsNoTracking()
         join c in db.Clientes.AsNoTracking() on r.ClienteId equals c.ClienteId
         join s in db.Salidas.AsNoTracking() on r.SalidaId equals s.SalidaId
@@ -273,6 +273,7 @@ public sealed class ReservaStore(WayPathDbContext db) : IReservaStore
         join d in db.Destinos.AsNoTracking() on p.DestinoId equals d.DestinoId
         join e in db.Estados.AsNoTracking() on r.EstadoId equals e.EstadoId
         join m in db.Monedas.AsNoTracking() on r.MonedaId equals m.MonedaId
+        where clienteId == null || r.ClienteId == clienteId
         let passengerCount = db.ReservaPasajeros.Count(rp => rp.ReservaId == r.ReservaId)
         select new ReservaResumenDto(Id(r.ReservaId), r.CodigoReserva, Id(r.ClienteId),
             c.Nombres + " " + c.Apellidos, Id(r.SalidaId), p.Nombre, d.Nombre,

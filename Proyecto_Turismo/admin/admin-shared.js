@@ -1,4 +1,4 @@
-import { api, ApiError } from "../js/api.js";
+import { api, ApiError, appUrl, broadcastAuthChange } from "../js/api.js";
 
 export const adminLinks = [
     { href: "index.html#dashboard", label: "Dashboard", i18n: "admin.nav.dashboard", icon: "fa-chart-line", permission: "REPORTES_LEER" },
@@ -137,6 +137,23 @@ function renderShell(user, active, title) {
             .map(link => `<a href="${link.href}" class="${active === link.label ? "active" : ""}"><i class="fa-solid ${link.icon}" aria-hidden="true"></i> <span data-i18n="${link.i18n}">${link.label}</span></a>`)
             .join("");
         window.WayPathI18n?.applyTranslations(nav);
+    }
+    const publicLink = document.querySelector(".admin-public-link");
+    if (publicLink) {
+        publicLink.href = "#";
+        publicLink.innerHTML = '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> <span>Cerrar sesión</span>';
+        publicLink.addEventListener("click", async event => {
+            event.preventDefault();
+            publicLink.setAttribute("aria-disabled", "true");
+            try {
+                await api("/api/auth/logout", { method: "POST" });
+                broadcastAuthChange();
+                location.replace(appUrl("login.html"));
+            } catch (error) {
+                publicLink.removeAttribute("aria-disabled");
+                alert(error.message || "No se pudo cerrar la sesión.");
+            }
+        }, { once: true });
     }
 }
 

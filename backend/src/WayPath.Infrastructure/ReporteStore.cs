@@ -134,10 +134,18 @@ public sealed class ReporteStore(WayPathDbContext db, IDashboardStore dashboard)
         return new(items, page, pageSize, total);
     }
 
-    public async Task<EventoResumenDto[]> EventSummary(CancellationToken ct) =>
-        await db.EventosAnalitica.AsNoTracking().GroupBy(x => x.TipoEvento)
-            .Select(g => new EventoResumenDto(g.Key, g.Count(), g.Max(x => (DateTime?)x.CreadoEn)))
-            .OrderByDescending(x => x.Total).Take(20).ToArrayAsync(ct);
+    public async Task<EventoResumenDto[]> EventSummary(CancellationToken ct)
+    {
+        return await EventSummaryQuery().ToArrayAsync(ct);
+    }
+
+    private IQueryable<EventoResumenDto> EventSummaryQuery() =>
+        db.EventosAnalitica.AsNoTracking()
+            .GroupBy(x => x.TipoEvento)
+            .Select(g => new { TipoEvento = g.Key, Total = g.Count(), UltimoEvento = g.Max(x => (DateTime?)x.CreadoEn) })
+            .OrderByDescending(x => x.Total)
+            .Take(20)
+            .Select(x => new EventoResumenDto(x.TipoEvento, x.Total, x.UltimoEvento));
 
     public async Task<DashboardSnapshotPage> Snapshots(string? dashboardCode, int page, int pageSize, CancellationToken ct)
     {

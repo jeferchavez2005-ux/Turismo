@@ -21,11 +21,6 @@
         { href: "compras.html", key: "nav.purchases", icon: "fa-bag-shopping" },
         { href: "reseñas.html", key: "nav.reviews", icon: "fa-star" }
     ];
-    const adminLinks = [
-        { href: "admin/index.html", key: "nav.dashboard", icon: "fa-table-columns" },
-        { href: "dashboards/dashboard-marketing.html", key: "nav.reports", icon: "fa-chart-pie" }
-    ];
-
     function t(key) {
         return window.WayPathI18n?.t(key) || fallback[key] || key;
     }
@@ -78,11 +73,6 @@
         return Array.isArray(user?.roles) && user.roles.some(value => value.toUpperCase() === role);
     }
 
-    function canSeeAdmin(user) {
-        if (hasRole(user, "ADMINISTRADOR") || hasRole(user, "EMPLEADO")) return true;
-        return Array.isArray(user?.permisos) && user.permisos.includes("REPORTES_LEER");
-    }
-
     function buildLinks(user) {
         if (!user) {
             return {
@@ -100,10 +90,6 @@
 
         const desktop = [...publicLinks, ...clientLinks.filter(link => link.key !== "nav.account")];
         const mobile = [...publicLinks, ...clientLinks];
-        if (canSeeAdmin(user)) {
-            desktop.push(...adminLinks);
-            mobile.push(...adminLinks);
-        }
         return { desktop, mobile };
     }
 
@@ -212,6 +198,10 @@
         renderNav(null);
         const authentication = await getUser();
         if (authentication.resolved) currentUser = authentication.user;
+        if (hasRole(currentUser, "ADMINISTRADOR")) {
+            location.replace(href("admin/index.html"));
+            return;
+        }
         renderNav(currentUser);
     }
 
