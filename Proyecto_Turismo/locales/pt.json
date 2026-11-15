@@ -342,6 +342,12 @@
   "reviews.errors.internal": "Não foi possível enviar a avaliação.",
   "errors.network": "Não foi possível conectar ao WayPath. Tente novamente.",
   "errors.trace": "Código de diagnóstico",
+  "account.passengers.invalidBirthDate": "Insira uma data de nascimento válida.", "account.passengers.birthDateHint": "Deve ser uma data anterior a hoje.",
+  "booking.auth.required": "Entre para fazer uma reserva.", "booking.trip.selectPrerequisite": "Selecione primeiro um destino ou pacote.", "booking.trip.selectDeparture": "Selecione uma saída disponível.", "booking.trip.empty": "Não há saídas disponíveis para a seleção atual.", "booking.trip.loadError": "Não foi possível carregar a disponibilidade. Tente novamente.", "booking.trip.seats": "vagas disponíveis", "booking.form.incomplete": "Preencha os dados obrigatórios antes de continuar.",
+  "reviews.summary.singular": "avaliação", "reviews.summary.plural": "avaliações", "reviews.summary.outOfFive": "de 5 estrelas",
+  "purchases.title": "Minhas compras", "purchases.loading": "Carregando suas compras...", "purchases.authRequired": "Entre para ver suas compras.", "purchases.loadError": "Não foi possível carregar suas compras.", "purchases.empty": "Você ainda não tem compras emitidas.", "purchases.emptyFiltered": "Não há compras neste estado.", "purchases.emptyHelp": "A WayPath mostrará aqui as compras geradas por pagamentos aprovados.",
+  "purchases.tabs.all": "Todas", "purchases.tabs.upcoming": "Próximas", "purchases.tabs.completed": "Concluídas", "purchases.tabs.cancelled": "Canceladas", "purchases.booking": "Reserva", "purchases.details": "Ver detalhes", "purchases.destination": "Destino", "purchases.receipt": "Comprovante", "purchases.pending": "pendente", "purchases.tickets": "Bilhetes emitidos", "purchases.detailError": "Não foi possível carregar os detalhes.", "purchases.datePending": "Data a confirmar",
+  "contact.title": "Fale conosco", "contact.customerService": "Atendimento ao cliente", "contact.email": "E-mail", "contact.office": "Escritório principal", "contact.form.title": "Envie uma mensagem", "contact.form.name": "Seu nome", "contact.form.subject": "Selecione um assunto", "contact.form.booking": "Alterar reserva", "contact.form.payment": "Dúvidas de pagamento", "contact.form.support": "Assistência em viagem", "contact.form.other": "Outro", "contact.form.message": "Escreva sua mensagem aqui...", "contact.faq": "Perguntas frequentes", "contact.additional": "Informações adicionais",
   "common.send": "Enviar",
   "common.cancel": "Cancelar"
 }

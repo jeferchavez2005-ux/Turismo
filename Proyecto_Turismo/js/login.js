@@ -1,13 +1,10 @@
 import { api, appPath, appUrl, broadcastAuthChange } from "./api.js";
+import { safeInternalReturnUrl, t } from "./frontend-utils.js";
 const form = document.getElementById("loginForm");
 const message = document.getElementById("authMessage");
 const params = new URLSearchParams(location.search);
-const requestedReturn = safeReturnUrl(params.get("returnUrl") || localStorage.getItem("wp_auth_return_url"));
+const requestedReturn = safeInternalReturnUrl(params.get("returnUrl") || localStorage.getItem("wp_auth_return_url"), appUrl);
 const registerLink = document.getElementById("registerFromLogin");
-const t = (key, fallback) => {
-    const translated = window.WayPathI18n?.t(key);
-    return translated && translated !== key ? translated : fallback;
-};
 if (registerLink && requestedReturn) registerLink.href = `registro.html?returnUrl=${encodeURIComponent(requestedReturn)}`;
 if (params.get("registered") === "1")
     message.textContent = t("login.registered", "Cuenta creada. Inicia sesión para continuar.");
@@ -34,13 +31,3 @@ document.querySelector(".forgot a").addEventListener("click", event => {
     event.preventDefault();
     message.textContent = t("login.recoveryUnavailable", "La recuperación de cuentas por correo aún no está disponible.");
 });
-
-function safeReturnUrl(value) {
-    if (!value) return "";
-    if (!value.startsWith("/") || value.startsWith("//")) return "";
-    const candidate = new URL(value, location.origin);
-    const appRoot = new URL(appUrl());
-    return candidate.origin === location.origin && candidate.pathname.startsWith(appRoot.pathname)
-        ? `${candidate.pathname}${candidate.search}${candidate.hash}`
-        : "";
-}

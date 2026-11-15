@@ -76,7 +76,9 @@
                             <div class="form-row">
                                 <div class="form-field">
                                     <label for="resFecha" data-i18n="booking.trip.startDate">Fecha de inicio</label>
-                                    <input type="date" class="wp-input" id="resFecha" required>
+                                    <select class="wp-input" id="resFecha" required disabled>
+                                        <option value="">Seleccione primero un destino o paquete.</option>
+                                    </select>
                                 </div>
                                 <div class="form-field reservation-travelers-count">
                                     <span class="form-label" data-i18n="booking.passengers.count">Viajeros seleccionados</span>
@@ -98,7 +100,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="wp-btn wp-btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
+                        <button type="submit" id="continueToPayment" class="wp-btn wp-btn-primary" disabled style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
                             <span data-i18n="booking.continue">Continuar al pago</span> <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </form>

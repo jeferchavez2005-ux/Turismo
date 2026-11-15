@@ -1,4 +1,5 @@
 import { api, ApiError } from "./api.js";
+import { errorMessageWithTrace, t } from "./frontend-utils.js";
 
 const fallbackImage = "Img/machupichu.jpg";
 let purchases = [];
@@ -13,14 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadPurchases() {
     const container = document.getElementById("contenedor-compras");
     if (!container) return;
-    container.innerHTML = state("Cargando tus compras...");
+    container.innerHTML = state(t("purchases.loading", "Cargando tus compras..."));
     try {
         purchases = await api("/api/ventas/compras/me");
         renderPurchases();
     } catch (error) {
         const message = error instanceof ApiError && error.status === 401
-            ? "Inicia sesion para ver tus compras reales."
-            : error.message || "No se pudieron cargar tus compras.";
+            ? t("purchases.authRequired", "Inicie sesión para ver sus compras.")
+            : errorMessageWithTrace(error, t("purchases.loadError", "No se pudieron cargar tus compras."));
         container.innerHTML = state(message);
         updateStats([]);
     }
@@ -32,8 +33,8 @@ function renderPurchases() {
     updateStats(purchases);
     if (visible.length === 0) {
         container.innerHTML = state(currentFilter === "all"
-            ? "Aun no tienes compras emitidas."
-            : "No hay compras en este estado.");
+            ? t("purchases.empty", "Aún no tienes compras emitidas.")
+            : t("purchases.emptyFiltered", "No hay compras en este estado."));
         return;
     }
     container.innerHTML = visible.map(cardHtml).join("");
@@ -53,14 +54,14 @@ function cardHtml(item) {
                     <span><i class="fa-solid fa-map-location-dot"></i> ${escapeHtml(item.destino)}</span>
                     <span><i class="fa-regular fa-calendar"></i> ${formatDate(item.fechaInicio)} - ${formatDate(item.fechaFin)}</span>
                 </div>
-                <p>Reserva ${escapeHtml(item.codigoReserva)}</p>
+                <p>${escapeHtml(t("purchases.booking", "Reserva"))} ${escapeHtml(item.codigoReserva)}</p>
                 <span class="purchase-code">${escapeHtml(item.codigoCompra)}</span>
             </div>
             <div class="purchase-side">
                 <span class="status-pill ${status}">${escapeHtml(item.estado)}</span>
                 <strong>${money(item.totalPagado)}</strong>
                 <button class="pc-detail-btn" type="button" data-id="${item.compraId}">
-                    Ver detalles
+                    ${escapeHtml(t("purchases.details", "Ver detalles"))}
                 </button>
             </div>
         </article>`;
@@ -74,15 +75,15 @@ async function openDetails(id) {
         document.getElementById("modalImg").alt = detail.destino;
         document.getElementById("modalPrecio").textContent = money(detail.totalPagado);
         document.getElementById("modalDetalles").innerHTML = [
-            `Destino: ${escapeHtml(detail.destino)}`,
-            `Reserva: ${escapeHtml(detail.codigoReserva)}`,
-            `Comprobante: ${detail.comprobante ? `${escapeHtml(detail.comprobante.serie)}-${escapeHtml(detail.comprobante.numero)}` : "pendiente"}`,
-            `Tickets emitidos: ${detail.tickets?.length ?? 0}`,
-            `Voucher: ${detail.voucher ? escapeHtml(detail.voucher.codigoVoucher) : "pendiente"}`
+            `${t("purchases.destination", "Destino")}: ${escapeHtml(detail.destino)}`,
+            `${t("purchases.booking", "Reserva")}: ${escapeHtml(detail.codigoReserva)}`,
+            `${t("purchases.receipt", "Comprobante")}: ${detail.comprobante ? `${escapeHtml(detail.comprobante.serie)}-${escapeHtml(detail.comprobante.numero)}` : t("purchases.pending", "pendiente")}`,
+            `${t("purchases.tickets", "Tickets emitidos")}: ${detail.tickets?.length ?? 0}`,
+            `Voucher: ${detail.voucher ? escapeHtml(detail.voucher.codigoVoucher) : t("purchases.pending", "pendiente")}`
         ].join("<br>");
         showModal(true);
     } catch (error) {
-        alert(error.message || "No se pudo cargar el detalle.");
+        alert(errorMessageWithTrace(error, t("purchases.detailError", "No se pudo cargar el detalle.")));
     }
 }
 
@@ -131,17 +132,19 @@ function statusClass(value) {
 }
 
 function money(value) {
-    return Number(value || 0).toLocaleString("es-PE", { style: "currency", currency: "PEN" });
+    return Number(value || 0).toLocaleString(document.documentElement.lang || "es-PE", { style: "currency", currency: "PEN" });
 }
 
 function formatDate(value) {
-    if (!value) return "Fecha por definir";
-    return new Date(`${value}T00:00:00`).toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" });
+    if (!value) return t("purchases.datePending", "Fecha por definir");
+    return new Date(`${value}T00:00:00`).toLocaleDateString(document.documentElement.lang || "es-PE", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function state(text) {
-    return `<div class="wp-empty-state"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><strong>${escapeHtml(text)}</strong><p>WayPath mostrara aqui las compras generadas desde pagos aprobados.</p></div>`;
+    return `<div class="wp-empty-state"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><strong>${escapeHtml(text)}</strong><p>${escapeHtml(t("purchases.emptyHelp", "WayPath mostrará aquí las compras generadas desde pagos aprobados."))}</p></div>`;
 }
+
+window.addEventListener("waypath:languagechange", renderPurchases);
 
 function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({

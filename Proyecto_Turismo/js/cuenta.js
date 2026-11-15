@@ -1,14 +1,10 @@
 import { api, appPath, appUrl, broadcastAuthChange } from "./api.js";
+import { isValidPastDate, previousDateIso, safeInternalReturnUrl, t } from "./frontend-utils.js";
 
 const message = document.getElementById("accountMessage");
 const logout = document.getElementById("logout");
 const state = { user: null, cliente: null, catalogos: null, documentos: [], direcciones: [], pasajeros: [] };
-const returnUrl = safeReturnUrl(new URLSearchParams(location.search).get("returnUrl"));
-
-const t = (key, fallback) => {
-    const translated = window.WayPathI18n?.t(key);
-    return translated && translated !== key ? translated : fallback;
-};
+const returnUrl = safeInternalReturnUrl(new URLSearchParams(location.search).get("returnUrl"), appUrl);
 
 window.addEventListener("waypath:languagechange", () => {
     renderPassengers();
@@ -31,13 +27,6 @@ function showError(error) {
 function value(id) { return document.getElementById(id).value.trim(); }
 function nullable(id) { const data = value(id); return data.length ? data : null; }
 function checked(id) { return document.getElementById(id).checked; }
-function safeReturnUrl(value) {
-    if (!value || !value.startsWith("/") || value.startsWith("//")) return "";
-    const candidate = new URL(value, location.origin);
-    const root = new URL(appUrl());
-    return candidate.origin === location.origin && candidate.pathname.startsWith(root.pathname)
-        ? `${candidate.pathname}${candidate.search}${candidate.hash}` : "";
-}
 function setValue(id, data) { document.getElementById(id).value = data ?? ""; }
 function optionLabel(text, flag) { return flag ? `${text} - ${t("account.common.primary", "Principal")}` : text; }
 function asIntOrNull(id) {
@@ -310,12 +299,15 @@ document.getElementById("passengerForm").addEventListener("submit", async event 
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
     const birthDate = nullable("passengerBirthDate");
-    const today = new Date().toISOString().slice(0, 10);
-    if (birthDate && birthDate > today) {
-        setPassengersStatus(t("account.passengers.futureBirthDate", "La fecha de nacimiento no puede estar en el futuro."), true);
-        document.getElementById("passengerBirthDate").focus();
+    const birthDateInput = document.getElementById("passengerBirthDate");
+    if (birthDate && !isValidPastDate(birthDate)) {
+        birthDateInput.setCustomValidity(t("account.passengers.invalidBirthDate", "Ingrese una fecha de nacimiento válida."));
+        birthDateInput.reportValidity();
+        setPassengersStatus(t("account.passengers.invalidBirthDate", "Ingrese una fecha de nacimiento válida."), true);
+        birthDateInput.focus();
         return;
     }
+    birthDateInput.setCustomValidity("");
     setBusy(form, true);
     setPassengersStatus(t("account.passengers.saving", "Guardando pasajero..."));
     try {
@@ -335,7 +327,12 @@ document.getElementById("passengerForm").addEventListener("submit", async event 
     } finally { setBusy(form, false); }
 });
 
-document.getElementById("passengerBirthDate").max = new Date().toISOString().slice(0, 10);
+const passengerBirthDate = document.getElementById("passengerBirthDate");
+passengerBirthDate.max = previousDateIso();
+passengerBirthDate.addEventListener("input", () => {
+    passengerBirthDate.setCustomValidity(passengerBirthDate.value && !isValidPastDate(passengerBirthDate.value)
+        ? t("account.passengers.invalidBirthDate", "Ingrese una fecha de nacimiento válida.") : "");
+});
 
 document.getElementById("documentForm").addEventListener("submit", async event => {
     event.preventDefault();

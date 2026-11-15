@@ -99,7 +99,8 @@
                 <label for="passengerLastNames" data-i18n="account.passengers.lastNames">Apellidos</label>
                 <input id="passengerLastNames" class="wp-input" required maxlength="120" autocomplete="family-name">
                 <label for="passengerBirthDate" data-i18n="account.passengers.birthDate">Fecha de nacimiento</label>
-                <input id="passengerBirthDate" class="wp-input" type="date" autocomplete="bday">
+                <input id="passengerBirthDate" class="wp-input" type="date" autocomplete="bday" aria-describedby="passengerBirthDateHint">
+                <span id="passengerBirthDateHint" class="account-form-hint" data-i18n="account.passengers.birthDateHint">Debe ser una fecha anterior a hoy.</span>
                 <label for="passengerRequirements" data-i18n="account.passengers.requirements">Requerimientos especiales</label>
                 <textarea id="passengerRequirements" class="wp-input" maxlength="500" rows="3" data-i18n-placeholder="account.passengers.requirementsPlaceholder" placeholder="Alergias, movilidad u otra información relevante"></textarea>
                 <p class="account-form-hint" data-i18n="account.passengers.apiNotice">Podrás seleccionar y clasificar a cada pasajero durante la reserva.</p>

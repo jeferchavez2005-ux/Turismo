@@ -1,4 +1,4 @@
-const faqQuestions = document.querySelectorAll('.faq-question');
+const faqQuestions = document.querySelectorAll(".faq-q, .faq-question");
 
 faqQuestions.forEach(question => {
     question.addEventListener('click', () => {
@@ -9,6 +9,7 @@ faqQuestions.forEach(question => {
             currentlyActive.classList.remove('active');
         }
 
-        faqItem.classList.toggle('active');
+        const expanded = faqItem.classList.toggle("active");
+        question.setAttribute("aria-expanded", String(expanded));
     });
 });

@@ -342,6 +342,12 @@
   "reviews.errors.internal": "The review could not be submitted.",
   "errors.network": "We could not connect to WayPath. Try again.",
   "errors.trace": "Diagnostic code",
+  "account.passengers.invalidBirthDate": "Enter a valid date of birth.", "account.passengers.birthDateHint": "It must be a date before today.",
+  "booking.auth.required": "Sign in to make a booking.", "booking.trip.selectPrerequisite": "Select a destination or package first.", "booking.trip.selectDeparture": "Select an available departure.", "booking.trip.empty": "No departures are available for the current selection.", "booking.trip.loadError": "Availability could not be loaded. Please try again.", "booking.trip.seats": "seats available", "booking.form.incomplete": "Complete the required information before continuing.",
+  "reviews.summary.singular": "review", "reviews.summary.plural": "reviews", "reviews.summary.outOfFive": "out of 5 stars",
+  "purchases.title": "My purchases", "purchases.loading": "Loading your purchases...", "purchases.authRequired": "Sign in to view your purchases.", "purchases.loadError": "Your purchases could not be loaded.", "purchases.empty": "You do not have any issued purchases yet.", "purchases.emptyFiltered": "There are no purchases in this status.", "purchases.emptyHelp": "WayPath will show purchases generated from approved payments here.",
+  "purchases.tabs.all": "All", "purchases.tabs.upcoming": "Upcoming", "purchases.tabs.completed": "Completed", "purchases.tabs.cancelled": "Cancelled", "purchases.booking": "Booking", "purchases.details": "View details", "purchases.destination": "Destination", "purchases.receipt": "Receipt", "purchases.pending": "pending", "purchases.tickets": "Tickets issued", "purchases.detailError": "The details could not be loaded.", "purchases.datePending": "Date to be confirmed",
+  "contact.title": "Contact us", "contact.customerService": "Customer service", "contact.email": "Email", "contact.office": "Main office", "contact.form.title": "Send us a message", "contact.form.name": "Your name", "contact.form.subject": "Select a subject", "contact.form.booking": "Change a booking", "contact.form.payment": "Payment questions", "contact.form.support": "Travel assistance", "contact.form.other": "Other", "contact.form.message": "Write your message here...", "contact.faq": "Frequently asked questions", "contact.additional": "Additional information",
   "common.send": "Send",
   "common.cancel": "Cancel"
 }

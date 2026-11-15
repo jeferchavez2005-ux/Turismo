@@ -1,12 +1,11 @@
 import { api, ApiError } from "./api.js";
+import { errorMessageWithTrace, t } from "./frontend-utils.js";
 
 let requestVersion = 0;
-const t = (key, fallback) => {
-    const value = window.WayPathI18n?.t(key);
-    return value && value !== key ? value : fallback;
-};
-
 document.addEventListener("DOMContentLoaded", async () => {
+    const reviewsList = document.getElementById("reviewsList");
+    reviewsList?.replaceChildren();
+    if (reviewsList) reviewsList.hidden = false;
     document.getElementById("filtroDestino")?.addEventListener("change", loadReviews);
     document.getElementById("filtroEstrellas")?.addEventListener("change", loadReviews);
     document.getElementById("btnEscribirReseña")?.addEventListener("click", writeReview);
@@ -37,14 +36,31 @@ async function loadReviews() {
     try {
         const reviews = await api(`/api/ventas/resenas${query.size ? `?${query}` : ""}`);
         if (version !== requestVersion) return;
+        updateSummary(reviews);
         list.innerHTML = reviews.length ? reviews.map(reviewHtml).join("") :
-            empty(t("reviews.empty.filtered", "Aún no hay reseñas publicadas con esos filtros."),
+            empty(t("reviews.empty.filtered", "Aún no existen reseñas."),
                 t("reviews.empty.help", "Prueba otra combinación de destino y calificación."));
     } catch (error) {
         if (version !== requestVersion) return;
-        const trace = error.traceId ? `${t("errors.trace", "Código de diagnóstico")}: ${error.traceId}` : "";
-        list.innerHTML = empty(error.message || t("reviews.loadError", "No se pudieron cargar las reseñas."), trace);
+        updateSummary([]);
+        list.innerHTML = empty(errorMessageWithTrace(error, t("reviews.loadError", "No se pudieron cargar las reseñas.")));
     }
+}
+
+function updateSummary(reviews) {
+    const total = reviews.length;
+    const average = total ? reviews.reduce((sum, item) => sum + Number(item.calificacion || 0), 0) / total : 0;
+    document.getElementById("reviewsAverage").textContent = average.toFixed(total ? 1 : 0);
+    document.getElementById("reviewsTotal").textContent = `${total} ${t(total === 1 ? "reviews.summary.singular" : "reviews.summary.plural", total === 1 ? "reseña" : "reseñas")}`;
+    const summaryStars = document.getElementById("reviewsStars");
+    summaryStars.innerHTML = stars(Math.round(average));
+    summaryStars.setAttribute("aria-label", `${average.toFixed(1)} ${t("reviews.summary.outOfFive", "de 5 estrellas")}`);
+    document.querySelectorAll(".bar-row[data-rating]").forEach(row => {
+        const count = reviews.filter(item => Number(item.calificacion) === Number(row.dataset.rating)).length;
+        const percent = total ? Math.round(count * 100 / total) : 0;
+        row.querySelector(".fill").style.width = `${percent}%`;
+        row.querySelector(".bar-pct").textContent = `${percent}%`;
+    });
 }
 
 async function writeReview() {
@@ -53,7 +69,7 @@ async function writeReview() {
         const available = reservas.filter(item => (item.estado || "").toUpperCase() === "COMPLETADA");
         if (!available.length) {
             await Swal.fire(t("reviews.ineligible.title", "Sin viajes completados"),
-                t("reviews.ineligible.message", "Solo puedes publicar una reseña después de completar el viaje."), "info");
+                t("reviews.ineligible.message", "Necesita completar un viaje antes de publicar una reseña."), "info");
             return;
         }
         const options = available.map(item => `<option value="${item.reservaId}">${escapeHtml(item.codigoReserva)} - ${escapeHtml(item.paquete)}</option>`).join("");

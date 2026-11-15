@@ -1,10 +1,12 @@
 import { ApiError, api, appPath, appUrl } from "./api.js";
+import { errorMessageWithTrace, t } from "./frontend-utils.js";
 
 const state = {
     destinoId: localStorage.getItem("destinoIdSeleccionado"),
     destino: localStorage.getItem("destinoSeleccionado") || "Selecciona un destino",
     imagen: localStorage.getItem("imgSeleccionada") || "",
     paquete: null,
+    salidas: [],
     salida: null,
     tarifa: null,
     precio: Number.parseFloat(localStorage.getItem("precioSeleccionado") || "0") || 0,
@@ -14,11 +16,6 @@ const state = {
 };
 const draftKey = "wp_reservation_draft";
 
-const t = (key, fallback) => {
-    const translated = window.WayPathI18n?.t(key);
-    return translated && translated !== key ? translated : fallback;
-};
-
 document.addEventListener("DOMContentLoaded", async () => {
     const addPassengerLink = document.querySelector(".passenger-add-link");
     if (addPassengerLink) {
@@ -27,8 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     bindSummary();
     document.getElementById("formReserva")?.addEventListener("submit", submitReservation);
     document.getElementById("selectorDestinoReserva")?.addEventListener("change", selectDestination);
+    document.getElementById("resFecha")?.addEventListener("change", selectDeparture);
     document.getElementById("formReserva")?.addEventListener("input", saveDraft);
     document.getElementById("formReserva")?.addEventListener("change", saveDraft);
+    document.getElementById("formReserva")?.addEventListener("input", updateContinueState);
+    document.getElementById("formReserva")?.addEventListener("change", updateContinueState);
     try { await validateAuthenticatedClient(); }
     catch (error) { handleInitialError(error); return; }
 
@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ]);
     restoreDraft();
     updateTotal();
+    updateContinueState();
 });
 
 function bindSummary() {
@@ -80,8 +81,9 @@ async function validateAuthenticatedClient() {
     try {
         state.user = await api("/api/auth/me");
     } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 401) throw error;
         localStorage.setItem("wp_auth_return_url", appPath("reserva.html"));
-        throw new ApiError("Debes iniciar sesión para realizar una reserva.", error.status || 401);
+        throw new ApiError(t("booking.auth.required", "Debes iniciar sesión para realizar una reserva."), 401);
     }
     if (!(state.user.roles || []).includes("CLIENTE")) {
         throw new ApiError("Solo una cuenta Cliente puede realizar reservas desde este flujo.", 403);
@@ -90,6 +92,7 @@ async function validateAuthenticatedClient() {
 
 async function ensureDestinationSelected() {
     if (state.destinoId) return true;
+    setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
     const panel = document.getElementById("destinoSelectorPanel");
     const selector = document.getElementById("selectorDestinoReserva");
     const destinations = await api("/api/catalogo/destinos");
@@ -128,24 +131,72 @@ async function selectDestination(event) {
 }
 
 async function loadReservationContext() {
-    if (!state.destinoId) throw new ApiError("Seleccione un destino desde el catalogo antes de reservar.", 400);
-    const packages = await api(`/api/catalogo/paquetes?destinoId=${encodeURIComponent(state.destinoId)}`);
+    state.salida = null;
+    state.salidas = [];
+    updateContinueState();
+    if (!state.destinoId) {
+        setDepartureState(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."));
+        throw new ApiError(t("booking.trip.selectPrerequisite", "Seleccione primero un destino o paquete."), 400);
+    }
+    let packages;
+    try {
+        packages = await api(`/api/catalogo/paquetes?destinoId=${encodeURIComponent(state.destinoId)}`);
+    } catch (error) {
+        setDepartureState(t("booking.trip.loadError", "No se pudo cargar la disponibilidad. Intente nuevamente."));
+        throw error;
+    }
     state.paquete = packages[0];
-    if (!state.paquete) throw new ApiError("Este destino aun no tiene paquetes disponibles.", 404);
+    if (!state.paquete) {
+        setDepartureState(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."));
+        throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 404);
+    }
     const detail = await api(`/api/catalogo/paquetes/${encodeURIComponent(state.paquete.paqueteId)}`);
     state.tarifa = detail.tarifas?.[0];
     if (!state.tarifa) throw new ApiError("El paquete seleccionado no tiene tarifas activas.", 404);
     state.precio = Number(state.tarifa.precioBase);
-    const availability = await api(`/api/operacion/disponibilidad?paqueteId=${encodeURIComponent(state.paquete.paqueteId)}`);
-    state.salida = availability.find(x => !x.estaBloqueada && x.cupoDisponible > 0);
-    if (!state.salida) throw new ApiError("No hay salidas disponibles para este paquete.", 409);
-    const date = document.getElementById("resFecha");
-    if (date) {
-        date.value = state.salida.fechaInicio;
-        date.min = state.salida.fechaInicio;
-        date.max = state.salida.fechaInicio;
+    let availability;
+    try {
+        availability = await api(`/api/operacion/disponibilidad?paqueteId=${encodeURIComponent(state.paquete.paqueteId)}`);
+    } catch (error) {
+        setDepartureState(t("booking.trip.loadError", "No se pudo cargar la disponibilidad. Intente nuevamente."));
+        throw error;
     }
+    state.salidas = availability.filter(item => !item.estaBloqueada && Number(item.cupoDisponible) > 0);
+    if (!state.salidas.length) {
+        setDepartureState(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."));
+        throw new ApiError(t("booking.trip.empty", "No hay salidas disponibles para la selección actual."), 409);
+    }
+    renderDepartures();
     text("sumPrecioUnitario", money(state.precio));
+}
+
+function renderDepartures() {
+    const select = document.getElementById("resFecha");
+    select.disabled = false;
+    select.innerHTML = `<option value="">${escapeHtml(t("booking.trip.selectDeparture", "Seleccione una salida disponible."))}</option>` +
+        state.salidas.map(item => `<option value="${escapeHtml(item.salidaId)}">${escapeHtml(formatDeparture(item))}</option>`).join("");
+    if (state.salidas.length === 1) {
+        select.value = String(state.salidas[0].salidaId);
+        selectDeparture({ target: select });
+    }
+}
+
+function setDepartureState(message) {
+    const select = document.getElementById("resFecha");
+    select.disabled = true;
+    select.innerHTML = `<option value="">${escapeHtml(message)}</option>`;
+}
+
+function selectDeparture(event) {
+    state.salida = state.salidas.find(item => String(item.salidaId) === event.target.value) || null;
+    updateContinueState();
+    saveDraft();
+}
+
+function formatDeparture(item) {
+    const date = new Intl.DateTimeFormat(document.documentElement.lang || "es", { dateStyle: "long" })
+        .format(new Date(`${item.fechaInicio}T00:00:00`));
+    return `${date} · ${item.cupoDisponible} ${t("booking.trip.seats", "cupos disponibles")}`;
 }
 
 async function loadProfile() {
@@ -327,7 +378,7 @@ async function submitReservation(event) {
             return;
         }
         const fallback = t("booking.create.error", "No se pudo crear la reserva.");
-        showMessage(error instanceof ApiError ? error.message : fallback, true);
+        showMessage(errorMessageWithTrace(error, fallback), true);
     } finally {
         button.disabled = false;
         button.innerHTML = `<span data-i18n="booking.continue">${escapeHtml(t("booking.continue", "Continuar al pago"))}</span> <i class="fa-solid fa-arrow-right"></i>`;
@@ -383,9 +434,22 @@ function updateTotal() {
     text("resPasajerosCount", String(count));
     text("sumPasajerosNum", String(count));
     text("sumTotal", money(estimatedTotal));
+    updateContinueState();
+}
+
+function updateContinueState() {
+    const button = document.getElementById("continueToPayment");
+    if (!button) return;
+    const selected = document.querySelectorAll(".passenger-select:checked").length;
+    const ready = Boolean(state.salida && state.tarifa && selected > 0 && isProfileComplete());
+    button.disabled = !ready;
+    button.title = !state.salida ? t("booking.trip.selectDeparture", "Seleccione una salida disponible.")
+        : !selected ? t("booking.passengers.required", "Seleccione al menos un pasajero.")
+        : !isProfileComplete() ? t("booking.form.incomplete", "Complete los datos requeridos antes de continuar.") : "";
 }
 
 window.addEventListener("waypath:languagechange", () => {
+    if (state.salidas.length) renderDepartures();
     if (!state.pasajeros.length) return;
     const selection = currentPassengerSelection();
     renderPassengerPicker(selection);
