@@ -172,9 +172,12 @@ function filterLocal() {
 }
 async function loadDestinations() {
     try {
-        destinos = await api("/api/catalogo/destinos");
+        const response = await api("/api/catalogo/destinos");
+        destinos = Array.isArray(response) ? response : response?.items || response?.data || [];
+        if (!Array.isArray(destinos)) throw new ApiError("La respuesta del catálogo no es válida.", 0);
         render(destinos);
-    } catch {
+    } catch (error) {
+        console.error("No se pudo cargar el catálogo público", { status: error?.status, traceId: error?.traceId });
         destinos = Array.from(document.querySelectorAll("#destinosGrid .dest-card")).map(card => ({
             destinoId: card.querySelector(".btn-reserva")?.dataset.destinoId || "",
             nombre: card.dataset.nombre,

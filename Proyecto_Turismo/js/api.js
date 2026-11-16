@@ -65,6 +65,10 @@ export async function api(path, { method = "GET", body } = {}) {
     if (body !== undefined) headers["Content-Type"] = "application/json";
     return request(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
 }
+export async function apiForm(path, formData, method = "POST") {
+    const csrf = await request("/api/auth/csrf");
+    return request(path, { method, headers: { "X-CSRF-TOKEN": csrf.token }, body: formData });
+}
 export function broadcastAuthChange() {
     if ("BroadcastChannel" in window) {
         const channel = new BroadcastChannel("waypath-auth");

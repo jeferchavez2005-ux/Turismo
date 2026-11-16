@@ -37,7 +37,6 @@ async function openReceipt(id) {
         const detail = await api(`/api/ventas/compras/me/${id}`);
         document.getElementById("modalTitle").textContent = t("purchases.receiptTitle", "Comprobante de compra");
         const image = document.getElementById("modalImg"); image.src = getDestinationImage({ destino: detail.destino }, destinations); image.alt = detail.destino;
-        document.getElementById("modalPrecio").textContent = money(detail.totalPagado);
         document.getElementById("modalDetalles").innerHTML = receiptHtml(detail);
         ensurePrintActions(); showModal(true);
     } catch (error) { alert(errorMessageWithTrace(error, t("purchases.detailError", "No se pudo cargar el comprobante."))); }
@@ -46,21 +45,30 @@ async function openReceipt(id) {
 function receiptHtml(detail) {
     const travelers = detail.tickets?.length || null;
     const receiptState = detail.comprobante?.estado || null;
-    return `<div class="purchase-receipt"><strong class="receipt-brand">WAYPATH</strong><dl>
-      ${row(t("purchases.purchase", "Compra"), detail.codigoCompra)}${row(t("purchases.booking", "Reserva"), detail.codigoReserva)}${row(t("purchases.customer", "Cliente"), detail.cliente)}${row(t("purchases.destination", "Destino"), detail.destino)}${row(t("purchases.experience", "Experiencia"), detail.paquete)}${row(t("purchases.travelDate", "Fecha del viaje"), `${formatDate(detail.fechaInicio)} – ${formatDate(detail.fechaFin)}`)}${travelers ? row(t("purchases.travelers", "Viajeros"), travelers) : ""}${row(t("purchases.purchaseState", "Estado de compra"), translateState(detail.estado))}${receiptState ? row(t("purchases.receiptState", "Estado del comprobante"), translateState(receiptState)) : ""}</dl><p class="receipt-disclaimer">${escapeHtml(t("purchases.internalDisclaimer", "Comprobante interno de compra de WayPath. No constituye comprobante electrónico SUNAT."))}</p></div>`;
+    const issuedAt = detail.comprobante?.fechaEmision || detail.fechaCompra;
+    return `<article id="printReceipt" class="purchase-receipt">
+      <header class="receipt-header"><strong class="receipt-brand">WAYPATH</strong><span>${escapeHtml(t("purchases.receiptTitle", "Comprobante de compra WayPath"))}</span></header>
+      <section><h3>${escapeHtml(t("purchases.summary", "Resumen"))}</h3><dl>${row(t("purchases.purchaseNumber", "N.º de compra"), detail.codigoCompra)}${row(t("purchases.bookingNumber", "N.º de reserva"), detail.codigoReserva)}${issuedAt ? row(t("purchases.issuedAt", "Fecha de emisión"), formatDateTime(issuedAt)) : ""}</dl></section>
+      <section><h3>${escapeHtml(t("purchases.customerData", "Datos del cliente"))}</h3><dl>${row(t("purchases.customer", "Nombre"), detail.cliente)}</dl></section>
+      <section><h3>${escapeHtml(t("purchases.tripData", "Datos del viaje"))}</h3><dl>${row(t("purchases.destination", "Destino"), detail.destino)}${row(t("purchases.experience", "Experiencia"), detail.paquete)}${row(t("purchases.travelDate", "Fecha"), `${formatDate(detail.fechaInicio)} – ${formatDate(detail.fechaFin)}`)}${travelers ? row(t("purchases.travelers", "Cantidad de viajeros"), travelers) : ""}</dl></section>
+      <section><h3>${escapeHtml(t("purchases.totalSummary", "Total"))}</h3><strong class="receipt-total">${escapeHtml(money(detail.totalPagado))}</strong></section>
+      <section><h3>${escapeHtml(t("purchases.status", "Estado"))}</h3><dl>${row(t("purchases.purchaseState", "Estado de compra"), translateState(detail.estado))}${receiptState ? row(t("purchases.receiptState", "Estado del comprobante"), translateState(receiptState)) : ""}</dl></section>
+      <p class="receipt-disclaimer">${escapeHtml(t("purchases.internalDisclaimer", "Este documento es un comprobante interno de WayPath. No constituye comprobante electrónico SUNAT."))}</p>
+    </article>`;
 }
 
 function row(label, value) { return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`; }
-function ensurePrintActions() { const body = document.querySelector(".wp-modal-body"); if (body.querySelector(".receipt-actions")) return; const actions = document.createElement("div"); actions.className = "receipt-actions"; actions.innerHTML = `<button type="button" class="wp-btn wp-btn-primary" id="printReceipt"><i class="fa-solid fa-print" aria-hidden="true"></i> ${escapeHtml(t("purchases.print", "Imprimir"))}</button>`; body.append(actions); actions.querySelector("button").addEventListener("click", () => window.print()); }
+function ensurePrintActions() { const body = document.querySelector(".wp-modal-body"); if (body.querySelector(".receipt-actions")) return; const actions = document.createElement("div"); actions.className = "receipt-actions"; actions.innerHTML = `<button type="button" class="wp-btn wp-btn-primary" id="printReceiptButton"><i class="fa-solid fa-print" aria-hidden="true"></i> ${escapeHtml(t("purchases.print", "Imprimir / Guardar PDF"))}</button>`; body.append(actions); actions.querySelector("button").addEventListener("click", () => window.print()); }
 
 function bindTabs() { document.querySelectorAll(".tab-btn").forEach(button => button.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(item => { item.classList.remove("active"); item.setAttribute("aria-selected", "false"); }); button.classList.add("active"); button.setAttribute("aria-selected", "true"); currentFilter = button.dataset.filter || "all"; renderPurchases(); })); }
 function bindModal() { document.getElementById("modalClose")?.addEventListener("click", () => showModal(false)); document.querySelector(".wp-modal-backdrop")?.addEventListener("click", () => showModal(false)); document.addEventListener("keydown", event => { if (event.key === "Escape") showModal(false); }); }
-function showModal(open) { const modal = document.getElementById("detailModal"); modal.style.display = open ? "flex" : "none"; document.body.style.overflow = open ? "hidden" : ""; }
+function showModal(open) { const modal = document.getElementById("detailModal"); modal.style.display = open ? "grid" : "none"; document.body.style.overflow = open ? "hidden" : ""; }
 function updateStats(items) { const stats = document.querySelectorAll(".cstat-num"); if (stats[0]) stats[0].textContent = items.length; if (stats[1]) stats[1].textContent = items.filter(item => statusClass(item.estado) === "proxima").length; if (stats[2]) stats[2].textContent = items.filter(item => statusClass(item.estado) === "completado").length; }
 function statusClass(value) { const status = String(value || "").toUpperCase(); if (["ANULADA","CANCELADA"].includes(status)) return "cancelado"; if (status === "COMPLETADA") return "completado"; return "proxima"; }
 function translateState(value) { const key = `states.${String(value || "unknown").toLowerCase()}`; return t(key, String(value || t("states.unknown", "Sin estado")).replaceAll("_", " ")); }
 function money(value) { return Number(value || 0).toLocaleString(document.documentElement.lang || "es-PE", { style: "currency", currency: "PEN" }); }
 function formatDate(value) { return value ? new Date(`${value}T00:00:00`).toLocaleDateString(document.documentElement.lang || "es-PE", { dateStyle: "medium" }) : t("purchases.datePending", "Fecha por definir"); }
+function formatDateTime(value) { return value ? new Date(value).toLocaleString(document.documentElement.lang || "es-PE", { dateStyle: "medium", timeStyle: "short" }) : ""; }
 function emptyState(message) { return `<div class="wp-empty-state"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><strong>${escapeHtml(message)}</strong><p>${escapeHtml(t("purchases.emptyHelp", "Aquí aparecerán únicamente compras generadas desde pagos confirmados."))}</p></div>`; }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[char]); }
 window.addEventListener("waypath:languagechange", renderPurchases);

@@ -1,4 +1,4 @@
-import { api } from "../js/api.js";
+import { api, apiForm } from "../js/api.js";
 import { adminEmpty, adminError, adminLoading, can, escapeHtml, initAdminPage, stateBadge } from "./admin-shared.js";
 
 const state = {
@@ -227,12 +227,20 @@ async function createOrEditDestination(id) {
         confirmButtonText: "Guardar",
         cancelButtonText: "Cancelar",
         confirmButtonColor: "#f97316",
+        didOpen: bindDestinationImagePreview,
         preConfirm: readDestinationForm
     });
     if (!result.isConfirmed) return;
     try {
         const url = id ? `/api/catalogo/destinos/${encodeURIComponent(id)}` : "/api/catalogo/destinos";
-        await api(url, { method: id ? "PUT" : "POST", body: result.value });
+        const { image, ...body } = result.value;
+        const saved = await api(url, { method: id ? "PUT" : "POST", body });
+        const destinationId = id || saved?.destinoId;
+        if (image && destinationId) {
+            const formData = new FormData();
+            formData.append("image", image);
+            await apiForm(`/api/catalogo/admin/destinos/${encodeURIComponent(destinationId)}/imagen`, formData);
+        }
         toast("Destino guardado.");
         await loadData();
     } catch (error) {
@@ -264,9 +272,13 @@ async function createOrEditPackage(id) {
 }
 
 async function changeState(type, id) {
+    const collection = type === "destinos" ? state.destinations : state.packages;
+    const idKey = type === "destinos" ? "destinoId" : "paqueteId";
+    const current = collection.find(item => String(item[idKey]) === String(id));
+    const currentState = String(current?.estado || (current?.esActivo === false ? "INACTIVO" : "ACTIVO")).toUpperCase();
     const result = await Swal.fire({
         title: "Cambiar estado",
-        html: `<select id="catalogoEstado" class="swal2-input"><option value="ACTIVO">ACTIVO</option><option value="INACTIVO">INACTIVO</option></select>`,
+        html: `<select id="catalogoEstado" class="swal2-input"><option value="ACTIVO" ${currentState === "ACTIVO" ? "selected" : ""}>ACTIVO</option><option value="INACTIVO" ${currentState === "INACTIVO" ? "selected" : ""}>INACTIVO</option></select>`,
         showCancelButton: true,
         confirmButtonText: "Guardar",
         cancelButtonText: "Cancelar",
@@ -293,6 +305,11 @@ function destinationForm(item) {
             <textarea id="destinoDescripcionLarga" class="swal2-textarea" placeholder="Descripción larga">${escapeHtml(item?.descripcionLarga || "")}</textarea>
             <input id="destinoAltitud" class="swal2-input" type="number" placeholder="Altitud metros" value="${escapeHtml(item?.altitudMetros || "")}">
             <label class="admin-check"><input id="destinoDestacado" type="checkbox" ${item?.esDestacado ? "checked" : ""}> Destacado</label>
+            <label class="admin-image-field">Imagen del destino
+                <input id="destinoImagen" type="file" accept="image/jpeg,image/png,image/webp">
+                <small>JPEG, PNG o WebP. Máximo 5 MB.</small>
+            </label>
+            <img id="destinoImagenPreview" class="admin-image-preview" src="${escapeHtml(item?.imagenUrl || "../Img/waypath-placeholder.svg")}" alt="Vista previa de la imagen">
             ${categoryChecks(item)}
         </div>`;
 }
@@ -314,6 +331,15 @@ function packageForm(item) {
 }
 
 function readDestinationForm() {
+    const image = document.getElementById("destinoImagen")?.files?.[0] || null;
+    if (image && !["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
+        Swal.showValidationMessage("Solo se permiten imágenes JPEG, PNG o WebP.");
+        return false;
+    }
+    if (image && image.size > 5 * 1024 * 1024) {
+        Swal.showValidationMessage("La imagen debe pesar como máximo 5 MB.");
+        return false;
+    }
     return {
         ciudadId: Number(document.getElementById("destinoCiudad").value),
         ubicacionTuristicaId: null,
@@ -323,8 +349,22 @@ function readDestinationForm() {
         descripcionLarga: document.getElementById("destinoDescripcionLarga").value.trim() || null,
         altitudMetros: Number(document.getElementById("destinoAltitud").value) || null,
         esDestacado: document.getElementById("destinoDestacado").checked,
-        categoriaIds: [...document.querySelectorAll("[data-categoria]:checked")].map(item => Number(item.value))
+        categoriaIds: [...document.querySelectorAll("[data-categoria]:checked")].map(item => Number(item.value)),
+        image
     };
+}
+
+function bindDestinationImagePreview() {
+    const input = document.getElementById("destinoImagen");
+    const preview = document.getElementById("destinoImagenPreview");
+    input?.addEventListener("change", () => {
+        const image = input.files?.[0];
+        if (!image || !preview) return;
+        if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+        const objectUrl = URL.createObjectURL(image);
+        preview.dataset.objectUrl = objectUrl;
+        preview.src = objectUrl;
+    });
 }
 
 function readPackageForm() {

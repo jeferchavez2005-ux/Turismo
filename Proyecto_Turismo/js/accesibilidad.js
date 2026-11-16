@@ -2,6 +2,7 @@
     const storage = {
         theme: "wp_theme",
         fontScale: "wp_font_scale",
+        position: "waypath.accessibility.position",
         legacyContrast: "wp_alto_contraste",
         legacyLargeText: "wp_texto_grande"
     };
@@ -113,6 +114,69 @@
         if (languageWidget && languageWidget.parentNode !== utilityBar) utilityBar.append(languageWidget);
         if (accessibilityWidget && accessibilityWidget.parentNode !== utilityBar) utilityBar.append(accessibilityWidget);
         utilityBar.classList.add("wp-preferences-panel");
+        if (!utilityBar.querySelector(".wp-toolbar-handle")) {
+            const handle = document.createElement("button");
+            handle.type = "button";
+            handle.className = "wp-toolbar-handle";
+            handle.setAttribute("aria-label", "Mover panel de accesibilidad");
+            handle.title = "Arrastrar. Doble clic para restablecer la posición";
+            handle.innerHTML = '<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>';
+            utilityBar.prepend(handle);
+        }
+        enableDragging(utilityBar);
+    }
+
+    function enableDragging(bar) {
+        const margin = 8;
+        const handle = bar.querySelector(".wp-toolbar-handle");
+        let drag = null;
+        const clamp = (x, y) => ({
+            x: Math.min(Math.max(margin, x), Math.max(margin, window.innerWidth - bar.offsetWidth - margin)),
+            y: Math.min(Math.max(margin, y), Math.max(margin, window.innerHeight - bar.offsetHeight - margin))
+        });
+        const place = (x, y, save = false) => {
+            const point = clamp(x, y);
+            bar.style.left = `${point.x}px`;
+            bar.style.top = `${point.y}px`;
+            bar.style.right = "auto";
+            if (save) localStorage.setItem(storage.position, JSON.stringify(point));
+        };
+        try {
+            const saved = JSON.parse(localStorage.getItem(storage.position));
+            if (Number.isFinite(saved?.x) && Number.isFinite(saved?.y)) requestAnimationFrame(() => place(saved.x, saved.y));
+        } catch { localStorage.removeItem(storage.position); }
+        handle?.addEventListener("pointerdown", event => {
+            if (event.button !== 0) return;
+            const rect = bar.getBoundingClientRect();
+            drag = { dx: event.clientX - rect.left, dy: event.clientY - rect.top };
+            handle.setPointerCapture(event.pointerId);
+            bar.classList.add("is-dragging");
+            event.preventDefault();
+        });
+        handle?.addEventListener("pointermove", event => {
+            if (!drag) return;
+            place(event.clientX - drag.dx, event.clientY - drag.dy);
+        });
+        const finish = event => {
+            if (!drag) return;
+            drag = null;
+            bar.classList.remove("is-dragging");
+            const rect = bar.getBoundingClientRect();
+            place(rect.left, rect.top, true);
+            if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+        };
+        handle?.addEventListener("pointerup", finish);
+        handle?.addEventListener("pointercancel", finish);
+        handle?.addEventListener("dblclick", () => {
+            localStorage.removeItem(storage.position);
+            bar.style.left = "";
+            bar.style.top = "";
+            bar.style.right = "";
+        });
+        window.addEventListener("resize", () => {
+            const rect = bar.getBoundingClientRect();
+            place(rect.left, rect.top, Boolean(localStorage.getItem(storage.position)));
+        });
     }
 
     function init() {

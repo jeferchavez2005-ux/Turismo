@@ -24,6 +24,9 @@ public sealed class CatalogoService(ICatalogoStore store)
         store.UpdateDestino(id, Clean(request), ct);
     public Task SetDestinoState(long id, string codigo, CancellationToken ct) =>
         store.SetDestinoState(id, codigo.Trim().ToUpperInvariant(), ct);
+    public Task SetDestinoImage(long id, string url, string storedName, string mimeType,
+        string altText, CancellationToken ct) =>
+        store.SetDestinoImage(id, url, storedName, mimeType, altText.Trim(), ct);
     public Task<PaqueteDetalleDto> CreatePaquete(PaqueteRequest request, CancellationToken ct) =>
         store.CreatePaquete(Clean(request), ct);
     public Task<PaqueteDetalleDto> UpdatePaquete(long id, PaqueteRequest request, CancellationToken ct) =>

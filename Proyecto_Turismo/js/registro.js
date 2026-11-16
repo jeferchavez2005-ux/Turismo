@@ -18,7 +18,7 @@ form.addEventListener("submit", async event => {
     event.preventDefault();
     validatePasswordMatch();
     if (!isStrongPassword(password.value)) {
-        message.textContent = t("register.passwordError", "La contraseña debe tener mínimo 12 caracteres y al menos 4 caracteres especiales.");
+        message.textContent = t("register.passwordError", "Usa al menos 8 caracteres.");
         return;
     }
     if (!form.reportValidity()) return;
@@ -51,7 +51,7 @@ function renderPasswordStrength() {
     const bar = strength?.querySelector("span");
     const text = strength?.querySelector("small");
     if (bar) bar.style.width = `${Math.max(25, score * 33)}%`;
-    if (text) text.textContent = `${label}. ${t("register.passwordRule", "Usa mínimo 12 caracteres y 4 especiales.")}`;
+    if (text) text.textContent = `${label}. ${t("register.passwordRule", "Usa al menos 8 caracteres.")}`;
 }
 
 function validatePasswordMatch() {
@@ -61,14 +61,14 @@ function validatePasswordMatch() {
 
 function passwordScore(value) {
     let score = 0;
+    if (value.length >= 8) score += 1;
     if (value.length >= 12) score += 1;
-    if ((value.match(/[^A-Za-z0-9]/g) || []).length >= 4) score += 1;
-    if (/[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value)) score += 1;
+    if (new Set(value).size >= 6) score += 1;
     return score;
 }
 
 function isStrongPassword(value) {
-    return value.length >= 12 && (value.match(/[^A-Za-z0-9]/g) || []).length >= 4;
+    return value.length >= 8;
 }
 
 function safeReturnUrl(value) {

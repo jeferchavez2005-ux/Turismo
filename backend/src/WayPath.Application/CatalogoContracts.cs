@@ -65,6 +65,8 @@ public interface ICatalogoStore
     Task<DestinoDetalleDto> CreateDestino(DestinoRequest request, CancellationToken ct);
     Task<DestinoDetalleDto> UpdateDestino(long destinoId, DestinoRequest request, CancellationToken ct);
     Task SetDestinoState(long destinoId, string codigo, CancellationToken ct);
+    Task SetDestinoImage(long destinoId, string url, string storedName, string mimeType,
+        string altText, CancellationToken ct);
     Task<PaqueteResumenDto[]> ListPaquetes(long? destinoId, CancellationToken ct);
     Task<PaqueteDetalleDto?> GetPaquete(string slugOrId, CancellationToken ct);
     Task<PaqueteDetalleDto> CreatePaquete(PaqueteRequest request, CancellationToken ct);

@@ -5,7 +5,7 @@ namespace WayPath.Application;
 
 public sealed record RegisterRequest(
     [Required, EmailAddress, StringLength(255)] string Email,
-    [Required, StringLength(128, MinimumLength = 12)] string Password,
+    [Required, StringLength(128, MinimumLength = 8)] string Password,
     [Required, StringLength(100)] string Nombre);
 public sealed record LoginRequest(
     [Required, EmailAddress, StringLength(255)] string Email,
@@ -13,7 +13,7 @@ public sealed record LoginRequest(
 public sealed record ProfileRequest([Required, StringLength(100)] string Nombre);
 public sealed record PasswordRequest(
     [Required, StringLength(128)] string PasswordActual,
-    [Required, StringLength(128, MinimumLength = 12)] string PasswordNueva);
+    [Required, StringLength(128, MinimumLength = 8)] string PasswordNueva);
 public sealed record StateRequest([Required] string Codigo);
 public sealed record UserRolesRequest([Required, MaxLength(100)] int[] RolIds);
 public sealed record RolePermissionsRequest([Required, MaxLength(500)] int[] PermisoIds);

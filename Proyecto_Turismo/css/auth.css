@@ -46,16 +46,15 @@
 
 /* WayPath V2 authentication shell */
 .auth-body {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    padding: 0;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
     background:
         radial-gradient(circle at 12% 16%, rgba(249,115,22,.16), transparent 30%),
         linear-gradient(135deg, var(--brand-surface-strong), var(--brand-surface));
 }
-.auth-container { max-width: 520px; margin: clamp(32px, 6vw, 72px) auto; padding-inline: 16px; }
+.auth-container { width: min(480px, 100%); max-width: 480px; margin: 0; padding: 0; }
 .auth-panel {
     padding: clamp(30px, 5vw, 46px);
     background: var(--surface-raised);

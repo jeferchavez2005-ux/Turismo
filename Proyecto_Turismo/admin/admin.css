@@ -699,4 +699,9 @@
     .admin-sidebar, .admin-body::before { transition: none; }
 }
 .admin-public-link { display: none !important; }
+
+.admin-image-field { display: grid; gap: 7px; text-align: left; font-weight: 800; color: var(--text-primary); }
+.admin-image-field input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 10px; }
+.admin-image-field small { color: var(--text-muted); font-weight: 500; }
+.admin-image-preview { width: 100%; max-height: 240px; object-fit: cover; border: 1px solid var(--border); border-radius: 12px; }
 .admin-logout { display: inline-flex; }

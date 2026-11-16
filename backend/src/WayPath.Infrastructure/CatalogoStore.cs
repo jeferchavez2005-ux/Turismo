@@ -154,6 +154,46 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
         await db.SaveChangesAsync(ct);
     }
 
+    public async Task SetDestinoImage(long destinoId, string url, string storedName,
+        string mimeType, string altText, CancellationToken ct)
+    {
+        if (!await db.Destinos.AnyAsync(x => x.DestinoId == destinoId, ct))
+            throw new SecurityFault(404, "Destino no encontrado.");
+
+        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+        var current = await (from link in db.DestinoImagenes
+            join media in db.MediaAssets on link.MediaAssetId equals media.MediaAssetId
+            where link.DestinoId == destinoId && link.EsPrincipal
+            select new { Link = link, Media = media }).ToArrayAsync(ct);
+        foreach (var item in current)
+        {
+            item.Link.EsPrincipal = false;
+            item.Media.EsActivo = false;
+        }
+
+        var asset = new MediaAsset
+        {
+            Tipo = "IMAGEN_DESTINO",
+            Url = url,
+            NombreArchivo = storedName,
+            MimeType = mimeType,
+            TextoAlternativo = altText[..Math.Min(altText.Length, 250)],
+            EsActivo = true,
+            CreadoEn = DateTime.UtcNow
+        };
+        db.MediaAssets.Add(asset);
+        await db.SaveChangesAsync(ct);
+        db.DestinoImagenes.Add(new DestinoImagen
+        {
+            DestinoId = destinoId,
+            MediaAssetId = asset.MediaAssetId,
+            EsPrincipal = true,
+            Orden = 0
+        });
+        await db.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
+    }
+
     public async Task<PaqueteResumenDto[]> ListPaquetes(long? destinoId, CancellationToken ct)
     {
         var activePackage = await StateId("PAQUETE", "ACTIVO", ct);

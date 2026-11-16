@@ -860,6 +860,18 @@ body.large-text { font-size: 1rem; }
 .wp-utility-bar .wp-language-select { min-height: 44px; width: auto; }
 .wp-utility-bar .accessibility-widget { padding: 0; border: 0; background: transparent; }
 .wp-utility-bar .accessibility-widget button::before { bottom: auto; top: calc(100% + 8px); }
+.wp-toolbar-handle {
+    width: 28px;
+    min-width: 28px;
+    height: 44px;
+    border: 0;
+    border-right: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: grab;
+    touch-action: none;
+}
+.wp-utility-bar.is-dragging, .wp-utility-bar.is-dragging .wp-toolbar-handle { cursor: grabbing; user-select: none; }
 
 .wp-btn,
 .wp-btn-login,
@@ -916,6 +928,7 @@ textarea {
     .wp-utility-bar .wp-language-select { min-width: 104px; max-width: 112px; font-size: .78rem; }
     .wp-utility-bar .accessibility-widget button { width: 36px; min-width: 36px; height: 40px; }
     .wp-utility-bar .wp-language-select { min-width: 84px; max-width: 92px; }
+    .wp-toolbar-handle { width: 22px; min-width: 22px; }
 }
 
 
