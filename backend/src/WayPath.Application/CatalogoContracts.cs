@@ -29,7 +29,7 @@ public sealed record PaqueteRequest(
 public sealed record DestinoResumenDto(string DestinoId, string Nombre, string Slug,
     string DescripcionCorta, string? ImagenUrl, string? ImagenAlt, string Ciudad,
     string Region, string Pais, bool EsDestacado, decimal? PrecioDesde, string? Moneda,
-    CategoriaDto[] Categorias);
+    CategoriaDto[] Categorias, string Estado);
 
 public sealed record DestinoDetalleDto(string DestinoId, string Nombre, string Slug,
     string DescripcionCorta, string? DescripcionLarga, string? ImagenUrl, string? ImagenAlt,
@@ -59,7 +59,9 @@ public sealed record CatalogoOpcionesDto(CategoriaDto[] Categorias, CiudadDto[] 
 public interface ICatalogoStore
 {
     Task<DestinoResumenDto[]> ListDestinos(CatalogoFiltroRequest filtro, CancellationToken ct);
+    Task<DestinoResumenDto[]> ListDestinosAdmin(CatalogoFiltroRequest filtro, CancellationToken ct);
     Task<DestinoDetalleDto?> GetDestino(string slugOrId, CancellationToken ct);
+    Task<DestinoDetalleDto?> GetDestinoAdmin(string slugOrId, CancellationToken ct);
     Task<DestinoDetalleDto> CreateDestino(DestinoRequest request, CancellationToken ct);
     Task<DestinoDetalleDto> UpdateDestino(long destinoId, DestinoRequest request, CancellationToken ct);
     Task SetDestinoState(long destinoId, string codigo, CancellationToken ct);

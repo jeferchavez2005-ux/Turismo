@@ -72,14 +72,12 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
 
     public async Task<AuditoriaResumenDto> Summary(CancellationToken ct)
     {
-        var changesByTable = await db.AuditoriaCambios.AsNoTracking()
-            .GroupBy(x => x.EsquemaNombre + "." + x.TablaNombre)
-            .Select(g => new DashboardSerieDto(g.Key, g.Count()))
-            .OrderByDescending(x => x.Valor).Take(10).ToArrayAsync(ct);
-        var errorsByLevel = await db.ErroresAplicacion.AsNoTracking()
-            .GroupBy(x => x.Nivel)
-            .Select(g => new DashboardSerieDto(g.Key, g.Count()))
-            .OrderByDescending(x => x.Valor).ToArrayAsync(ct);
+        var changesByTableData = await ChangesByTableSummaryQuery().ToArrayAsync(ct);
+        var errorsByLevelData = await ErrorsByLevelSummaryQuery().ToArrayAsync(ct);
+        var changesByTable = changesByTableData
+            .Select(x => new DashboardSerieDto(x.Clave, x.Valor)).ToArray();
+        var errorsByLevel = errorsByLevelData
+            .Select(x => new DashboardSerieDto(x.Clave, x.Valor)).ToArray();
         return new(
             await db.AuditoriaCambios.AsNoTracking().CountAsync(ct),
             await db.AuditoriaAccesos.AsNoTracking().CountAsync(x => x.Resultado == "EXITOSO", ct),
@@ -88,6 +86,18 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
             await db.ErroresAplicacion.AsNoTracking().CountAsync(x => x.Nivel == "CRITICAL", ct),
             changesByTable, errorsByLevel);
     }
+
+    private IQueryable<SummaryRow> ChangesByTableSummaryQuery() =>
+        db.AuditoriaCambios.AsNoTracking()
+            .GroupBy(x => x.EsquemaNombre + "." + x.TablaNombre)
+            .Select(g => new SummaryRow { Clave = g.Key, Valor = g.Count() })
+            .OrderByDescending(x => x.Valor).Take(10);
+
+    private IQueryable<SummaryRow> ErrorsByLevelSummaryQuery() =>
+        db.ErroresAplicacion.AsNoTracking()
+            .GroupBy(x => x.Nivel)
+            .Select(g => new SummaryRow { Clave = g.Key, Valor = g.Count() })
+            .OrderByDescending(x => x.Valor);
 
     public async Task<ActividadRecienteDto> RecentActivity(CancellationToken ct) =>
         new(await db.AuditoriaCambios.AsNoTracking().OrderByDescending(x => x.CreadoEn).Take(10)
@@ -177,5 +187,11 @@ public sealed class AuditoriaStore(WayPathDbContext db) : IAuditoriaStore
         var text = value?.Trim();
         if (string.IsNullOrEmpty(text)) return null;
         return text[..Math.Min(text.Length, max)];
+    }
+
+    private sealed class SummaryRow
+    {
+        public required string Clave { get; init; }
+        public int Valor { get; init; }
     }
 }

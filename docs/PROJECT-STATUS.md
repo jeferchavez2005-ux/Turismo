@@ -41,6 +41,7 @@
 - La fase administrativa se revisó a nivel estático y responsive; Chrome headless sólo confirmó visualmente el tema oscuro y el estado de acceso restringido. El tema claro, los datos reales y las operaciones autenticadas continúan pendientes por falta de una sesión administrativa de prueba y por limitaciones del navegador del entorno.
 - Las correcciones funcionales se comprobaron con API vacía controlada, sin consultar `WayPathDB`, en 2560×1440, 1920×1080, 1366×768 y 390×844: sin errores JavaScript ni overflow horizontal. No se creó ni confirmó ninguna reserva.
 - El mensaje «No se pudo completar la operación» corresponde al `POST /api/reservas` con HTTP 500 y una excepción no clasificada por `ApiExceptionHandler`. El cliente registra ahora ruta, estado y `traceId`; determinar la excepción interna sigue pendiente de logs de una sesión real y acceso autorizado a la infraestructura, sin consultar ni modificar SQL desde esta fase.
+- `ApiExceptionHandler` registra ahora las excepciones no clasificadas con `traceId`, tipos, mensajes saneados y stack trace, manteniendo genérica la respuesta HTTP y redactando credenciales, tokens, cadenas de conexión y correos. La causa concreta del 500 seguirá pendiente hasta correlacionar un fallo real con el log del servidor.
 
 ## Siguiente tarea prevista
 

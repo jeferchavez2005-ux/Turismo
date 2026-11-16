@@ -6,8 +6,12 @@ public sealed class CatalogoService(ICatalogoStore store)
 
     public Task<DestinoResumenDto[]> Destinos(CatalogoFiltroRequest filtro, CancellationToken ct) =>
         store.ListDestinos(filtro, ct);
+    public Task<DestinoResumenDto[]> DestinosAdmin(CatalogoFiltroRequest filtro, CancellationToken ct) =>
+        store.ListDestinosAdmin(filtro, ct);
     public Task<DestinoDetalleDto?> Destino(string slugOrId, CancellationToken ct) =>
         store.GetDestino(slugOrId.Trim(), ct);
+    public Task<DestinoDetalleDto?> DestinoAdmin(string slugOrId, CancellationToken ct) =>
+        store.GetDestinoAdmin(slugOrId.Trim(), ct);
     public Task<PaqueteResumenDto[]> Paquetes(long? destinoId, CancellationToken ct) =>
         store.ListPaquetes(destinoId, ct);
     public Task<PaqueteDetalleDto?> Paquete(string slugOrId, CancellationToken ct) =>

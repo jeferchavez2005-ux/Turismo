@@ -46,7 +46,7 @@ async function loadData() {
     host.innerHTML = adminLoading("Cargando catálogo...");
     try {
         const [destinations, packages, options] = await Promise.all([
-            api("/api/catalogo/destinos"),
+            api("/api/catalogo/admin/destinos"),
             api("/api/catalogo/paquetes"),
             api("/api/catalogo/opciones")
         ]);
@@ -84,9 +84,9 @@ function render() {
 function renderDestinations() {
     const rows = filteredDestinations();
     if (!rows.length) return adminEmpty("Sin destinos", "No hay destinos que coincidan con los filtros actuales.");
-    return tableCard(`${rows.length} destinos visibles`, "API: /api/catalogo/destinos", `
+    return tableCard(`${rows.length} destinos registrados`, "API: /api/catalogo/admin/destinos", `
         <table class="wp-table">
-            <thead><tr><th>Destino</th><th>Ubicación</th><th>Categorías</th><th>Precio desde</th><th>Destacado</th><th style="text-align:right;">Acciones</th></tr></thead>
+            <thead><tr><th>Destino</th><th>Ubicación</th><th>Categorías</th><th>Precio desde</th><th>Estado</th><th style="text-align:right;">Acciones</th></tr></thead>
             <tbody>${rows.map(destinationRow).join("")}</tbody>
         </table>`);
 }
@@ -98,7 +98,7 @@ function destinationRow(item) {
             <td><div class="admin-row-title"><strong>${escapeHtml(item.ciudad)}</strong><span>${escapeHtml(item.region)} · ${escapeHtml(item.pais)}</span></div></td>
             <td>${(item.categorias || []).map(category => escapeHtml(category.nombre)).join(", ") || "-"}</td>
             <td>${item.precioDesde ? money(item.precioDesde, item.moneda) : "-"}</td>
-            <td>${item.esDestacado ? stateBadge("ACTIVO") : stateBadge("INACTIVO")}</td>
+            <td>${stateBadge(item.estado)}</td>
             <td><div class="admin-actions-cell">
                 <button class="admin-action-btn" data-action="destination-detail" data-id="${escapeHtml(item.destinoId)}"><i class="fa-solid fa-eye"></i> Detalle</button>
                 <button class="admin-action-btn" data-action="destination-edit" data-id="${escapeHtml(item.destinoId)}"><i class="fa-solid fa-pen"></i> Editar</button>
@@ -188,7 +188,7 @@ function bindTableActions(host) {
 
 async function showDestination(id) {
     try {
-        const detail = await api(`/api/catalogo/destinos/${encodeURIComponent(id)}`);
+        const detail = await api(`/api/catalogo/admin/destinos/${encodeURIComponent(id)}`);
         modal("Detalle de destino", `
             <div class="admin-detail-list">
                 <p><strong>Destino:</strong> ${escapeHtml(detail.nombre)}</p>
@@ -218,7 +218,7 @@ function showPackage(id) {
 }
 
 async function createOrEditDestination(id) {
-    const current = id ? await api(`/api/catalogo/destinos/${encodeURIComponent(id)}`) : null;
+    const current = id ? await api(`/api/catalogo/admin/destinos/${encodeURIComponent(id)}`) : null;
     const result = await Swal.fire({
         title: id ? "Editar destino" : "Nuevo destino",
         html: destinationForm(current),

@@ -14,6 +14,19 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
         var activeDestination = await StateId("DESTINO", "ACTIVO", ct);
         var activePackage = await StateId("PAQUETE", "ACTIVO", ct);
         var destinations = await DestinationRows(activeDestination, filtro, ct);
+        return await DestinationSummaries(destinations, activePackage, filtro, ct);
+    }
+
+    public async Task<DestinoResumenDto[]> ListDestinosAdmin(CatalogoFiltroRequest filtro, CancellationToken ct)
+    {
+        var activePackage = await StateId("PAQUETE", "ACTIVO", ct);
+        var destinations = await DestinationRows(null, filtro, ct);
+        return await DestinationSummaries(destinations, activePackage, filtro, ct);
+    }
+
+    private async Task<DestinoResumenDto[]> DestinationSummaries(DestinationRow[] destinations,
+        int activePackage, CatalogoFiltroRequest filtro, CancellationToken ct)
+    {
         var ids = destinations.Select(x => x.DestinoId).ToArray();
         var categories = await CategoriesForDestinations(ids, ct);
         var prices = await PricesForDestinations(ids, activePackage, ct);
@@ -26,7 +39,7 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
             images.TryGetValue(d.DestinoId, out var image);
             return new DestinoResumenDto(Id(d.DestinoId), d.Nombre, d.Slug, d.DescripcionCorta,
                 image?.Url, image?.Alt, d.Ciudad, d.Region, d.Pais, d.EsDestacado,
-                price?.Price, price?.Currency, cats ?? []);
+                price?.Price, price?.Currency, cats ?? [], d.Estado);
         }).Where(x =>
             filtro.PrecioMinimo is null || x.PrecioDesde is null || x.PrecioDesde >= filtro.PrecioMinimo)
           .Where(x =>
@@ -57,6 +70,26 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
         return new(row.DestinoId.ToString(), row.Nombre, row.Slug, row.DescripcionCorta,
             row.DescripcionLarga, image?.Url, image?.Alt, row.Ciudad, row.Region, row.Pais,
             row.AltitudMetros, row.EsDestacado, cats ?? [], attractions, packages);
+    }
+
+    public async Task<DestinoDetalleDto?> GetDestinoAdmin(string slugOrId, CancellationToken ct)
+    {
+        var rows = await BaseDestinationQuery().ToArrayAsync(ct);
+        var row = long.TryParse(slugOrId, out var id)
+            ? rows.SingleOrDefault(x => x.DestinoId == id)
+            : rows.SingleOrDefault(x => string.Equals(x.Slug, slugOrId, StringComparison.OrdinalIgnoreCase));
+        if (row is null) return null;
+        var categories = await CategoriesForDestinations([row.DestinoId], ct);
+        var images = await ImagesForDestinations([row.DestinoId], ct);
+        var attractions = await db.AtraccionesDestino.AsNoTracking().Where(x => x.DestinoId == row.DestinoId)
+            .OrderBy(x => x.Orden).ThenBy(x => x.AtraccionDestinoId)
+            .Select(x => new AtraccionDto(Id(x.AtraccionDestinoId), x.Nombre, x.Descripcion, x.DuracionEstimadaMinutos))
+            .ToArrayAsync(ct);
+        categories.TryGetValue(row.DestinoId, out var cats);
+        images.TryGetValue(row.DestinoId, out var image);
+        return new(row.DestinoId.ToString(), row.Nombre, row.Slug, row.DescripcionCorta,
+            row.DescripcionLarga, image?.Url, image?.Alt, row.Ciudad, row.Region, row.Pais,
+            row.AltitudMetros, row.EsDestacado, cats ?? [], attractions, []);
     }
 
     public async Task<DestinoDetalleDto> CreateDestino(DestinoRequest request, CancellationToken ct)
@@ -109,7 +142,7 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
             .Select(id => new DestinoCategoria { DestinoId = destinoId, CategoriaDestinoId = id }));
         await SaveWithDuplicateGuard(ct);
         await tx.CommitAsync(ct);
-        return await GetDestino(destination.DestinoId.ToString(), ct) ?? throw new SecurityFault(500, "No se pudo leer el destino actualizado.");
+        return await GetDestinoAdmin(destination.DestinoId.ToString(), ct) ?? throw new SecurityFault(500, "No se pudo leer el destino actualizado.");
     }
 
     public async Task SetDestinoState(long destinoId, string codigo, CancellationToken ct)
@@ -237,14 +270,16 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
         join c in db.Ciudades.AsNoTracking() on d.CiudadId equals c.CiudadId
         join r in db.Regiones.AsNoTracking() on c.RegionId equals r.RegionId
         join p in db.Paises.AsNoTracking() on r.PaisId equals p.PaisId
+        join e in db.Estados.AsNoTracking() on d.EstadoId equals e.EstadoId
         where c.EsActivo && r.EsActivo && p.EsActivo
         select new DestinationRow(d.DestinoId, d.CiudadId, d.EstadoId, d.Nombre, d.Slug,
             d.DescripcionCorta, d.DescripcionLarga, d.AltitudMetros, d.EsDestacado,
-            c.Nombre, r.Nombre, p.Nombre);
+            c.Nombre, r.Nombre, p.Nombre, e.Codigo);
 
-    private async Task<DestinationRow[]> DestinationRows(int activeStateId, CatalogoFiltroRequest filtro, CancellationToken ct)
+    private async Task<DestinationRow[]> DestinationRows(int? activeStateId, CatalogoFiltroRequest filtro, CancellationToken ct)
     {
-        var rows = (await BaseDestinationQuery().ToArrayAsync(ct)).Where(x => x.EstadoId == activeStateId);
+        var rows = (await BaseDestinationQuery().ToArrayAsync(ct))
+            .Where(x => activeStateId is null || x.EstadoId == activeStateId);
         if (!string.IsNullOrWhiteSpace(filtro.Search))
         {
             var term = filtro.Search.Trim();
@@ -351,5 +386,5 @@ public sealed class CatalogoStore(WayPathDbContext db) : ICatalogoStore
     private sealed record ImageInfo(string Url, string? Alt);
     private sealed record DestinationRow(long DestinoId, int CiudadId, int EstadoId, string Nombre,
         string Slug, string DescripcionCorta, string? DescripcionLarga, int? AltitudMetros,
-        bool EsDestacado, string Ciudad, string Region, string Pais);
+        bool EsDestacado, string Ciudad, string Region, string Pais, string Estado);
 }

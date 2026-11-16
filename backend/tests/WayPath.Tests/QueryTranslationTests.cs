@@ -66,6 +66,21 @@ public sealed class QueryTranslationTests
     }
 
     [Fact]
+    public void Audit_summary_grouping_and_count_ordering_translate_to_sql()
+    {
+        using var db = Context();
+        var changesSql = Query(new AuditoriaStore(db), "ChangesByTableSummaryQuery").ToQueryString();
+        var errorsSql = Query(new AuditoriaStore(db), "ErrorsByLevelSummaryQuery").ToQueryString();
+
+        Assert.Contains("GROUP BY", changesSql);
+        Assert.Contains("COUNT(*)", changesSql);
+        Assert.Contains("ORDER BY", changesSql);
+        Assert.Contains("GROUP BY", errorsSql);
+        Assert.Contains("COUNT(*)", errorsSql);
+        Assert.Contains("ORDER BY", errorsSql);
+    }
+
+    [Fact]
     public void Payment_order_lookup_filters_entity_id_in_sql()
     {
         using var db = Context();

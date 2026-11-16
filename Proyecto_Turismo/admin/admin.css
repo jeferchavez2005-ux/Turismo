@@ -589,7 +589,7 @@
 }
 
 /* WhyPath V2 admin: a denser, task-first shell shared by every module. */
-.admin-body { min-width: 320px; background: var(--surface-muted); }
+.admin-body { min-width: 0; background: var(--surface-muted); }
 .admin-sidebar { background: var(--brand-surface-strong); border-right: 0; box-shadow: 10px 0 30px rgba(0, 26, 61, .08); }
 .admin-brand { min-height: 54px; align-items: center; color: #fff; letter-spacing: -.03em; }
 .admin-brand small { background: rgba(249, 115, 22, .18); color: var(--orange-300); letter-spacing: .08em; }

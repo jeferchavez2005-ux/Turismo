@@ -814,10 +814,14 @@ body.large-text { font-size: 1rem; }
 
 /* WayPath V2: coherent surfaces, controls and non-overlapping utilities. */
 .wp-utility-bar {
-    width: fit-content;
-    max-width: calc(100% - 24px);
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 10000;
+    width: max-content;
+    max-width: calc(100vw - 32px);
     min-height: 52px;
-    margin: 10px 12px 10px auto;
+    margin: 0;
     padding: 6px 8px 6px 12px;
     display: flex;
     align-items: center;
@@ -829,8 +833,6 @@ body.large-text { font-size: 1rem; }
     border: 1px solid var(--border);
     border-radius: 14px;
     box-shadow: 0 8px 24px rgba(15, 42, 55, .12);
-    position: relative;
-    z-index: 1001;
 }
 
 .wp-utility-bar .traductor-widget,
@@ -893,9 +895,11 @@ textarea {
     .wp-utility-bar {
         min-height: auto;
         padding: 8px 12px;
-        width: calc(100% - 16px);
-        max-width: none;
-        margin: 8px;
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        width: max-content;
+        max-width: calc(100vw - 16px);
+        margin: 0;
         justify-content: flex-end;
         gap: 8px;
         flex-wrap: nowrap;
@@ -908,10 +912,10 @@ textarea {
 }
 
 @media (max-width: 390px) {
-    .wp-utility-bar { padding-inline: 8px; }
+    .wp-utility-bar { padding-inline: 6px; gap: 4px; }
     .wp-utility-bar .wp-language-select { min-width: 104px; max-width: 112px; font-size: .78rem; }
-    .wp-utility-bar .accessibility-widget button { width: 40px; min-width: 40px; height: 40px; }
-    .wp-utility-bar .wp-language-select { min-width: 92px; max-width: 100px; }
+    .wp-utility-bar .accessibility-widget button { width: 36px; min-width: 36px; height: 40px; }
+    .wp-utility-bar .wp-language-select { min-width: 84px; max-width: 92px; }
 }
 
 

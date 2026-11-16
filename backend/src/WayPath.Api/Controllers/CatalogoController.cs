@@ -23,6 +23,21 @@ public sealed class CatalogoController(CatalogoService service) : ControllerBase
         return destino is null ? NotFound() : Ok(destino);
     }
 
+    [HttpGet("admin/destinos"), Authorize(Policy = "permission:CATALOGO_DESTINOS_GESTIONAR")]
+    public async Task<IActionResult> DestinosAdmin([FromQuery] string? search,
+        [FromQuery] int? ciudadId, [FromQuery] int? categoriaId,
+        [FromQuery] decimal? precioMinimo, [FromQuery] decimal? precioMaximo,
+        [FromQuery] bool? destacado, CancellationToken ct) =>
+        Ok(await service.DestinosAdmin(new(search, ciudadId, categoriaId, precioMinimo,
+            precioMaximo, destacado), ct));
+
+    [HttpGet("admin/destinos/{slugOrId}"), Authorize(Policy = "permission:CATALOGO_DESTINOS_GESTIONAR")]
+    public async Task<IActionResult> DestinoAdmin(string slugOrId, CancellationToken ct)
+    {
+        var destino = await service.DestinoAdmin(slugOrId, ct);
+        return destino is null ? NotFound() : Ok(destino);
+    }
+
     [HttpPost("destinos"), Authorize(Policy = "permission:CATALOGO_DESTINOS_GESTIONAR")]
     public async Task<IActionResult> CreateDestino(DestinoRequest request, CancellationToken ct) =>
         StatusCode(201, await service.CreateDestino(request, ct));
